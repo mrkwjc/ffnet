@@ -1,12 +1,23 @@
 Overview
 --------
-ffnet is meant to be an easy and fast feed-forward neural network training solution for python. Main parts of the project (propagation of the signal, gradient calculus with error backpropagation) are written in fortran 77 for computational speed. Fast scipy optimization routines (also written in fortran) are used to minimize error of the network predictions. All steering is done using simple python class. Usage of the trained network is as simple as function call in python.
+ffnet is meant to be an easy and fast feed-forward neural network 
+training solution for python. Main parts of the project 
+(propagation of the signal, gradient calculus with error backpropagation) 
+are written in fortran 77 for computational speed. 
+Fast scipy optimization routines (also written in fortran) 
+are used to minimize error of the network predictions. 
+All steering is done using simple python class. Usage of the trained 
+network is as simple as function call in python.
 
 There are some unique features present in ffnet:
-1. Any network connectivity without cycles is allowed; most avilable software supports layered architecture only.
-2. Training can be performed with use of several optimization schemes including genetic alorithm based optimization.
-3. There is access to partial derivatives of network outputs vs. its inputs (when it makes sens).
-4. Automatic normalization of data; most software avilable leaves this to the user.
+1. Any network connectivity without cycles is allowed; most 
+   avilable software supports layered architecture only.
+2. Training can be performed with use of several optimization 
+   schemes including genetic alorithm based optimization.
+3. There is access to partial derivatives of network outputs 
+   vs. its inputs (when it makes sens).
+4. Automatic normalization of data; most software avilable 
+   leaves this to the user.
 
 ffnet uses some external open source software: 
 - networkx for handling network architecture as the graph data structure;
