@@ -2,20 +2,31 @@ Overview
 --------
 ffnet is meant to be an easy and fast feed-forward neural network 
 training solution for python. Main parts of the project 
-(propagation of the signal, gradient calculus with error backpropagation) 
-are written in fortran 77 for computational speed. 
+(propagation of the signal, gradient calculus with error 
+backpropagation)  are written in fortran 77 for computational speed. 
 Fast scipy optimization routines (also written in fortran) 
 are used to minimize error of the network predictions. 
 All steering is done using simple python class. Usage of the trained 
 network is as simple as function call in python.
 
-There are some unique features present in ffnet:
+Basic assumptions and limitations:
+1. Network has feed-forward architecture.
+2. Input units have identity activation function, 
+   all other units have sigmoid activation function.
+3. Provided data are automatically normalized, both input and output, 
+   with a linear mapping to the range (0.15, 0.85).
+   Each input and output is treated separately (i.e. linear map is 
+   unique for each input and output).
+4. Function minimized during training is a sum of squared errors 
+   of each output for each training patterns.
+
+Unique features present in ffnet:
 1. Any network connectivity without cycles is allowed; most 
    avilable software supports layered architecture only.
 2. Training can be performed with use of several optimization 
    schemes including genetic alorithm based optimization.
-3. There is access to partial derivatives of network outputs 
-   vs. its inputs (when it makes sens).
+3. There is access to exact partial derivatives of network outputs 
+   vs. its inputs.
 4. Automatic normalization of data; most software avilable 
    leaves this to the user.
 
@@ -24,7 +35,7 @@ ffnet uses some external open source software:
 - numpy/scipy for training purposes;
 - pikaia, genetic algorihm based oprimizer.
 
-Assuming, using ffnet software it is be possible:
+Using ffnet software it is be possible:
 - train/save/load/use feed-forward neural network in python;
 - test new training algorithms for these type of networks;
 - visualize networks using networkx/graphviz tandem (in the further future).
