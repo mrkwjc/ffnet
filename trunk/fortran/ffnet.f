@@ -5,9 +5,17 @@ c
 c Copyright: See COPYING file that comes with this distribution
 c
 c########################################################################
-
+c
+cc
+ccc
+cccc
+ccccc BASIC FFNN PROPAGATION ROUTINES
+cccc
+ccc
+cc
+c
 c************************************************************************
-      subroutine prop1(x, conec, n, units, u)
+      subroutine prop(x, conec, n, units, u)
 c************************************************************************
 c
 c.....Gets conec and units with input already set 
@@ -53,40 +61,10 @@ c.....propagate signals with sigmoid activation function
 
       return
       end
-
-c************************************************************************
-      subroutine prop2(x, conec, n, units, u, inno, i, outno, o, 
-     &                 input, output)
-c************************************************************************
-c
-c.....Takes single input pattern and returns network output
-c
-      implicit none
-c.....variables
-      integer n, u, i, o, conec(n,2), inno(i), outno(o)
-      double precision x(n), units(u), input(i), output(o)
-c.....helper variables
-      integer k
-c.....f2py statements
-cf2py intent(out) output
-
-c.....set input units
-      do k=1,i
-         units(inno(k)) = input(k)
-      enddo
-c.....propagate signals
-      call prop1(x, conec, n, units, u)
-c.....get output
-      do k=1,o
-         output(k) = units(outno(k))
-      enddo  
-      
-      return
-      end
       
 c************************************************************************
-      subroutine prop4(x, conec, n, units, u, inno, i, outno, o, 
-     &                 Input, Targ, p, sqerr)
+      subroutine sqerror(x, conec, n, units, u, inno, i, outno, o, 
+     &                   Input, Targ, p, sqerr)
 c************************************************************************
 c
 c.....Takes Input and Target patterns and returns sum of squared errors
@@ -108,51 +86,24 @@ c.........set input units
              units(inno(k)) = Input(pat,k)
           enddo
 c.........propagate signals
-          call prop1(x, conec, n, units, u)
+          call prop(x, conec, n, units, u)
 c.........sum squared errors
           do k=1,o
              sqerr = sqerr + (units(outno(k)) - Targ(pat,k))**2
           enddo  
       ENDDO
+      sqerr = 0.5d0*sqerr
       
       return
       end    
       
 c************************************************************************
-      subroutine prop5(x, ffn, conec, n, units, u, inno, i, outno, o, 
-     &                 Input, Targ, p, bound1, bound2, isqerr)
+      subroutine grad(x, conec, n, bconecno, bn, units, u, inno, i,  
+     &                outno, o, Input, Targ, p, xprime)
 c************************************************************************
 c
-c.....Routine for use with pikaia - genetic algorithm based optimizer.
-c.....Takes Input and Target patterns and returns inverse of
-c.....sum of quared errors. Note: (bound1, bound2)
-c.....is constraint range for x.
-c
-      implicit none
-c.....variables
-      integer n, ffn, u, i, o, p, conec(n,2), inno(i), outno(o)
-      double precision x(n), x2(n), units(u), Input(p,i), Targ(p,o)
-      double precision bound1, bound2, isqerr
-c.....f2py statements
-cf2py intent(out) isqerr
-      
-c.....first map x vector values from 0,1 to bound1,bound2
-      call vmapa(x, n, 0d0, 1d0, bound1, bound2, x2)
-c.....now propagate patterns and obtain error
-      call prop4(x2, conec, n, units, u, inno, i, outno, o, 
-     &           Input, Targ, p, isqerr)
-c.....inverse error
-      isqerr = 1. / isqerr
-      
-      RETURN
-      end
-      
-c************************************************************************
-      subroutine prop6(x, conec, n, bconecno, bn, units, u, inno, i,  
-     &                 outno, o, Input, Targ, p, xprime)
-c************************************************************************
-c
-c.....Takes Input and Target patterns and returns gradient
+c.....Takes conec, bconecno, Input and Target patterns and returns 
+c.....gradient calculated with error backpropagation
 c
       implicit none
 c.....variables
@@ -176,7 +127,7 @@ c.........propagate input signals
           do k=1,i
               units(inno(k)) = Input(pat,k)
           enddo
-          call prop1(x, conec, n, units, u)        
+          call prop(x, conec, n, units, u)        
 c.........set diffs at network output as back network inputs
           do k=1,o
 	         diff(k) = units(outno(k)) - Targ(pat,k)
@@ -219,30 +170,38 @@ c.........add gradient elements to overall xprime
       end    
 
 c************************************************************************
-      subroutine prop7(x, conec, n, bconecno, bn, units, u, inno, i,  
-     &                 outno, o, Input, Targ, p, sqerr)
+      subroutine recall(x, conec, n, units, u, inno, i, outno, o, 
+     &                  input, output)
 c************************************************************************
 c
-c.....Just calls prop4, but now the agruments list
-c.....is compatibile with prop6.
+c.....Takes single input pattern and returns network output
 c
       implicit none
 c.....variables
-      integer n, bn, u, i, o, p 
-      integer conec(n,2), bconecno(bn), inno(i), outno(o)
-      double precision x(n), units(u), Input(p,i), Targ(p,o), sqerr
+      integer n, u, i, o, conec(n,2), inno(i), outno(o)
+      double precision x(n), units(u), input(i), output(o)
+c.....helper variables
+      integer k
 c.....f2py statements
-cf2py intent(out) sqerr
+cf2py intent(out) output
 
-      call prop4(x, conec, n, units, u, inno, i, outno, o, 
-     &           Input, Targ, p, sqerr)
-     
+c.....set input units
+      do k=1,i
+         units(inno(k)) = input(k)
+      enddo
+c.....propagate signals
+      call prop(x, conec, n, units, u)
+c.....get output
+      do k=1,o
+         output(k) = units(outno(k))
+      enddo  
+      
       return
       end
 
 c************************************************************************
-      subroutine prop8(x, conec, n, dconecno, dn, dconecmk, units, u,
-     &                 inno, i, outno, o, input, deriv)
+      subroutine diff(x, conec, n, dconecno, dn, dconecmk, units, u,
+     &                inno, i, outno, o, input, deriv)
 c************************************************************************
 c
 c.....Takes single input pattern and returns network partial derivatives
@@ -268,7 +227,7 @@ c.....first set inputs for usual and derivative network units
 c.....calculate derivatives of activation functions --> units became
 c.....units derivatives (ugly, usable only for sigmoid function 
 c.....and identity input)
-      call prop1(x, conec, n, units, u)
+      call prop(x, conec, n, units, u)
       do k=1,u
 	      units(k) = units(k) * (1d0 - units(k))
       enddo
@@ -313,14 +272,74 @@ c.........restore current input
 
       RETURN
       end
+c
+cc
+ccc
+cccc
+ccccc EXTENSIONS OF BASIC ROUTINES 
+cccc
+ccc
+cc
+c
+c************************************************************************
+      subroutine func(x, conec, n, bconecno, bn, units, u, inno, i,  
+     &                outno, o, Input, Targ, p, sqerr)
+c************************************************************************
+c
+c.....Just calls sqerror, but now the agruments list
+c.....is compatibile with grad. This compatibility is needed by scipy 
+c.....optimizers.
+c
+      implicit none
+c.....variables
+      integer n, bn, u, i, o, p 
+      integer conec(n,2), bconecno(bn), inno(i), outno(o)
+      double precision x(n), units(u), Input(p,i), Targ(p,o), sqerr
+c.....f2py statements
+cf2py intent(out) sqerr
+
+      call sqerror(x, conec, n, units, u, inno, i, outno, o, 
+     &             Input, Targ, p, sqerr)
+     
+      return
+      end
 
 c************************************************************************
-      subroutine prop9(x, conec, n, units, u, inno, i, outno, o,
-     &                 eni, deo, input, output)
+      subroutine pikaiaff(x, ffn, conec, n, units, u, inno, i, outno, o, 
+     &                    Input, Targ, p, bound1, bound2, isqerr)
+c************************************************************************
+c
+c.....Routine for use with pikaia - genetic algorithm based optimizer.
+c.....Takes Input and Target patterns and returns inverse of
+c.....sum of quared errors. Note: (bound1, bound2)
+c.....is constraint range for x.
+c
+      implicit none
+c.....variables
+      integer n, ffn, u, i, o, p, conec(n,2), inno(i), outno(o)
+      double precision x(n), x2(n), units(u), Input(p,i), Targ(p,o)
+      double precision bound1, bound2, isqerr
+c.....f2py statements
+cf2py intent(out) isqerr
+      
+c.....first map x vector values from 0,1 to bound1,bound2
+      call vmapa(x, n, 0d0, 1d0, bound1, bound2, x2)
+c.....now propagate patterns and obtain error
+      call sqerror(x2, conec, n, units, u, inno, i, outno, o, 
+     &             Input, Targ, p, isqerr)
+c.....inverse error
+      isqerr = 1. / isqerr
+      
+      RETURN
+      end
+
+c************************************************************************
+      subroutine normcall(x, conec, n, units, u, inno, i, outno, o,
+     &                    eni, deo, input, output)
 c************************************************************************
 c
 c.....Takes single input pattern and returns network output
-c.....This have the same functionality as prop2 but now input and
+c.....This have the same functionality as recall but now input and
 c.....output are normalized inside the function.
 c.....eni = [ai, bi], eno = [ao, bo] - parameters of linear mapping
 c
@@ -335,7 +354,7 @@ cf2py intent(out) output, istat
 c.....set input units
       call setin(input, inno, i, eni, units, u)
 c.....propagate signals
-      call prop1(x, conec, n, units, u)
+      call prop(x, conec, n, units, u)
 c.....get output
       call getout(units, u, outno, o, deo, output)
       
@@ -343,15 +362,17 @@ c.....get output
       end
 	  
 c************************************************************************
-      subroutine prop10(x, conec, n, dconecno, dn, dconecmk, units, u,
-     &                  inno, i, outno, o, eni, ded, input, deriv)
+      subroutine normdiff(x, conec, n, dconecno, dn, dconecmk, units,
+     &                    u, inno, i, outno, o, eni, ded, input, deriv)
 c************************************************************************
 c
 c.....Takes single input pattern and returns network partial derivatives
 c.....in the form d(output,o)/d(input,i). 'units' contain now activation
 c.....derivatives
-c.....This have the same functionality as prop8 but now input and
+c.....This have the same functionality as diff but now input and
 c.....output are normalized inside function
+c
+c.....Solution not very smart, whole diff routine is rewritten here...
 c
       implicit none
 c.....variables
@@ -368,7 +389,7 @@ cf2py intent(out) deriv
 c.....first set inputs for usual and derivative network units
       call setin(input, inno, i, eni, units, u)
 c.....propagate through network
-      call prop1(x, conec, n, units, u)
+      call prop(x, conec, n, units, u)
 c.....calculate derivatives of activation functions --> units became
 c.....units derivatives (ugly, usable only for sigmoid function 
 c.....and identity input)
@@ -416,7 +437,61 @@ c.........restore current input
 
       RETURN
       end
-
+c
+cc
+ccc
+cccc
+ccccc BASIC TRAINING ALGORITHMS
+cccc
+ccc
+cc
+c
+c************************************************************************
+      subroutine momentum(x, conec, n, bconecno, bn, units, u, inno, i,  
+     &                   outno, o, Input, Targ, p, eta, moment, maxiter)
+c************************************************************************
+c
+c.....Standard backpropagation training with momentum
+c
+      implicit none
+c.....variables
+      integer n, bn, u, i, o, p, maxiter
+      integer conec(n,2), bconecno(bn), inno(i), outno(o)
+      double precision x(n), units(u), Input(p,i), Targ(p,o)
+      double precision xprime(n), update, update0(n), eta, moment
+c.....helper variables
+      integer j, k
+c.....f2py statements
+cf2py intent(in, out) x
+      
+c.....initialize variables
+      do j=1,n
+          update0(j) = 0d0
+      enddo
+      k=0
+c.....update maxiter times
+      do while (k.lt.maxiter)
+          call grad(x, conec, n, bconecno, bn, units, u, inno, i,  
+     &              outno, o, Input, Targ, p, xprime)
+	      do j=1,n
+              update = -eta*xprime(j)
+              x(j) = x(j) + update + moment*update0(j)
+              update0(j) = update
+          enddo
+          k=k+1
+      enddo
+	  
+      return
+      end
+c
+cc
+ccc
+cccc
+ccccc HELPER FUNCTIONS AND ROUTINES
+cccc
+ccc
+cc
+c
 c************************************************************************
       subroutine setin(input, inno, i, eni, units, u)
 c************************************************************************
@@ -443,7 +518,7 @@ c************************************************************************
       subroutine getout(units, u, outno, o, deo, output)
 c************************************************************************
 c
-c.....normalize and set input units
+c.....get and denormalize output units
 c
       implicit none
 c.....variables
@@ -460,7 +535,6 @@ cf2py intent(out) output
 
       return
       end
-
 
 c************************************************************************
       function mapa(f, a, b, c, d)
