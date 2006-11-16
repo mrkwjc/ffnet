@@ -242,8 +242,8 @@ class ffnet:
 	
 	def call(self, inp):
 		""" Returns network answer to input sequence """
-		output = netprop.prop9(self.weights, self.conec, self.units, \
-							   self.inno, self.outno, self.eni, self.deo, inp)
+		output = netprop.normcall(self.weights, self.conec, self.units, \
+							      self.inno, self.outno, self.eni, self.deo, inp)
 		return output
 
 	def derivative(self, inp):
@@ -254,8 +254,8 @@ class ffnet:
 				| ...                      |
 				| om/i1, om/i2, ..., om/in |
 		"""
-		deriv = netprop.prop10(self.weights, self.conec, self.dconecno, self.dconecmk, \
-							   self.units, self.inno, self.outno, self.eni, self.ded, inp)
+		deriv = netprop.normdiff(self.weights, self.conec, self.dconecno, self.dconecmk, \
+							     self.units, self.inno, self.outno, self.eni, self.ded, inp)
 		return deriv
 
 	def randomweights(self):
@@ -297,6 +297,30 @@ class ffnet:
 			for i in xrange(numi):
 				self.ded[o,i] = self.eni[i,0] * self.deo[o,0]
 		return normarray(input, self.eni), normarray(target, self.eno)
+
+	def train_momentum(self, input, target, eta = 0.2, momentum = 0.8, \
+						maxiter = 1000, disp = 1):
+		"""
+		Simple backpropagation training with momentum.
+		
+		Allowed parameters:
+		eta			 - descent scaling parameter (default is 0.2)
+		momentum		 - momentum coefficient (default is 0.8)
+		maxiter	  	 - the maximum number of iterations (default is 1000)
+		disp		 - print convergence message if non-zero (default is 1)
+		"""
+		input, target = self._setnorm(input, target)
+		if disp:
+			err  = netprop.sqerror(self.weights, self.conec, self.units, \
+								   self.inno, self.outno, input, target)
+			print "Initial error --> 0.5*(sum of squared errors at output): %f" %err
+		self.weights = netprop.momentum(self.weights, self.conec, self.bconecno, \
+										self.units, self.inno, self.outno, input, \
+										target, eta, momentum, maxiter)
+		if disp:
+			err  = netprop.sqerror(self.weights, self.conec, self.units, \
+								   self.inno, self.outno, input, target)
+			print "Final error   --> 0.5*(sum of squared errors at output): %f" %err
 
 	def train_genetic(self, input, target, **kwargs):
 		""" 
@@ -350,7 +374,7 @@ class ffnet:
 		if 'upper' in kwargs: upper = kwargs['upper']; del kwargs['upper']
 		if lower >= upper: raise ValueError("Wrong weights range: (%f, %f)" %(lower, upper))
 		if 'individuals' not in kwargs: kwargs['individuals'] = 20
-		func = netprop.prop5
+		func = netprop.pikaiaff
 		n = len(self.weights)
 		extra_args = (self.conec, self.units, self.inno, 
 					  self.outno, input, target, lower, upper)
@@ -376,8 +400,8 @@ class ffnet:
 		Note: optimization routine used here is part of scipy.optimize.
 		"""
 		input, target = self._setnorm(input, target)
-		func = netprop.prop7
-		fprime = netprop.prop6
+		func = netprop.func
+		fprime = netprop.grad
 		extra_args = (self.conec, self.bconecno, self.units, \
 						   self.inno, self.outno, input, target)
 		self.weights = optimize.fmin_cg(func, self.weights, fprime=fprime, \
@@ -436,8 +460,8 @@ class ffnet:
 		   ACM Transactions on Mathematical Software, Vol 23, Num. 4, pp. 550 - 560.
 		"""
 		input, target = self._setnorm(input, target)
-		func = netprop.prop7
-		fprime = netprop.prop6
+		func = netprop.func
+		fprime = netprop.grad
 		extra_args = (self.conec, self.bconecno, self.units, \
 						   self.inno, self.outno, input, target)
 		self.weights = optimize.fmin_l_bfgs_b(func, self.weights, fprime=fprime, \
@@ -498,8 +522,8 @@ class ffnet:
 		"""
 		input, target = self._setnorm(input, target)
 		if 'messages' not in kwargs: kwargs['messages'] = 0
-		func = netprop.prop7
-		fprime = netprop.prop6
+		func = netprop.func
+		fprime = netprop.grad
 		extra_args = (self.conec, self.bconecno, self.units, \
 						   self.inno, self.outno, input, target)
 		self.weights = optimize.fmin_tnc(func, self.weights.tolist(), fprime=fprime, \
@@ -518,6 +542,8 @@ def loadnet(filename):
 	file = open(filename, 'r')
 	net = cPickle.load(file)
 	return net
+
+
 
 conec = [[1, 3], [2, 3], \
 	     [1, 4], [2, 4], \
@@ -540,8 +566,8 @@ n = ffnet(conec=conec)
 #~ print n.weights
 input = [[0.,0.], [0.,1.], [1.,0.], [1.,1.]]
 target  = [[1.], [0.], [0.], [1.]]
-from _ffnet import vmapa
-target = vmapa(target, 0., 1., 0.15, 0.85)
+
+target = netprop.vmapa(target, 0., 1., 0.15, 0.85)
 
 #n.powell(input, target, maxiter=100)
 #n.bfgs(input, target)
@@ -566,7 +592,8 @@ target = [[2*sin(x[0]),5*cos(x[1])] for x in input]
 print n.weights
 #n.genetic(input, target, lower = -20., upper = 20., individuals = 20, generations = 2000)
 
-n.train_tnc(input, target, maxfun=5000)
+#n.train_tnc(input, target, maxfun=5000)
+n.train_momentum(input, target, maxiter=10000)
 #n.bfgs(input, target, iprint=1, bounds=n._getbounds())
 #n.train_cg(input, target, maxiter=10000, disp=1)
 print n.weights
