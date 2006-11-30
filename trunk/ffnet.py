@@ -165,7 +165,7 @@ class ffnet:
 	- multilayer perceptron:
 		n = ffnet(mlp = (2,2,1))
 		note: this produces network with connectivity as in the above 'coneclist'
-	- total multilayer perceptron:
+	- total multilayer perceptron (connections between all layers):
 		n = ffnet(tmlp = (2,1,1))
 		note: produced connectivity: [[1, 3], [2, 3], [0, 3], \
 									  [1, 4], [2, 4], [3, 4], [0, 4]]
@@ -178,17 +178,17 @@ class ffnet:
 	train_genetic, train_cg, train_bfgs, train_tnc.
 	The simplest usage is, for example:
 		n.train_tnc(input, target)
-	where 'input' and 'target' are RAW data to be learned. Class performs data 
+	where 'input' and 'target' is raw data to be learned. Class performs data 
 	normalization by itself and records encoding/decoding information to be used
 	during network recalling.
-	Class makes basic checks of data.
+	Class makes basic checks of consistency of data.
 	
 	For information about training prameters see appropriate method description.
 	
 	RECALLING NETWORK:
-	Usage of the trained network is very simple:
+	Usage of the trained network is an simple as function call:
 		ans = n(inp)
-	or
+	or, alternatively:
 		ans = n.call(inp)
 	where 'inp' - list of network inputs and 'ans' - array of network outputs
 	There is also possibility to retrieve partial derivatives of output vs. input 
@@ -543,6 +543,17 @@ def loadnet(filename):
 	net = cPickle.load(file)
 	return net
 
+# TESTS
+import unittest
+class Testffnet(unittest.TestCase):
+    def setUp(self):
+        conec1 = [[1, 3], [2, 3], [0, 3] \
+                  [1, 4], [2, 4], [0, 4] \
+                  [3, 5], [4, 5], [0, 5]]
+        arch1 = 2, 2, 1
+        arch2 = 2, 1, 1
+        input = [[0.,0.], [0.,1.], [1.,0.], [1.,1.]]
+        target  = [[1.], [0.], [0.], [1.]]
 
 
 conec = [[1, 3], [2, 3], \
