@@ -248,7 +248,7 @@ class ffnet:
     def __call__(self, inp):
         output = netprop.normcall(self.weights, self.conec, self.units, \
                                   self.inno, self.outno, self.eni, self.deo, inp)
-        return output
+        return output.tolist()
     
     def call(self, inp):
         """ Returns network answer to input sequence """
@@ -264,7 +264,7 @@ class ffnet:
         """
         deriv = netprop.normdiff(self.weights, self.conec, self.dconecno, self.dconecmk, \
                                  self.units, self.inno, self.outno, self.eni, self.ded, inp)
-        return deriv
+        return deriv.tolist()
 
     def randomweights(self):
         """Randomize weights due to Bottou proposition"""
@@ -280,10 +280,15 @@ class ffnet:
 
     def _testdata(self, input, target):
         """Tests input and target data"""
+        try: input = array(input, 'd')
+        except: raise ValueEror("Input cannot be converted to numpy array")
+        try: target = array(target, 'd')
+        except: raise ValueEror("Target cannot be converted to numpy array")
+        
         numip = input.shape[0]; numop = target.shape[0]
         if numip != numop:
             raise ValueError \
-            ("Training data not aligned: input patterns %i, target patterns: %i" %(numip, numop))
+            ("Data not aligned: input patterns %i, target patterns: %i" %(numip, numop))
         numi = len(self.inno); numiv = input.shape[1]
         if numiv != numi:
             raise ValueError \
@@ -292,6 +297,8 @@ class ffnet:
         if numov != numo:
             raise ValueError \
             ("Inconsistent target data, target units: %i, target values: %i" %(numo, numov))
+        
+        return input, target
 
     def _setnorm(self, input = None, target = None):
         """Retrieves normalization info from training data and normalizes data"""
@@ -303,8 +310,7 @@ class ffnet:
             self.eno = self.deo = array( [[1., 0.]] * numo )
             self.ded = ones(shape = (numo, numi))
         else:
-            input = array(input); target = array(target)
-            self._testdata(input, target)
+            input, target = self._testdata(input, target)
             #limits are informative only, eni,dei/eno,deo - input/output coding-decoding
             self.inlimits, self.eni, self.dei = norms(input, lower=0.15, upper=0.85)
             self.outlimits, self.eno, self.deo = norms(target, lower=0.15, upper=0.85)
@@ -547,6 +553,10 @@ class ffnet:
         self.weights = array(self.weights)
         self.trained = 'tnc'
         
+    def test(self, input, target):
+        self._testdata(input, target)
+        output = [self(inp) for inp in input]
+        
 
 def savenet(net, filename):
     import cPickle
@@ -715,17 +725,17 @@ class TestFfnetSigmoid(unittest.TestCase):
         
     def testCall(self):
         self.assertEqual(self.net([0., 0.]), self.net.call([0., 0.]))
-        self.assertAlmostEqual(self.net([0., 0.]), [0.8495477739862124], 8)
+        self.assertAlmostEqual(self.net([0., 0.])[0], 0.8495477739862124, 8)
         
     def testDerivative(self):
-        self.assertAlmostEqual(self.net.derivative([0., 0.])[0,0], 0.1529465741023702, 8)
-        self.assertAlmostEqual(self.net.derivative([0., 0.])[0,1], 0.1529465741023702, 8)
+        self.assertAlmostEqual(self.net.derivative([0., 0.])[0][0], 0.1529465741023702, 8)
+        self.assertAlmostEqual(self.net.derivative([0., 0.])[0][1], 0.1529465741023702, 8)
         
     def testTrainGenetic(self):
         print "Test of genetic algorithm optimization"
         self.tnet.train_genetic(self.input, self.target, lower = -50., upper = 50., \
                                 individuals = 20, generations = 500)
-        #self.tnet.test(self.input, self.target)
+        self.tnet.test(self.input, self.target)
     
     def testTrainMomentum(self): 
         print "Test of backpropagation momentum algorithm"
