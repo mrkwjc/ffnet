@@ -245,9 +245,9 @@ c.........set current input unit derivative as network input
 c.........propagate signals through derivative network (dunits became 
 c.........net units and units derivatives are now scaling factors)
           if (dn.gt.0) then
-              ctrg = conec(dconecno(dconecmk(di)),2)
+              ctrg = conec(dconecno(dconecmk(di)+1),2)
               dunits(ctrg) = 0.
-              do xn=dconecmk(di),dconecmk(di+1)
+              do xn=dconecmk(di)+1,dconecmk(di+1)
                   src = conec(dconecno(xn),1)
                   trg = conec(dconecno(xn),2)
                   dx = x(dconecno(xn))
@@ -410,9 +410,9 @@ c.........set current input unit derivative as network input
 c.........propagate signals through derivative network (dunits became 
 c.........net units and units derivatives are now scaling factors)
           if (dn.gt.0) then
-              ctrg = conec(dconecno(dconecmk(di)),2)
+              ctrg = conec(dconecno(dconecmk(di)+1),2)
               dunits(ctrg) = 0.
-              do xn=dconecmk(di),dconecmk(di+1)
+              do xn=dconecmk(di)+1,dconecmk(di+1)
                   src = conec(dconecno(xn),1)
                   trg = conec(dconecno(xn),2)
                   dx = x(dconecno(xn))

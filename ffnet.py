@@ -1,4 +1,4 @@
-from scipy import array, zeros, random, optimize, sqrt
+from scipy import array, zeros, ones, random, optimize, sqrt
 import networkx as NX
 import _ffnet as netprop
 from pikaia import pikaia
@@ -9,7 +9,8 @@ def mlgraph(arch, biases = True):
     Creates standard multilayer network full connectivity list.
     '''
     nofl = len(arch)
-    conec = []; trg = arch[0]
+    conec = []
+    if nofl: trg = arch[0]
     for l in xrange(1, nofl):
         layer = arch[l]
         player = arch[l-1]
@@ -28,8 +29,9 @@ def tmlgraph(arch, biases = True):
     (not only the first one)
     '''
     nofl = len(arch)
-    conec = []; trg = arch[0]; srclist = []
+    conec = []; srclist = []
     if biases: srclist = [0]
+    if nofl: trg = arch[0]
     for l in xrange(1, nofl):
         layer = arch[l]
         player = arch[l-1]
@@ -51,11 +53,10 @@ def linear(a, b, c, d):
 
 def norms(inarray, lower = 0., upper = 1.):
     '''
-    Gets normalization information from an array,
-    for use in ffnet class.
+    Gets normalization information from an array,for use in ffnet class.
     (lower, upper) is a range of normalisation.
-    If inarray is 2-dimensional then each column
-    is treated sepearately.
+    inarray is 2-dimensional and normalisation parameters are computed
+    for each column...
     '''
     limits = []; en = []; de = []
     inarray = array(inarray).transpose()
@@ -65,17 +66,21 @@ def norms(inarray, lower = 0., upper = 1.):
         limits += [(minarr, maxarr)]
         en += [linear(minarr, maxarr, lower, upper)]
         de += [linear(lower, upper, minarr, maxarr)]
-    return limits, array(en), array(de)
+    return array(limits), array(en), array(de)
     
-def normarray(inarray, coeff = None):
-    ''' Normalize array linearly column by column with provided coefficiens '''
-    if coeff is not None:
-        inarray = array(inarray).transpose()
-        i = inarray.shape[0]
-        for ii in xrange(i):
-            inarray[ii] = inarray[ii] * coeff[ii,0] + coeff[ii,1]
-        return inarray.transpose()
-    else: print "Lack of normalization parameters. Nothing done."
+def normarray(inarray, coeff):
+    ''' 
+    Normalize 2-dimensional array linearly column by column 
+    with provided coefficiens.
+    '''
+    #if coeff is not None:
+    inarray = array(inarray).transpose()
+    coeff = array(coeff)
+    i = inarray.shape[0]
+    for ii in xrange(i):
+        inarray[ii] = inarray[ii] * coeff[ii,0] + coeff[ii,1]
+    return inarray.transpose()
+    #else: print "Lack of normalization parameters. Nothing done."
 
 def ffconec(conec):
     """
@@ -84,6 +89,7 @@ def ffconec(conec):
     conec - sorted input connectivity
     inno/hidno/outno  - lists of input/hidden/ouput units
     """
+    if len(conec) == 0: raise ValueError("Empty connectivity list")
     graph = NX.DiGraph()
     graph.add_edges_from(conec)
     snodes = NX.paths.topological_sort(graph)
@@ -128,7 +134,7 @@ def dconec(conec, inno):
     derivative calculation, all packed in one list (dconecno). Additionaly
     beginings of each graph in this list is returned (dconecmk)
     """
-    dgraphs = []; dconecno = []; dconecmk = [1]
+    dgraphs = []; dconecno = []; dconecmk = [0]
     for idx, i in enumerate(inno):
         dgraph = NX.DiGraph()
         dgraph.add_edges_from(conec)
@@ -160,15 +166,11 @@ class ffnet:
     Only feed-forward directed graphs are allowed. Class makes check
     for cycles in the provided graph and raises TypeError if any.
     All nodes (exept input ones) have sigmoid activation function.
-    
-    There is support for some standard feed-forward architectures:
-    - multilayer perceptron:
-        n = ffnet(mlp = (2,2,1))
-        note: this produces network with connectivity as in the above 'coneclist'
-    - total multilayer perceptron (connections between all layers):
-        n = ffnet(tmlp = (2,1,1))
-        note: produced connectivity: [[1, 3], [2, 3], [0, 3], \
-                                      [1, 4], [2, 4], [3, 4], [0, 4]]
+
+    Generation of coneclist is left to the user. There are however
+    functions mlgraph, tmlgraph provided to generate coneclist for layered network.
+    See description of these functions.
+    More common architectures may be provided in the future.
     
     Weights are automatically initialized at the network creation. They can
     be reinitialized later with 'randomweights' method.
@@ -214,11 +216,14 @@ class ffnet:
         pylab.show()
     This is a very basic solution, network is drawn with circular layout.
     """
-    def __init__(self, **kwargs):
-        if 'conec'  in kwargs: conec = kwargs['conec']
-        elif 'mlp'  in kwargs: conec = mlgraph(kwargs['mlp'])
-        elif 'tmlp' in kwargs: conec = tmlgraph(kwargs['tmlp'])
-        else: raise TypeError("Wrong network definition")
+    def __init__(self, conec):
+        #~ if 'biases' in kwargs: biases = kwargs['biases']
+        #~ else: biases = True
+            
+        #~ if 'conec'  in kwargs: conec = kwargs['conec']
+        #~ elif 'mlp'  in kwargs: conec = mlgraph(kwargs['mlp'], biases = biases)
+        #~ elif 'tmlp' in kwargs: conec = tmlgraph(kwargs['tmlp', biases = biases])
+        #~ else: raise TypeError("Wrong network definition")
     
         graph, conec, inno, hidno, outno = ffconec(conec)
         bgraph, bconecno = bconec(conec, inno)
@@ -235,16 +240,19 @@ class ffnet:
         self.dconecmk = array(dconecmk)
         #max(graph) below needed if graph lacks some numbers
         self.units = zeros(max(graph), 'd')
+        # initialize weights
         self.randomweights()
-
+        # set initial normalization parameters
+        self._setnorm()
+        
     def __call__(self, inp):
-        return self.call(inp)
-    
-    def call(self, inp):
-        """ Returns network answer to input sequence """
         output = netprop.normcall(self.weights, self.conec, self.units, \
                                   self.inno, self.outno, self.eni, self.deo, inp)
         return output
+    
+    def call(self, inp):
+        """ Returns network answer to input sequence """
+        return self.__call__(inp)
 
     def derivative(self, inp):
         """ Returns partial derivatives of output vs. input at given input point
@@ -285,18 +293,26 @@ class ffnet:
             raise ValueError \
             ("Inconsistent target data, target units: %i, target values: %i" %(numo, numov))
 
-    def _setnorm(self, input, target):
+    def _setnorm(self, input = None, target = None):
         """Retrieves normalization info from training data and normalizes data"""
-        input = array(input); target = array(target)
-        self._testdata(input, target)
-        self.inlimits, self.eni, self.dei = norms(input, lower=0.15, upper=0.85)
-        self.outlimits, self.eno, self.deo = norms(target, lower=0.15, upper=0.85)
         numi = len(self.inno); numo = len(self.outno)
-        self.ded = zeros((numo,numi), 'd')
-        for o in xrange(numo):
-            for i in xrange(numi):
-                self.ded[o,i] = self.eni[i,0] * self.deo[o,0]
-        return normarray(input, self.eni), normarray(target, self.eno)
+        if input == target == None:
+            #self.inlimits  = array( [[0.15, 0.85]]*numi ) #informative only
+            #self.outlimits = array( [[0.15, 0.85]]*numo ) #informative only
+            self.eni = self.dei = array( [[1., 0.]] * numi )
+            self.eno = self.deo = array( [[1., 0.]] * numo )
+            self.ded = ones(shape = (numo, numi))
+        else:
+            input = array(input); target = array(target)
+            self._testdata(input, target)
+            #limits are informative only, eni,dei/eno,deo - input/output coding-decoding
+            self.inlimits, self.eni, self.dei = norms(input, lower=0.15, upper=0.85)
+            self.outlimits, self.eno, self.deo = norms(target, lower=0.15, upper=0.85)
+            self.ded = zeros((numo,numi), 'd')
+            for o in xrange(numo):
+                for i in xrange(numi):
+                    self.ded[o,i] = self.eni[i,0] * self.deo[o,0]
+            return normarray(input, self.eni), normarray(target, self.eno)
 
     def train_momentum(self, input, target, eta = 0.2, momentum = 0.8, \
                         maxiter = 1000, disp = 1):
@@ -530,6 +546,7 @@ class ffnet:
                                          args=extra_args, **kwargs)[-1]
         self.weights = array(self.weights)
         self.trained = 'tnc'
+        
 
 def savenet(net, filename):
     import cPickle
@@ -545,28 +562,201 @@ def loadnet(filename):
 
 # TESTS
 import unittest
-class Testffnet(unittest.TestCase):
+
+class Testmlgraph(unittest.TestCase):
+    def testEmpty(self):
+        arch = ()
+        conec = mlgraph(arch)
+        self.assertEqual(conec, [])
+    def testOneLayer(self):
+        arch = (5,)
+        conec = mlgraph(arch)
+        self.assertEqual(conec, [])
+    def testTwoLayers(self):
+        arch = (1,1)
+        conec = mlgraph(arch)
+        self.assertEqual(conec, [(1,2), (0,2)])
+    def testThreeLayers(self):
+        arch = (2,2,1)
+        conec = mlgraph(arch)
+        conec0 = [(1, 3), (2, 3), (0, 3), \
+                  (1, 4), (2, 4), (0, 4), \
+                  (3, 5), (4, 5), (0, 5)]
+        self.assertEqual(conec, conec0)
+    def testNoBiases(self):
+        arch = (2,2,1)
+        conec = mlgraph(arch, biases = False)
+        conec0 = [(1, 3), (2, 3), \
+                  (1, 4), (2, 4), \
+                  (3, 5), (4, 5)]
+        self.assertEqual(conec, conec0)
+
+class Testtmlgraph(unittest.TestCase):
+    def testEmpty(self):
+        arch = ()
+        conec = tmlgraph(arch)
+        self.assertEqual(conec, [])
+    def testOneLayer(self):
+        arch = (5,)
+        conec = tmlgraph(arch)
+        self.assertEqual(conec, [])
+    def testTwoLayers(self):
+        arch = (1,1)
+        conec = tmlgraph(arch)
+        self.assertEqual(conec, [(0,2), (1,2)])
+    def testThreeLayers(self):
+        arch = (2,1,1)
+        conec = tmlgraph(arch)
+        conec0 = [(0, 3), (1, 3), (2, 3), \
+                  (0, 4), (1, 4), (2, 4), (3, 4)]
+        self.assertEqual(conec, conec0)
+    def testNoBiases(self):
+        arch = (2,1,1)
+        conec = tmlgraph(arch, biases = False)
+        conec0 = [(1, 3), (2, 3), \
+                  (1, 4), (2, 4), (3, 4)]
+        self.assertEqual(conec, conec0)
+
+class Testlinear(unittest.TestCase):
+    def testEqualInRanges(self):
+        self.assertRaises(ValueError, linear, 1.0, 1.0, 2.0, 3.0)
+    def testEqualOutRanges(self):
+        self.assertEqual(linear(1.0, 2.0, 2.0, 2.0), (0.0, 2.0))
+    def testNormalCase(self):
+        self.assertEqual(linear(0.0, 1.0, 0.0, 2.0), (2.0, 0.0))
+
+class Testnorms(unittest.TestCase):
+    def testEmpty(self):
+        inarray = [[], []]
+        n = norms(inarray)
+        for i in xrange(len(n)):
+            self.assertEqual(n[i].tolist(), [])
+    def testOneColumn(self):
+        inarray = [[0.], [1.], [2.]]
+        n = norms(inarray)
+        bool1 = n[0].tolist() == [[0., 2.]]
+        bool2 = n[1].tolist() == [[0.5, 0.]]
+        bool3 = n[2].tolist() == [[2., 0.]]
+        self.assert_(bool1 and bool2 and bool3)
+    def testNormalCase(self):
+        inarray = [[0.,0.], [0.,1.], [1.,0.], [1.,1.]]
+        n = norms(inarray, lower=0.15, upper=0.85)
+        self.assertEqual(n[0].tolist(), [[0., 1.], [0, 1.]])
+        self.assertEqual(n[1].tolist(), [[0.7, 0.15], [0.7, 0.15]])
+        self.assertAlmostEqual(n[2][0,0], 1.42857143, 8)
+        self.assertAlmostEqual(n[2][0,1], -0.21428571, 8)
+        
+class Testnormarray(unittest.TestCase):
+    def testEmpty(self):
+        inarray = [[], []]
+        n = normarray(inarray, [])
+        for i in xrange(len(n)):
+            self.assertEqual(n[i].tolist(), [])
+    
+    def testOneColumn(self):
+        inarray = [[0.], [1.], [1.], [0.]]
+        coeff = [[0.7, 0.15]]
+        n = normarray(inarray, coeff)
+        for i in xrange(4):
+            self.assertAlmostEqual(n[i,0], coeff[0][0]*inarray[i][0] + coeff[0][1], 8)
+            
+class Testffconec(unittest.TestCase):
+    def testEmpty(self):
+        conec = []
+        self.assertRaises(ValueError, ffconec, conec)
+
+    def testWithCycles(self):
+        conec = [(1, 3), (2, 3), (0, 3), (3, 1), \
+                 (1, 4), (2, 4), (0, 4), (4, 2), \
+                 (3, 5), (4, 5), (0, 5), (5, 1) ]
+        self.assertRaises(TypeError, ffconec, conec)
+
+    def testNoCycles(self):
+        conec = [(1, 3), (2, 3), (0, 3), \
+                 (1, 4), (2, 4), (0, 4), \
+                 (3, 5), (4, 5), (0, 5) ]
+        n = ffconec(conec)
+        self.assertEqual(sorted(n[2]), [1, 2])
+        self.assertEqual(sorted(n[3]), [0, 3, 4])
+        self.assertEqual(sorted(n[4]), [5])
+        
+class Testbconec(unittest.TestCase):
+    def testNoCycles(self):
+        conec = [(1, 3), (2, 3), (0, 3), \
+                 (1, 4), (2, 4), (0, 4), \
+                 (3, 5), (4, 5), (0, 5) ]
+        inno = [1,2]
+        n = bconec(conec, inno)
+        self.assertEqual(n[1], [8,7])
+        
+class Testdconec(unittest.TestCase):
+    def testNoCycles(self):
+        conec = [(1, 3), (2, 3), (0, 3), \
+                 (1, 4), (2, 4), (0, 4), \
+                 (3, 5), (4, 5), (0, 5) ]
+        inno = [1,2]
+        n = dconec(conec, inno)
+        self.assertEqual(n[1], [1, 4, 7, 8, 2, 5, 7, 8])
+        self.assertEqual(n[2], [0, 4, 8])
+        
+class TestFfnetSigmoid(unittest.TestCase):
     def setUp(self):
-        conec1 = [[1, 3], [2, 3], [0, 3] \
-                  [1, 4], [2, 4], [0, 4] \
-                  [3, 5], [4, 5], [0, 5]]
-        arch1 = 2, 2, 1
-        arch2 = 2, 1, 1
-        input = [[0.,0.], [0.,1.], [1.,0.], [1.,1.]]
-        target  = [[1.], [0.], [0.], [1.]]
+        self.conec = [(0, 3), (1, 3), (2, 3), \
+                      (0, 4), (1, 4), (2, 4), (3, 4)]
+        
+        self.net = ffnet(self.conec); self.net([1.,1.]) #try if net works
+        self.net.weights = array([1.]*7)
+        
+        self.tnet = ffnet(self.conec)
+        self.tnet.weights = array([ 0.65527021, -1.12400619, 0.02066321, \
+                                   0.13930684, -0.40153965, 0.11965115, -1.00622429 ])       
+        self.input = [[0.,0.], [0.,1.], [1.,0.], [1.,1.]]
+        self.target  = [[1.], [0.], [0.], [1.]]
+        
+    def testCall(self):
+        self.assertEqual(self.net([0., 0.]), self.net.call([0., 0.]))
+        self.assertAlmostEqual(self.net([0., 0.]), [0.8495477739862124], 8)
+        
+    def testDerivative(self):
+        self.assertAlmostEqual(self.net.derivative([0., 0.])[0,0], 0.1529465741023702, 8)
+        self.assertAlmostEqual(self.net.derivative([0., 0.])[0,1], 0.1529465741023702, 8)
+        
+    def testTrainGenetic(self):
+        print "Test of genetic algorithm optimization"
+        self.tnet.train_genetic(self.input, self.target, lower = -50., upper = 50., \
+                                individuals = 20, generations = 500)
+        #self.tnet.test(self.input, self.target)
+    
+    def testTrainMomentum(self): 
+        print "Test of backpropagation momentum algorithm"
+        self.tnet.train_momentum(self.input, self.target, maxiter=10000)
+    
+
+if __name__ == '__main__':
+    unittest.main()
+        
+#~ class Testffnet(unittest.TestCase):
+    #~ def setUp(self):
+        #~ conec1 = [[1, 3], [2, 3], [0, 3] \
+                  #~ [1, 4], [2, 4], [0, 4] \
+                  #~ [3, 5], [4, 5], [0, 5]]
+        #~ arch1 = 2, 2, 1
+        #~ arch2 = 2, 1, 1
+        #~ input = [[0.,0.], [0.,1.], [1.,0.], [1.,1.]]
+        #~ target  = [[1.], [0.], [0.], [1.]]
 
 
-conec = [[1, 3], [2, 3], \
-         [1, 4], [2, 4], \
-         [3, 5], [4, 5]]
-conec = mlgraph((2,2,1))
-conec = tmlgraph((2,1,1))
+#~ conec = [[1, 3], [2, 3], \
+         #~ [1, 4], [2, 4], \
+         #~ [3, 5], [4, 5]]
+#~ conec = mlgraph((2,2,1))
+#~ conec = tmlgraph((2,1,1))
 #~ conec = [[1, 3], [2, 3], \
          #~ [1, 4], [2, 4], [3, 4]]
 #print conec
 #~ conec = [[1, 3], [2, 3], \
          #~ [1, 4], [2, 4], [3, 4]]
-n = ffnet(conec=conec)
+#~ n = ffnet(conec=conec)
 #n.genetic.im_func.__doc__ += pikaia.__doc__
 #~ print n.conec
 #~ print n.inno
@@ -575,68 +765,68 @@ n = ffnet(conec=conec)
 #~ print n.bconecno
 #~ print n.units
 #~ print n.weights
-input = [[0.,0.], [0.,1.], [1.,0.], [1.,1.]]
-target  = [[1.], [0.], [0.], [1.]]
+#~ input = [[0.,0.], [0.,1.], [1.,0.], [1.,1.]]
+#~ target  = [[1.], [0.], [0.], [1.]]
 
-target = netprop.vmapa(target, 0., 1., 0.15, 0.85)
+#~ target = netprop.vmapa(target, 0., 1., 0.15, 0.85)
 
-#n.powell(input, target, maxiter=100)
-#n.bfgs(input, target)
-#n.anneal(input, target, lower = -1., upper = 1., learn_rate=0.001)
-#n.genetic(input, target, lower = -5., upper = 5., individuals = 20, generations = 100)
-#n.ncg(input, target, epsilon=0.0001)
-#n.l_bfgs_b(input, target, iprint=1)
-conec = mlgraph((2,4,2))
-print conec
-n = ffnet(mlp=(2,4,2))
-print n.conec
-print n.dconecno
-from scipy import sin, pi, cos
-pat = 20
-#input = [[k*2*pi/pat] for k in xrange(1,pat+1)]+[[0.]]
-#target = [[0.4*sin(x[0])+0.5] for x in input]
+#~ #n.powell(input, target, maxiter=100)
+#~ #n.bfgs(input, target)
+#~ #n.anneal(input, target, lower = -1., upper = 1., learn_rate=0.001)
+#~ #n.genetic(input, target, lower = -5., upper = 5., individuals = 20, generations = 100)
+#~ #n.ncg(input, target, epsilon=0.0001)
+#~ #n.l_bfgs_b(input, target, iprint=1)
+#~ conec = mlgraph((2,4,2))
+#~ print conec
+#~ n = ffnet(mlp=(2,4,2))
+#~ print n.conec
+#~ print n.dconecno
+#~ from scipy import sin, pi, cos
+#~ pat = 20
+#~ #input = [[k*2*pi/pat] for k in xrange(1,pat+1)]+[[0.]]
+#~ #target = [[0.4*sin(x[0])+0.5] for x in input]
 
-input = [[2*pi+k*2*pi/pat, k*2*pi/pat] for k in xrange(1,pat+1)]+[[2*pi,0.]]
-target = [[2*sin(x[0]),5*cos(x[1])] for x in input]
+#~ input = [[2*pi+k*2*pi/pat, k*2*pi/pat] for k in xrange(1,pat+1)]+[[2*pi,0.]]
+#~ target = [[2*sin(x[0]),5*cos(x[1])] for x in input]
 
-#target = vmapa(target, -1., 1., 0.15, 0.85)
-print n.weights
-#n.genetic(input, target, lower = -20., upper = 20., individuals = 20, generations = 2000)
+#~ #target = vmapa(target, -1., 1., 0.15, 0.85)
+#~ print n.weights
+#~ #n.genetic(input, target, lower = -20., upper = 20., individuals = 20, generations = 2000)
 
-#n.train_tnc(input, target, maxfun=5000)
-n.train_momentum(input, target, maxiter=10000)
-#n.bfgs(input, target, iprint=1, bounds=n._getbounds())
-#n.train_cg(input, target, maxiter=10000, disp=1)
-print n.weights
-print n.units
-#n.genetic(input, target, lower = -5., upper = 5., individuals = 20, generations = 1000)
-#print n.deriv([pi/6])
+#~ #n.train_tnc(input, target, maxfun=5000)
+#~ n.train_momentum(input, target, maxiter=10000)
+#~ #n.bfgs(input, target, iprint=1, bounds=n._getbounds())
+#~ #n.train_cg(input, target, maxiter=10000, disp=1)
+#~ print n.weights
+#~ print n.units
+#~ #n.genetic(input, target, lower = -5., upper = 5., individuals = 20, generations = 1000)
+#~ #print n.deriv([pi/6])
 
-savenet(n, "lala")
-n = loadnet("lala")
+#~ savenet(n, "lala")
+#~ n = loadnet("lala")
 
 
-import pylab
-inp = input[:-1]
-inp1 = [x[0] for x in input[:-1]]
-inp2 = [x[1] for x in input[:-1]]
-res1 = [n(x)[0] for x in inp]
-res2 = [n(x)[1] for x in inp]
-#print target
-#print res1
-dres1 = [n.derivative(x)[0][0] for x in inp]
-dres2 = [n.derivative(x)[1][0] for x in inp]
-#from flagshyp import partial_derivative as pd
-#res3 = [pd(n, [x], dx=0.001)[0] for x in inp]
+#~ import pylab
+#~ inp = input[:-1]
+#~ inp1 = [x[0] for x in input[:-1]]
+#~ inp2 = [x[1] for x in input[:-1]]
+#~ res1 = [n(x)[0] for x in inp]
+#~ res2 = [n(x)[1] for x in inp]
+#~ #print target
+#~ #print res1
+#~ dres1 = [n.derivative(x)[0][0] for x in inp]
+#~ dres2 = [n.derivative(x)[1][0] for x in inp]
+#~ #from flagshyp import partial_derivative as pd
+#~ #res3 = [pd(n, [x], dx=0.001)[0] for x in inp]
 
-pylab.plot(inp1, res1)
-pylab.plot(inp1, dres1)
-pylab.plot(inp2, res2)
-pylab.plot(inp2, dres2)
-#pylab.plot(inp, res3)
-pylab.show()
-#pylab.close()
-#n.draw(biasnode=True)
+#~ pylab.plot(inp1, res1)
+#~ pylab.plot(inp1, dres1)
+#~ pylab.plot(inp2, res2)
+#~ pylab.plot(inp2, dres2)
+#~ #pylab.plot(inp, res3)
+#~ pylab.show()
+#~ #pylab.close()
+#~ #n.draw(biasnode=True)
 
 
 #~ bounds=n._getbounds()

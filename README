@@ -33,9 +33,9 @@ Unique features present in ffnet:
 ffnet uses some external open source software: 
 - networkx for handling network architecture as the graph data structure;
 - numpy/scipy for training purposes;
-- pikaia, genetic algorihm based oprimizer.
+- pikaia, genetic algorihm based oprimizer in fortran.
 
-Using ffnet software it is be possible:
+Using ffnet software it's possible to:
 - train/save/load/use feed-forward neural network in python;
 - test new training algorithms for these type of networks;
 - visualize networks using networkx/graphviz tandem (in the further future).
