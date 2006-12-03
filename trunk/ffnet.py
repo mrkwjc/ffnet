@@ -168,9 +168,9 @@ class ffnet:
     All nodes (exept input ones) have sigmoid activation function.
 
     Generation of coneclist is left to the user. There are however
-    functions mlgraph, tmlgraph provided to generate coneclist for layered network.
+    functions: mlgraph and tmlgraph provided to generate coneclist for layered network.
     See description of these functions.
-    More common architectures may be provided in the future.
+    More architectures may be provided in the future.
     
     Weights are automatically initialized at the network creation. They can
     be reinitialized later with 'randomweights' method.
@@ -553,10 +553,35 @@ class ffnet:
         self.weights = array(self.weights)
         self.trained = 'tnc'
         
-    def test(self, input, target):
-        self._testdata(input, target)
-        output = [self(inp) for inp in input]
+    def test(self, input, target, iprint = True):
+        """
+        Calculates and prints parameters of regression line for targets vs. outputs.
+        Returns: (input, target, output, regress)
+        where regress contains regression line parameters for each output node. These
+        parameters are (slope, intercept, r, two-tailed prob, stderr-of-the-estimate).
         
+        If iprint is True (default) regression info is printed to the screen.
+        """
+        input, target = self._testdata(input, target)
+        output = array([self(inp) for inp in input])
+        
+        from scipy.stats import linregress
+        numo = len(self.outno)
+        target = target.transpose()
+        output = output.transpose()
+        regress = []
+        if iprint: print "*** Regression line parameters ***"
+        for o in xrange(numo):
+            r = linregress(target[o], output[o])
+            if iprint:
+                print "Output %i (node nr %i):" %(o, self.outno[o])
+                print "  slope       = %f" %(r[0])
+                print "  intercept   = %f" %(r[1])
+                print "  correlation = %f" %(r[2])
+                print "  tailprob    = %f" %(r[3])
+                print "  stderr      = %f" %(r[4])
+            regress.append(r)
+        return input.tolist(), target.transpose().tolist(), output.transpose().tolist(), regress
 
 def savenet(net, filename):
     import cPickle
@@ -734,13 +759,28 @@ class TestFfnetSigmoid(unittest.TestCase):
     def testTrainGenetic(self):
         print "Test of genetic algorithm optimization"
         self.tnet.train_genetic(self.input, self.target, lower = -50., upper = 50., \
-                                individuals = 20, generations = 500)
+                                individuals = 20, generations = 1000)
         self.tnet.test(self.input, self.target)
     
     def testTrainMomentum(self): 
         print "Test of backpropagation momentum algorithm"
         self.tnet.train_momentum(self.input, self.target, maxiter=10000)
+        self.tnet.test(self.input, self.target)
     
+    def testTrainCg(self):
+        print "Test of conjugate gradient algorithm"
+        self.tnet.train_cg(self.input, self.target, maxiter=1000, disp=1)
+        self.tnet.test(self.input, self.target)
+        
+    def testTrainBfgs(self):
+        print "Test of BFGS algorithm"
+        self.tnet.train_bfgs(self.input, self.target, maxfun = 1000)
+        self.tnet.test(self.input, self.target)
+        
+    def testTrainTnc(self):
+        print "Test of TNC algorithm"
+        self.tnet.train_tnc(self.input, self.target, maxfun = 1000)
+        self.tnet.test(self.input, self.target)
 
 if __name__ == '__main__':
     unittest.main()
