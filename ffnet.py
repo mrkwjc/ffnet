@@ -105,7 +105,8 @@ def ffconec(conec):
             else:
                 conec += ins   #Maybe + [(0,node)] i.e. bias
                 if not outs: outno += [node]
-                else: hidno += [node]
+                else: 
+                    if node != 0: hidno += [node] #bias handling again
     return graph, conec, inno, hidno, outno
 
 def bconec(conec, inno):
@@ -247,10 +248,10 @@ class ffnet:
         
     def __repr__(self):
         info = "Feed-forward neural network: \n" + \
-               "inputs:       %4i \n" %(len(self.inno)) + \
-               "hiddens:      %4i \n" %(len(self.hidno)) + \
-               "outputs:      %4i \n" %(len(self.outno)) + \
-               "connections:  %4i" %(len(self.conec)) 
+               "inputs:  %4i \n" %(len(self.inno)) + \
+               "hiddens: %4i \n" %(len(self.hidno)) + \
+               "outputs: %4i \n" %(len(self.outno)) + \
+               "connections and biases: %4i" %(len(self.conec)) 
         return info
     
     def __call__(self, inp):
@@ -751,7 +752,7 @@ class Testffconec(unittest.TestCase):
                  (3, 5), (4, 5), (0, 5) ]
         n = ffconec(conec)
         self.assertEqual(sorted(n[2]), [1, 2])
-        self.assertEqual(sorted(n[3]), [0, 3, 4])
+        self.assertEqual(sorted(n[3]), [3, 4])
         self.assertEqual(sorted(n[4]), [5])
         
 class Testbconec(unittest.TestCase):
