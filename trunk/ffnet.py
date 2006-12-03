@@ -598,7 +598,7 @@ class ffnet:
         target = target.transpose()
         output = output.transpose()
         regress = []
-        #if iprint: print "RESULTS FOR %i TESTING CASES" % nump
+        if iprint: print "Testing results for %i testing cases:" % nump
         for o in xrange(numo):
             if iprint:
                 print "OUTPUT %i (node nr %i):" %(o+1, self.outno[o])
