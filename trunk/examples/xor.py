@@ -10,12 +10,28 @@ input = [[0.,0.], [0.,1.], [1.,0.], [1.,1.]]
 target  = [[1.], [0.], [0.], [1.]]
 
 # Train network
-net.train_momentum(input, target, maxiter = 10000)
+#first find good starting point with genetic algorithm (not necessary, but helpful)
+net.train_genetic(input, target, individuals=20, generations=500)
+#then train with scipy tnc optimizer
+net.train_tnc(input, target, maxfun = 1000)
 
 # Test network
-net.test(input, target)
+net.test(input, target, iprint = 2)
 
+# Save/load network
+from ffnet import savenet, loadnet
+print "Network is saved..."
+savenet(net, "xor.net")
+print "Network is reloaded..."
+net = loadnet("xor.net")
+print "Network is tested again..."
+net.test(input, target, iprint = 2)
 
+# Use network as a function...
+print "Note:"
+print "You can use the network as a python function."
+print "For example calling net([1, 1]) gives %s:" % net([1, 1])
+print "Ladies and gentelments, it just works!"
 
 #initial_weights = [ 1.06887228,  1.08273479, -1.11452322, -0.0479572 , -0.80835213,
 #                   -0.69700962, -0.53619104, -0.90239253, -0.04677224]
