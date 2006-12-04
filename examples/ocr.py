@@ -30,9 +30,12 @@ input, target = read_array(file, columns=[input_cols, target_cols])
 
 # Train network
 #train with scipy tnc optimizer
-net.train_tnc(input[:58], target[:58], maxfun = 2000)
+print "TRAINING NETWORK..."
+net.train_tnc(input[:58], target[:58], maxfun = 2000, messages=1)
 
 # Test network
+print
+print "TESTING NETWORK..."
 output, regression = net.test(input[58:], target[58:], iprint = 2)
 
 #Make a plot of a chosen digit along with the network guess

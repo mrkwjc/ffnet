@@ -20,12 +20,16 @@ input = [[0.,0.], [0.,1.], [1.,0.], [1.,1.]]
 target  = [[1.], [0.], [0.], [1.]]
 
 # Train network
-#first find good starting point with genetic algorithm (not necessary, but helpful)
+#first find good starting point with genetic algorithm (not necessary, but may be helpful)
+print "FINDING STARTING WEIGHTS WITH GENETIC ALGORITHM..."
 net.train_genetic(input, target, individuals=20, generations=500)
 #then train with scipy tnc optimizer
-net.train_tnc(input, target, maxfun = 1000)
+print "TRAINING NETWORK..."
+net.train_tnc(input, target, maxfun = 1000, messages=1)
 
 # Test network
+print
+print "TESTING NETWORK..."
 output, regression = net.test(input, target, iprint = 2)
 
 # Save/load network

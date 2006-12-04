@@ -34,12 +34,16 @@ input = [ [0.] ] + [ [k*2*pi/patterns] for k in xrange(1, patterns + 1) ]
 target = [[sin(x[0])] for x in input]
 
 # Train network
-#first find good starting point with genetic algorithm (not necessary, but helpful)
+#first find good starting point with genetic algorithm (not necessary, but may be helpful)
+print "FINDING STARTING WEIGHTS WITH GENETIC ALGORITHM..."
 net.train_genetic(input, target, individuals=20, generations=500)
 #then train with scipy tnc optimizer
-net.train_tnc(input, target, maxfun = 10000)
+print "TRAINING NETWORK..."
+net.train_tnc(input, target, maxfun = 5000, messages=1)
 
 # Test network
+print
+print "TESTNG NETWORK..."
 output, regression = net.test(input, target, iprint = 2)
 
 # Make some plots

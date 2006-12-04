@@ -9,13 +9,7 @@ Copyright (C) 2006 by Marek Wojciechowski
 Overview
 --------
 ffnet is meant to be an easy and fast feed-forward neural network 
-training solution for python. Main parts of the project 
-(propagation of the signal, gradient calculus with error 
-backpropagation) are written in fortran 77 for computational speed.
-Fast scipy optimization routines (also written in fortran) 
-are used to minimize error of the network predictions. 
-All steering is done using a python class. Usage of the trained
-network is as simple as function call in python.
+training solution for python.
 
 Unique features present in ffnet:
 1. Any network connectivity without cycles is allowed; most 
@@ -37,6 +31,13 @@ Basic assumptions and limitations:
    unique for each input and output).
 4. Function minimized during training is a sum of squared errors 
    of each output for each training patterns.
+
+Main parts of the project (propagation of the signal, gradient 
+calculus with error backpropagation) are written in fortran 77 for 
+computational speed. Fast scipy optimization routines (also written 
+in fortran)  are used to minimize error of the network predictions. 
+All steering is done using a python class. Usage of the trained
+network is as simple as function call in python.
 
 ffnet uses some external open source software:
 - networkx for handling network architecture as the graph data structure,
@@ -87,7 +88,7 @@ python setup.py install
 ffnet uses numpy.distutils and f2py tool to compile Fortran parts of
 the program. The above will work if you are running Linux/Unix system 
 with gcc and g77 (gfortran).
-If you have need to use specific Fortran compiler check for avilable options at:
+If you need to use specific Fortran compiler check for avilable options at:
 http://cens.ioc.ee/projects/f2py2e/FAQ.html#q-what-are-supported-platforms-and-compilers
 For example, installing with Intel Fortran looks like:
 
@@ -120,5 +121,5 @@ of source distribution.
 Documentation
 -------------
 1. Go to http://ffnet.sourceforge.net for more info about ffnet.
-2. Use docstrings of ffnet functions and methods.
+2. Read docstrings of ffnet functions and methods.
 

@@ -172,7 +172,7 @@ class ffnet:
         coneclist = [[1, 3], [2, 3], [0, 3] \
                      [1, 4], [2, 4], [0, 4] \
                      [3, 5], [4, 5], [0, 5]]
-        n = ffnet(conec = coneclist)
+        n = ffnet(coneclist)
     0 in coneclist is a special unit representing bias. If there is
     no connection from 0, bias is not considered in the node.
     Only feed-forward directed graphs are allowed. Class makes check
@@ -188,7 +188,7 @@ class ffnet:
     be reinitialized later with 'randomweights' method.
     
     TRAINING NETWORK:
-    There are some training methods included, currently:
+    There are several training methods included, currently:
     train_genetic, train_cg, train_bfgs, train_tnc.
     The simplest usage is, for example:
         n.train_tnc(input, target)
