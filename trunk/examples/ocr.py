@@ -23,7 +23,7 @@ conec = mlgraph((64,10,10,10))
 net = ffnet(conec)
 
 # Read training data
-file = open("examples/data/ocr.dat", 'r')
+file = open("data/ocr.dat", 'r')
 from scipy.io import read_array
 input_cols = tuple(range(0, 64)); target_cols = tuple(range(64, 74))
 input, target = read_array(file, columns=[input_cols, target_cols])
