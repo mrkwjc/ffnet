@@ -37,7 +37,7 @@ target = [[sin(x[0])] for x in input]
 #first find good starting point with genetic algorithm (not necessary, but helpful)
 net.train_genetic(input, target, individuals=20, generations=500)
 #then train with scipy tnc optimizer
-net.train_tnc(input, target, maxfun = 10000)
+net.train_tnc(input, target, maxfun = 10000, bounds=((-100, 100),)*13)
 
 # Test network
 net.test(input, target, iprint = 2)
