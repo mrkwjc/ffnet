@@ -285,7 +285,7 @@ class ffnet:
         deriv = netprop.normdiff(self.weights, self.conec, self.dconecno, self.dconecmk, \
                                  self.units, self.inno, self.outno, self.eni, self.ded, inp)
         return deriv.tolist()
-
+        
     def randomweights(self):
         """Randomize weights due to Bottou proposition"""
         nofw = len(self.conec)
@@ -354,15 +354,15 @@ class ffnet:
             return normarray(input, self.eni), normarray(target, self.eno)
 
     def train_momentum(self, input, target, eta = 0.2, momentum = 0.8, \
-                        maxiter = 1000, disp = 1):
+                        maxiter = 10000, disp = 0):
         """
         Simple backpropagation training with momentum.
     
         Allowed parameters:
         eta             - descent scaling parameter (default is 0.2)
         momentum         - momentum coefficient (default is 0.8)
-        maxiter         - the maximum number of iterations (default is 1000)
-        disp            - print convergence message if non-zero (default is 1)
+        maxiter         - the maximum number of iterations (default is 10000)
+        disp            - print convergence message if non-zero (default is 0)
         """
         input, target = self._setnorm(input, target)
         if disp:
@@ -382,8 +382,8 @@ class ffnet:
         Global weights optimization with genetic algorithm.
     
         Allowed parameters:
-        lower         - lower bound of weights values (default is -25.)
-        upper         - upper bound of weights values (default is 25.)
+        lower        - lower bound of weights values (default is -25.)
+        upper        - upper bound of weights values (default is 25.)
         individuals  - number of individuals in a population (default
                        is 20)
         generations  - number of generations over which solution is
@@ -447,13 +447,14 @@ class ffnet:
         gtol         - stop when norm of gradient is less than gtol
                        (default is 1e-5)
         norm         - order of vector norm to use (default is infinity)
-        maxiter      - the maximum number of iterations (default is None)
+        maxiter      - the maximum number of iterations (default is 10000)
         disp         - print convergence message at the end of training
                        if non-zero (default is 1)
     
         Note: this procedure does not produce any output during training.
         Note: optimization routine used here is part of scipy.optimize.
         """
+        if 'maxiter' not in kwargs: kwargs['maxiter'] = 10000
         input, target = self._setnorm(input, target)
         func = netprop.func
         fprime = netprop.grad
@@ -472,8 +473,8 @@ class ffnet:
         Allowed parameters:
         bounds  -- a list of (min, max) pairs for each weight, defining
                    the bounds on that parameter. Use None for one of min or max
-                   when there is no bound in that direction. There are no bounds
-                   at default.
+                   when there is no bound in that direction. At default all weights
+                   are bounded to (-100, 100)
         m       -- the maximum number of variable metric corrections
                    used to define the limited memory matrix. (the limited memory BFGS
                    method does not store the full hessian but uses this many terms in an
@@ -515,6 +516,7 @@ class ffnet:
            ACM Transactions on Mathematical Software, Vol 23, Num. 4, pp. 550 - 560.
         """
         input, target = self._setnorm(input, target)
+        if 'bounds' not in kwargs: kwargs['bounds'] = ((-100., 100.),)*len(self.conec)
         func = netprop.func
         fprime = netprop.grad
         extra_args = (self.conec, self.bconecno, self.units, \
@@ -532,8 +534,8 @@ class ffnet:
         Allowed parameters:
         bounds    : a list of (min, max) pairs for each weight, defining
                     the bounds on that parameter. Use None for one of min or max
-                    when there is no bound in that direction. There are no bounds
-                    at default.
+                    when there is no bound in that direction. At default all weights
+                    are bounded to (-100, 100)
         scale      : scaling factors to apply to each weight (a list of floats)
                     if None, the factors are up-low for interval bounded weights
                     and 1+|weight| for the others.
@@ -577,6 +579,7 @@ class ffnet:
         """
         input, target = self._setnorm(input, target)
         if 'messages' not in kwargs: kwargs['messages'] = 0
+        if 'bounds' not in kwargs: kwargs['bounds'] = ((-100., 100.),)*len(self.conec)
         func = netprop.func
         fprime = netprop.grad
         extra_args = (self.conec, self.bconecno, self.units, \
