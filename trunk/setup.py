@@ -11,7 +11,7 @@ ext2 = Extension(name = '_pikaia',
 if __name__ == "__main__":
     from numpy.distutils.core import setup
     setup(name              = 'ffnet',
-          description       = "Feed-forward neural network routines",
+          description       = "Feed-forward neural network solution for python",
           author            = "Marek Wojciechowski",
           author_email      = "mwojc@p.lodz.pl",
           ext_modules       = [ext1, ext2],
