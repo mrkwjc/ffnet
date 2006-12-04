@@ -1,7 +1,14 @@
-""" Digits recognition example for ffnet""" 
+########################################################################
+##  Copyright (C) 2006 by Marek Wojciechowski
+##  <mwojc@p.lodz.pl>
+##
+##  Distributed under the terms of the GNU General Public License (GPL)
+##  http://www.gnu.org/copyleft/gpl.html
+########################################################################
 
-# Example is borrowed from qnet2000 program.
-# The training set is contained in the file data/ocr.dat. 
+### Digits recognition example for ffnet ###
+
+# The training set is contained in the file data/ocr.dat.
 # The file contains 68 total patterns (first 58 are used for training 
 # and last 10 are used for the test set). Data columns 1 through 64 
 # contain the input node bitmap data and 64 through 74 contain the

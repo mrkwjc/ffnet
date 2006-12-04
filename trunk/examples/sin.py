@@ -1,4 +1,12 @@
-""" Sinus training example for ffnet """
+########################################################################
+##  Copyright (C) 2006 by Marek Wojciechowski
+##  <mwojc@p.lodz.pl>
+##
+##  Distributed under the terms of the GNU General Public License (GPL)
+##  http://www.gnu.org/copyleft/gpl.html
+########################################################################
+
+### Sine training example for ffnet ###
 
 from ffnet import ffnet, mlgraph
 from math import pi, sin, cos
@@ -20,7 +28,7 @@ conec = [(1, 2), (1, 3), (1, 4), (1, 5), (2, 6), (3, 6), (4, 6), (5, 6), \
 # Create network
 net = ffnet(conec)
 
-# Generate training data (sinus values from 0 to 2*pi)
+# Generate training data (sine values for x from 0 to 2*pi)
 patterns = 16
 input = [ [0.] ] + [ [k*2*pi/patterns] for k in xrange(1, patterns + 1) ]
 target = [[sin(x[0])] for x in input]
@@ -39,20 +47,20 @@ try:
     from pylab import *
     points = 128
     xaxis = [ 0. ] + [ k*2*pi/points for k in xrange(1, points + 1) ]
-    sinus = [ sin(x) for x in xaxis ]
-    cosinus = [ cos(x) for x in xaxis ]
-    netsinus = [ net([x]) for x in xaxis]
-    netcosinus = [ net.derivative([x]) for x in xaxis ]
+    sine = [ sin(x) for x in xaxis ]
+    cosine = [ cos(x) for x in xaxis ]
+    netsine = [ net([x]) for x in xaxis]
+    netcosine = [ net.derivative([x]) for x in xaxis ]
     
     subplot(211)
-    plot(xaxis, sinus, 'b--', xaxis, netsinus, 'k-')
-    legend(('sinus', 'network output'))
+    plot(xaxis, sine, 'b--', xaxis, netsine, 'k-')
+    legend(('sine', 'network output'))
     grid(True)
     title('Outputs of trained network.')
     
     subplot(212)
-    plot(xaxis, cosinus, 'b--', xaxis, netcosinus, 'k-')
-    legend(('cosinus', 'network derivative'))
+    plot(xaxis, cosine, 'b--', xaxis, netcosine, 'k-')
+    legend(('cosine', 'network derivative'))
     grid(True)
     show()
 except: 
@@ -63,7 +71,7 @@ print \
 Note:
 You have access to partial derivatives of the network
 outputs vs. its inputs. For example, calling
-net.derivative([3.14]) for just trained sinus network
-we obtain %s (cosinus at 3.14 is -1).
+net.derivative([3.14]) for a sine network just trained 
+we obtain %s (cosine at 3.14 is -1).
 """ % net.derivative([3.14])
  
