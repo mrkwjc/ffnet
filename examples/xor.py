@@ -1,4 +1,12 @@
-""" XOR problem example for ffnet """
+########################################################################
+##  Copyright (C) 2006 by Marek Wojciechowski
+##  <mwojc@p.lodz.pl>
+##
+##  Distributed under the terms of the GNU General Public License (GPL)
+##  http://www.gnu.org/copyleft/gpl.html
+########################################################################
+
+### XOR problem example for ffnet ###
 
 from ffnet import ffnet, mlgraph
 

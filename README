@@ -1,13 +1,33 @@
+########################################################################
+##  Copyright (C) 2006 by Marek Wojciechowski
+##  <mwojc@p.lodz.pl>
+##
+##  Distributed under the terms of the GNU General Public License (GPL)
+##  http://www.gnu.org/copyleft/lesser.html
+########################################################################
+
+This is ffnet README file.
+
 Overview
 --------
 ffnet is meant to be an easy and fast feed-forward neural network 
 training solution for python. Main parts of the project 
 (propagation of the signal, gradient calculus with error 
-backpropagation)  are written in fortran 77 for computational speed. 
+backpropagation) are written in fortran 77 for computational speed.
 Fast scipy optimization routines (also written in fortran) 
 are used to minimize error of the network predictions. 
-All steering is done using simple python class. Usage of the trained 
+All steering is done using a python class. Usage of the trained
 network is as simple as function call in python.
+
+Unique features present in ffnet:
+1. Any network connectivity without cycles is allowed; most 
+   avilable software supports layered architecture only.
+2. Training can be performed with use of several optimization 
+   schemes including genetic alorithm based optimization.
+3. There is access to exact partial derivatives of network outputs 
+   vs. its inputs.
+4. Automatic normalization of data; most software avilable 
+   leaves this to the user.
 
 Basic assumptions and limitations:
 1. Network has feed-forward architecture.
@@ -20,17 +40,7 @@ Basic assumptions and limitations:
 4. Function minimized during training is a sum of squared errors 
    of each output for each training patterns.
 
-Unique features present in ffnet:
-1. Any network connectivity without cycles is allowed; most 
-   avilable software supports layered architecture only.
-2. Training can be performed with use of several optimization 
-   schemes including genetic alorithm based optimization.
-3. There is access to exact partial derivatives of network outputs 
-   vs. its inputs.
-4. Automatic normalization of data; most software avilable 
-   leaves this to the user.
-
-ffnet uses some external open source software: 
+ffnet uses some external open source software:
 - networkx for handling network architecture as the graph data structure;
 - numpy/scipy for training purposes;
 - pikaia, genetic algorihm based oprimizer in fortran.

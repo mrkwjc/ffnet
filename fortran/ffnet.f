@@ -1,10 +1,10 @@
-c########################################################################
-c    Copyright (C) 2006 by Marek Wojciechowski                                      
-c    <mwojc@p.lodz.pl>                                                             
-c
-c Copyright: See COPYING file that comes with this distribution
-c
-c########################################################################
+c#######################################################################
+c#  Copyright (C) 2006 by Marek Wojciechowski
+c#  <mwojc@p.lodz.pl>
+c#
+c#  Distributed under the terms of the GNU General Public License (GPL)
+c#  http://www.gnu.org/copyleft/gpl.html
+c#######################################################################
 c
 cc
 ccc

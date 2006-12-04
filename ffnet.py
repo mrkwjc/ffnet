@@ -1,8 +1,15 @@
+########################################################################
+##  Copyright (C) 2006 by Marek Wojciechowski
+##  <mwojc@p.lodz.pl>
+##
+##  Distributed under the terms of the GNU General Public License (GPL)
+##  http://www.gnu.org/copyleft/gpl.html
+########################################################################
+
 from scipy import array, zeros, ones, random, optimize, sqrt
 import networkx as NX
 import _ffnet as netprop
 from pikaia import pikaia
-
 
 def mlgraph(arch, biases = True):
     '''
