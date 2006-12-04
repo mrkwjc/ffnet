@@ -23,7 +23,7 @@ target  = [[1.], [0.], [0.], [1.]]
 #first find good starting point with genetic algorithm (not necessary, but helpful)
 net.train_genetic(input, target, individuals=20, generations=500)
 #then train with scipy tnc optimizer
-net.train_tnc(input, target, maxfun = 1000)
+net.train_tnc(input, target, maxfun = 1000, bounds=((-100, 100),)*9)
 
 # Test network
 net.test(input, target, iprint = 2)

@@ -30,7 +30,7 @@ input, target = read_array(file, columns=[input_cols, target_cols])
 
 # Train network
 #train with scipy tnc optimizer
-net.train_tnc(input[:58], target[:58], maxfun = 500)
+net.train_tnc(input[:58], target[:58], maxfun = 500, bounds=((-100, 100),)*870)
 
 # Test network
 net.test(input[58:], target[58:], iprint = 2)
