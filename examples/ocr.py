@@ -30,32 +30,35 @@ input, target = read_array(file, columns=[input_cols, target_cols])
 
 # Train network
 #train with scipy tnc optimizer
-net.train_tnc(input[:58], target[:58], maxfun = 500, bounds=((-100, 100),)*870)
+net.train_tnc(input[:58], target[:58], maxfun = 2000)
 
 # Test network
-net.test(input[58:], target[58:], iprint = 2)
+output, regression = net.test(input[58:], target[58:], iprint = 2)
 
-#Make a plot of testing digit '3' (pattern 60) along with the network guess
+#Make a plot of a chosen digit along with the network guess
 try:
     from pylab import *
+    from random import randint
+    
+    digitpat = randint(58, 67) #Choose testing pattern to plot
     
     subplot(211)
-    imshow(input[60].reshape(8,8), interpolation = 'nearest')
+    imshow(input[digitpat].reshape(8,8), interpolation = 'nearest')
     
     subplot(212)
     N = 10  # number of digits / network outputs
     ind = arange(N)   # the x locations for the groups
     width = 0.35       # the width of the bars
-    bar(ind, net(input[60]), width, color='b') #make a plot
+    bar(ind, net(input[digitpat]), width, color='b') #make a plot
     xticks(ind+width/2., ('1', '2', '3', '4', '5', '6', '7', '8', '9', '0'))
     xlim(-width,N-width)
     axhline(linewidth=1, color='black')
-    title("Network guesses a digit above...")
+    title("Trained network (64-10-10-10) guesses a digit above...")
     xlabel("Digit")
     ylabel("Network outputs")
    
     show()
-except: 
+except ImportError: 
     print "Cannot make plots. For plotting install matplotlib..."
     
 print \

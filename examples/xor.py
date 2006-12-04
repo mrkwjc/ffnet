@@ -23,10 +23,10 @@ target  = [[1.], [0.], [0.], [1.]]
 #first find good starting point with genetic algorithm (not necessary, but helpful)
 net.train_genetic(input, target, individuals=20, generations=500)
 #then train with scipy tnc optimizer
-net.train_tnc(input, target, maxfun = 1000, bounds=((-100, 100),)*9)
+net.train_tnc(input, target, maxfun = 1000)
 
 # Test network
-net.test(input, target, iprint = 2)
+output, regression = net.test(input, target, iprint = 2)
 
 # Save/load network
 from ffnet import savenet, loadnet
@@ -34,9 +34,10 @@ print "Network is saved..."
 savenet(net, "xor.net")
 print "Network is reloaded..."
 net = loadnet("xor.net")
-print "Network is tested again..."
-net.test(input, target, iprint = 2)
+print "Network is tested again, but nothing is printed..."
+output, regression = net.test(input, target, iprint = 0)
 
+print
 print "Note:"
 print "You can use ffnet network as a python function."
 print "For example calling net([1, 1]) gives %s:" % net([1, 1])
