@@ -53,9 +53,13 @@ def linear(a, b, c, d):
     '''
     Returns coefficients of linear map from range (a,b) to (c,d)
     '''
-    if b == a: raise ValueError("Mapping not possible due to equal limits")
-    c1 = ( d - c ) / ( b - a )
-    c2 = c - a*c1
+    #if b == a: raise ValueError("Mapping not possible due to equal limits")
+    if b == a: 
+        c1 = 0.0
+        c2 = ( c + d ) / 2.
+    else:
+        c1 = ( d - c ) / ( b - a )
+        c2 = c - a * c1
     return c1, c2
 
 def norms(inarray, lower = 0., upper = 1.):
@@ -327,7 +331,7 @@ class ffnet:
             self.ded = ones(shape = (numo, numi))
         else:
             input, target = self._testdata(input, target)
-            #limits are informative only, eni,dei/eno,deo - input/output coding-decoding
+            #limits are informative only, eni,dei/eno,deo are input/output coding-decoding
             self.inlimits, self.eni, self.dei = norms(input, lower=0.15, upper=0.85)
             self.outlimits, self.eno, self.deo = norms(target, lower=0.15, upper=0.85)
             self.ded = zeros((numo,numi), 'd')
@@ -402,7 +406,7 @@ class ffnet:
     
         Note: this optimization routine is a python port of fortran pikaia code.
     
-        For more info see pikaia homepage and documentation4:
+        For more info see pikaia homepage and documentation:
         http://www.hao.ucar.edu/Public/models/pikaia/pikaia.html
         """
         input, target = self._setnorm(input, target)
@@ -430,7 +434,7 @@ class ffnet:
         gtol         - stop when norm of gradient is less than gtol
                        (default is 1e-5)
         norm         - order of vector norm to use (default is infinity)
-        maxiter         - the maximum number of iterations (default is None)
+        maxiter      - the maximum number of iterations (default is None)
         disp         - print convergence message at the end of training
                        if non-zero (default is 1)
     
@@ -701,9 +705,10 @@ class Testtmlgraph(unittest.TestCase):
 
 class Testlinear(unittest.TestCase):
     def testEqualInRanges(self):
-        self.assertRaises(ValueError, linear, 1.0, 1.0, 2.0, 3.0)
+        #self.assertRaises(ValueError, linear, 1.0, 1.0, 2.0, 3.0)
+        self.assertEqual(linear(1.0, 1.0, 2.0, 3.0), (0, 2.5))
     def testEqualOutRanges(self):
-        self.assertEqual(linear(1.0, 2.0, 2.0, 2.0), (0.0, 2.0))
+        self.assertEqual(linear(2.0, 3.0, 1.0, 1.0), (0.0, 1.0))
     def testNormalCase(self):
         self.assertEqual(linear(0.0, 1.0, 0.0, 2.0), (2.0, 0.0))
 
