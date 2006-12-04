@@ -40,19 +40,18 @@ Basic assumptions and limitations:
 
 ffnet uses some external open source software:
 - networkx for handling network architecture as the graph data structure,
-- numpy/scipy for training purposes.
+- numpy/scipy for training purposes,
 - pikaia, genetic algorihm based oprimizer in fortran (included
   in this distribution).
 
 Using ffnet software it's possible to:
-- train/save/load/use feed-forward neural network in python;
-- test new training algorithms for these type of networks;
+- train/save/load/use feed-forward neural network in python,
+- test new training algorithms for these type of networks,
 
 
 Prerequisites
 -------------
-ffnet needs python version 2.3 or above and 'not too old' versions 
-of the following  python packages:
+ffnet needs python version 2.3 or above and 'not too old' versions of:
 1. numpy/scipy (http://scipy.org/)
 2. NetworkX (https://networkx.lanl.gov/wiki)
 
