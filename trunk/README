@@ -83,7 +83,7 @@ Installation
 Unpack ffnet to the directory of your choice, enter this
 directory and run:
 
-python setup.py install
+    python setup.py install
 
 ffnet uses numpy.distutils and f2py tool to compile Fortran parts of
 the program. The above will work if you are running Linux/Unix system 
@@ -92,9 +92,15 @@ If you need to use specific Fortran compiler check for avilable options at:
 http://cens.ioc.ee/projects/f2py2e/FAQ.html#q-what-are-supported-platforms-and-compilers
 For example, installing with Intel Fortran looks like:
 
-python setup.py install --fcompiler=intel
+    python setup.py install --fcompiler=intel
 
-2. Binary installer for Windows:
+2. Building from source on Windows:
+If you have mingw compilers installed (these are included in Enthought
+Python distribution!), just run:
+
+    python setup.py install --compiler=mingw32
+
+3. Binary installer for Windows:
 Double click the installation program.
 
 
