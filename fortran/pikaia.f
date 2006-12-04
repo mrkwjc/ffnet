@@ -429,7 +429,7 @@ c
 c
 c     Constants
       integer   NMAX, PMAX, DMAX
-      parameter (NMAX = 100, PMAX = 1000, DMAX = 15)
+      parameter (NMAX = 10000, PMAX = 1000, DMAX = 15)
 c
 c      o NMAX is the maximum number of adjustable parameters
 c        (n <= NMAX)
