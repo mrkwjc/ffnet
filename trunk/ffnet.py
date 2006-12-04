@@ -300,11 +300,13 @@ class ffnet:
 
     def _testdata(self, input, target):
         """Tests input and target data"""
+        # Test conversion
         try: input = array(input, 'd')
         except: raise ValueEror("Input cannot be converted to numpy array")
         try: target = array(target, 'd')
         except: raise ValueEror("Target cannot be converted to numpy array")
         
+        #Test sizes
         numip = input.shape[0]; numop = target.shape[0]
         if numip != numop:
             raise ValueError \
@@ -331,6 +333,17 @@ class ffnet:
             self.ded = ones(shape = (numo, numi))
         else:
             input, target = self._testdata(input, target)
+            
+            # Warn if any input or target node takes a one single value
+            # I'm still not sure where to put this check....
+            for i, col in enumerate(input.transpose()):
+                if max(col) == min(col):
+                    print "Warning: %ith input node takes single value %f." %(i+1, max(col))
+
+            for i, col in enumerate(target.transpose()):
+                if max(col) == min(col):
+                    print "Warning: %ith target node takes single value %f." %(i+1, max(col))
+            
             #limits are informative only, eni,dei/eno,deo are input/output coding-decoding
             self.inlimits, self.eni, self.dei = norms(input, lower=0.15, upper=0.85)
             self.outlimits, self.eno, self.deo = norms(target, lower=0.15, upper=0.85)
