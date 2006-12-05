@@ -1,2 +1,7 @@
 recursive-include examples *
+prune examples/.svn
+
+recursive-include examples/data *
+prune examples/data/.svn
+
 include LICENSE
