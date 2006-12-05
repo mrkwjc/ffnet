@@ -98,7 +98,8 @@ For example, installing with Intel Fortran looks like:
 If you have mingw compilers installed (these are included in Enthought
 Python distribution!), just run:
 
-    python setup.py install --compiler=mingw32
+    python setup.py build --compiler=mingw32
+	python setup.py install --skip-build
 
 3. Binary installer for Windows:
 Double click the installation program.
