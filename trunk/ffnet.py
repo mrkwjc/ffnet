@@ -103,7 +103,7 @@ def ffconec(conec):
     if len(conec) == 0: raise ValueError("Empty connectivity list")
     graph = NX.DiGraph()
     graph.add_edges_from(conec)
-    snodes = NX.paths.topological_sort(graph)
+    snodes = NX.topological_sort(graph)
     if not snodes:
         raise TypeError("Network has cycles.")
     else:
@@ -131,7 +131,7 @@ def bconec(conec, inno):
     bgraph.delete_nodes_from(inno)
     try: bgraph.delete_node(0) #handling biases
     except: pass
-    bsnodes = NX.paths.topological_sort(bgraph)
+    bsnodes = NX.topological_sort(bgraph)
     bconecno = []
     for bnode in bsnodes:
         for bedge in bgraph.in_edges(bnode):
@@ -154,7 +154,7 @@ def dconec(conec, inno):
         dgraph.delete_nodes_from(inno[idx+1:])
         try: dgraph.delete_node(0)  #handling biases
         except: pass
-        dsnodes = NX.paths.topological_sort(dgraph)
+        dsnodes = NX.topological_sort(dgraph)
         for dnode in dsnodes:
             for dedge in dgraph.in_edges(dnode):
                 idx = conec.index(dedge) + 1
