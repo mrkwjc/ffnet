@@ -50,8 +50,8 @@ Using ffnet software it's possible to:
 - test new training algorithms for these type of networks,
 
 
-Prerequisites
--------------
+Requirements
+------------
 ffnet needs python version 2.3 or above and 'not too old' versions of:
 1. numpy/scipy (http://scipy.org/)
 2. NetworkX (https://networkx.lanl.gov/wiki)
@@ -59,10 +59,14 @@ ffnet needs python version 2.3 or above and 'not too old' versions of:
 For plots (which apperar in examples) you will also need the
 matplotlib package (http://matplotlib.sourceforge.net/)
 
-Windows users may be interested in installing Enthought Python
+Windows users are encouraged to install Enthought Python
 edition (http://code.enthought.com/enthon) which includes numpy/scipy,
-matplotlib and many other goodies. NetworkX however have to be 
-installed separately.
+matplotlib and many other goodies (NetworkX however have to be
+installed separately). ffnet binary installer for Windows is built
+using configuration provided by:
+http://code.enthought.com/downloads/enthon-python2.4-1.0.0.exe
+(it means it works only with python an numpy versions included in
+this enthon release).
 
 It is also very convenient to run ffnet interactively with
 ipython, an enhanced python shell. See http://ipython.scipy.org/moin.
@@ -103,6 +107,8 @@ Python distribution!), just run:
 
 3. Binary installer for Windows:
 Double click the installation program.
+Important: installation the most probably will not work if you have not installed 
+http://code.enthought.com/downloads/enthon-python2.4-1.0.0.exe.
 
 
 Usage
