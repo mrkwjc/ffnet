@@ -67,7 +67,7 @@ try:
     legend(('cosine', 'network derivative'))
     grid(True)
     show()
-except: 
+except ImportError: 
     print "Cannot make plots. For plotting install matplotlib..."
 
 print \
