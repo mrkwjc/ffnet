@@ -325,7 +325,7 @@ class ffnet:
     def _setnorm(self, input = None, target = None):
         """Retrieves normalization info from training data and normalizes data"""
         numi = len(self.inno); numo = len(self.outno)
-        if input == target == None:
+        if input is None and target is None:
             #self.inlimits  = array( [[0.15, 0.85]]*numi ) #informative only
             #self.outlimits = array( [[0.15, 0.85]]*numo ) #informative only
             self.eni = self.dei = array( [[1., 0.]] * numi )
@@ -847,7 +847,7 @@ class TestFfnetSigmoid(unittest.TestCase):
         
     def testTrainTnc(self):
         print "Test of TNC algorithm"
-        self.tnet.train_tnc(self.input, self.target, maxfun = 1000)
+        self.tnet.train_tnc(array(self.input), array(self.target), maxfun = 1000)
         self.tnet.test(self.input, self.target)
 
 if __name__ == '__main__':
