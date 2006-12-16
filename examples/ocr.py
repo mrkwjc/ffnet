@@ -31,6 +31,7 @@ input, target = read_array(file, columns=[input_cols, target_cols])
 # Train network
 #train with scipy tnc optimizer
 print "TRAINING NETWORK..."
+##net.train_genetic(input, target, individuals=20, generations=500, lower=-1., upper=1.)
 net.train_tnc(input[:58], target[:58], maxfun = 2000, messages=1)
 
 # Test network
