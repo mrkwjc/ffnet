@@ -395,6 +395,7 @@ c.....units derivatives (ugly, usable only for sigmoid function
 c.....and identity input)
       do k=1,u
 	      units(k) = units(k) * (1d0 - units(k))
+          !units(k) = units(k) * (1d0 - units(k)) * (1d0-2d0*units(k))
       enddo
       do k=1,i
           units(inno(k)) = 1d0
