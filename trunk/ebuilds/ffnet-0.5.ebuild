@@ -19,12 +19,17 @@ DEPEND="virtual/python
 	sci-libs/scipy
 	matplotlib? ( dev-python/matplotlib )"
 
-F2PY_FC="gnu"
+# set environment variable F2PY_FC with proper f2py compiler name
+# or gnu compilers will be used
+if [ ${F2PY_FC} ]; then
+	FCOMPILER="--fcompiler=${F2PY_FC}"
+fi
+	
 
 src_compile() {
 	distutils_src_compile \
 		config_fc \
-		--fcompiler=${F2PY_FC} \
+		${FCOMPILER} \
 		--opt="${CFLAGS}" \
 		|| die "compilation failed"
 }
