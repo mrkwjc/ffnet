@@ -1,0 +1,11 @@
+SMALLER THINGS
+o  Add support for one dimensional arrays as input and target (in case the network
+   have one input/output).
+o  Add two spiral problem example.
+
+
+BIGGER THINGS
+o  Add support for frozen weights.
+o  Add other activation functions (also user defined ones).
+o  Refactor fortran code in the light of the above new capabilities.
+o  Add rprop training algorithm.
