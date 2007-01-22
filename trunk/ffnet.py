@@ -13,7 +13,7 @@ from pikaia import pikaia
 
 def mlgraph(arch, biases = True):
     '''
-    Creates standard multilayer network full connectivity list.
+    Creates standard multilayer network with full connectivity list.
     '''
     nofl = len(arch)
     conec = []
@@ -28,7 +28,55 @@ def mlgraph(arch, biases = True):
             for src in srclist:
                 conec.append((src, trg))
     return conec
+
+def imlgraph(arch, biases = True):
+    '''
+    Creates special layered network where outputs are
+    independent from each other.
+    Exemplary architecture definition:
+    arch = (3, [(4,), (), (6, 3)], 3).
+    With such an arch, function builds three independent
+    multilayer graphs: 3-4-1, 3-1, 3-6-3-1
+    and merges them into one graph with common input nodes.
     
+    Simplified version of the above architecture syntax is:
+    arch = (3, 3, 3)  #as in the mlgraph
+    Three nets: 3-3-1, 3-3-1, 3-3-1 are merged in this case.
+    '''
+    #Checks of the architecture
+    if len(arch) < 3:
+        raise TypeError("Wrong architecture definition (at least 3 layers needed).")
+    if isinstance(arch[1], int):
+        arch = tuple(arch)
+        arch = arch[:1] + tuple([[ arch[1:-1] ] * arch[-1]]) + arch[-1:]
+    elif isinstance(arch[1], (list, tuple)):
+        if len(arch[1]) != arch[2]:
+            raise TypeError("Length of arch[1] should be equal to arch[2].")
+    else: raise TypeError("Wrong architecture definition.")
+    
+    #Merging function
+    def merge(conec, conec_tmp, nofi):
+        from scipy import array, where
+        try:
+            trans = array(conec).max() - nofi
+            tmp = array(conec_tmp)
+            tmp = where(tmp > nofi, tmp + trans, tmp)
+            conec_tmp = [ tuple(c) for c in tmp ]
+            return conec + conec_tmp
+        except ValueError:
+            return conec_tmp
+        
+    nofi = arch[0]
+    inps = arch[:1]
+    outs = [1]
+    conec = []
+    for hids in arch[1]:
+        arch_tmp = inps + hids + outs
+        conec_tmp = mlgraph(arch_tmp, **kwargs)
+        conec = merge(conec, conec_tmp, nofi)
+
+    return conec
+
 def tmlgraph(arch, biases = True):
     '''
     Creates multilayer network full connectivity list,
@@ -169,8 +217,8 @@ class ffnet:
     
     NETWORK CREATION:
     Base creation of the network consist in delivering list of connections:
-        coneclist = [[1, 3], [2, 3], [0, 3] \
-                     [1, 4], [2, 4], [0, 4] \
+        coneclist = [[1, 3], [2, 3], [0, 3] 
+                     [1, 4], [2, 4], [0, 4] 
                      [3, 5], [4, 5], [0, 5]]
         n = ffnet(coneclist)
     0 in coneclist is a special unit representing bias. If there is
@@ -338,11 +386,11 @@ class ffnet:
             # I'm still not sure where to put this check....
             for i, col in enumerate(input.transpose()):
                 if max(col) == min(col):
-                    print "Warning: %ith input node takes single value %f." %(i+1, max(col))
+                    print "Warning: %ith input node takes always a single value of %f." %(i+1, max(col))
 
             for i, col in enumerate(target.transpose()):
                 if max(col) == min(col):
-                    print "Warning: %ith target node takes single value %f." %(i+1, max(col))
+                    print "Warning: %ith target node takes always a single value of %f." %(i+1, max(col))
             
             #limits are informative only, eni,dei/eno,deo are input/output coding-decoding
             self.inlimits, self.eni, self.dei = norms(input, lower=0.15, upper=0.85)
@@ -692,6 +740,32 @@ class Testmlgraph(unittest.TestCase):
                   (1, 4), (2, 4), \
                   (3, 5), (4, 5)]
         self.assertEqual(conec, conec0)
+
+class Testimlgraph(unittest.TestCase):
+    def testEmpty(self):
+        arch = ()
+        self.assertRaises(TypeError, imlgraph, arch)
+    def testOneLayer(self):
+        arch = (5,)
+        self.assertRaises(TypeError, imlgraph, arch)
+    def testTwoLayers(self):
+        arch = (1,1)
+        self.assertRaises(TypeError, imlgraph, arch)
+    #~ def testThreeLayers(self):
+        #~ arch = (2,2,1)
+        #~ conec = mlgraph(arch)
+        #~ conec0 = [(1, 3), (2, 3), (0, 3), \
+                  #~ (1, 4), (2, 4), (0, 4), \
+                  #~ (3, 5), (4, 5), (0, 5)]
+        #~ self.assertEqual(conec, conec0)
+    #~ def testNoBiases(self):
+        #~ arch = (2,2,1)
+        #~ conec = mlgraph(arch, biases = False)
+        #~ conec0 = [(1, 3), (2, 3), \
+                  #~ (1, 4), (2, 4), \
+                  #~ (3, 5), (4, 5)]
+        #~ self.assertEqual(conec, conec0)
+
 
 class Testtmlgraph(unittest.TestCase):
     def testEmpty(self):
