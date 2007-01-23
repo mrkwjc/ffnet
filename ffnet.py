@@ -68,11 +68,11 @@ def imlgraph(arch, biases = True):
         
     nofi = arch[0]
     inps = arch[:1]
-    outs = [1]
+    outs = (1,)
     conec = []
     for hids in arch[1]:
         arch_tmp = inps + hids + outs
-        conec_tmp = mlgraph(arch_tmp, **kwargs)
+        conec_tmp = mlgraph(arch_tmp, biases=biases)
         conec = merge(conec, conec_tmp, nofi)
 
     return conec
@@ -751,20 +751,26 @@ class Testimlgraph(unittest.TestCase):
     def testTwoLayers(self):
         arch = (1,1)
         self.assertRaises(TypeError, imlgraph, arch)
-    #~ def testThreeLayers(self):
-        #~ arch = (2,2,1)
-        #~ conec = mlgraph(arch)
-        #~ conec0 = [(1, 3), (2, 3), (0, 3), \
-                  #~ (1, 4), (2, 4), (0, 4), \
-                  #~ (3, 5), (4, 5), (0, 5)]
-        #~ self.assertEqual(conec, conec0)
-    #~ def testNoBiases(self):
-        #~ arch = (2,2,1)
-        #~ conec = mlgraph(arch, biases = False)
-        #~ conec0 = [(1, 3), (2, 3), \
-                  #~ (1, 4), (2, 4), \
-                  #~ (3, 5), (4, 5)]
-        #~ self.assertEqual(conec, conec0)
+    def testThreeLayers(self):
+        arch = (2,2,2)
+        conec = imlgraph(arch)
+        conec0 = [(1, 3), (2, 3), (0, 3), \
+                  (1, 4), (2, 4), (0, 4), \
+                  (3, 5), (4, 5), (0, 5), \
+                  (1, 6), (2, 6), (0, 6), \
+                  (1, 7), (2, 7), (0, 7), \
+                  (6, 8), (7, 8), (0, 8)]
+        self.assertEqual(conec, conec0)
+    def testNoBiases(self):
+        arch = (2,[(2,), (2,)],2)
+        conec = imlgraph(arch, biases = False)
+        conec0 = [(1, 3), (2, 3), \
+                  (1, 4), (2, 4), \
+                  (3, 5), (4, 5), \
+                  (1, 6), (2, 6), \
+                  (1, 7), (2, 7), \
+                  (6, 8), (7, 8),]
+        self.assertEqual(conec, conec0)
 
 
 class Testtmlgraph(unittest.TestCase):
