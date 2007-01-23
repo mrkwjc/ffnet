@@ -35,12 +35,12 @@ def imlgraph(arch, biases = True):
     independent from each other.
     Exemplary architecture definition:
     arch = (3, [(4,), (), (6, 3)], 3).
-    With such an arch, function builds three independent
+    With such an arch, imlgraph builds three independent
     multilayer graphs: 3-4-1, 3-1, 3-6-3-1
     and merges them into one graph with common input nodes.
     
     Simplified version of the above architecture syntax is:
-    arch = (3, 3, 3)  #as in the mlgraph
+    arch = (3, 3, 3)  #exactly as in the mlgraph
     Three nets: 3-3-1, 3-3-1, 3-3-1 are merged in this case.
     '''
     #Checks of the architecture
@@ -71,10 +71,9 @@ def imlgraph(arch, biases = True):
     outs = (1,)
     conec = []
     for hids in arch[1]:
-        arch_tmp = inps + hids + outs
+        arch_tmp = tuple(inps) + tuple(hids) + tuple(outs)
         conec_tmp = mlgraph(arch_tmp, biases=biases)
         conec = merge(conec, conec_tmp, nofi)
-
     return conec
 
 def tmlgraph(arch, biases = True):
