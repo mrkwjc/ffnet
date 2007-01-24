@@ -6,6 +6,18 @@ import networkx as NX
 
 # General function making network plot
 def drawffnet(net):
+    """
+    Takes ffnet object and draws the network. 
+    Networkx layouts and maplotlib buttons are used to control layout. 
+    
+    Note:
+    This is draft solution.
+    Function seems not to work with older versions of matplotlib 
+    (below 0.87.7, e.g. in enthought python we have 0.87.3 and
+    there are problems). There might occur also problems
+    with graphviz layouts on Windows.
+    """
+    
     G = net.graph
     BG = net.bgraph
     
