@@ -84,14 +84,21 @@ def drawffnet(net):
     dgraphax = axes([0.025, 0.2, 0.18, 0.04])
     button2 = Button(dgraphax, 'Diff graphs', color=axcolor, hovercolor='0.975')
     def showdgraphs(event):
+        def dsubgraph_nodes(inp, out, nbunch):
+            pred = NX.predecessor(G, inp, out)
+            nbunch += pred
+            for node in pred:
+                dsubgraph_nodes(inp, node, nbunch)
+            return nbunch
         layout = radio_layout.layout
         import time
         for innode in net.inno:
-            for outnode in net.outno:
+            for outnode in net.outno:               
+                nbunch = [outnode]
+                nbunch = dsubgraph_nodes(innode, outnode, nbunch)
+                g = G.subgraph(nbunch)
                 ax.clear()
                 setp(ax, xticks=[], yticks=[])
-                nbunch = NX.predecessor(G, innode, outnode) + [innode, outnode]
-                g = G.subgraph(nbunch)
                 NX.draw_networkx(G, layout, alpha=0.1, labels={})
                 NX.draw_networkx(g, layout, node_color='c')
                 draw()
@@ -104,7 +111,9 @@ def drawffnet(net):
 if __name__ == "__main__":
     from ffnet import ffnet, mlgraph, tmlgraph
     
-    conec = mlgraph((3,5,3), biases = False)   ##(3,[(3,), (6,3), (3,)],3)
+    ##conec = mlgraph((3,5,5,3), biases = False)
+    from ffnet import imlgraph
+    conec = imlgraph((3,[(3,), (6,3), (3,)],3), biases = False)
     net = ffnet(conec)
     
     drawffnet(net)
