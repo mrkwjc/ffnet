@@ -104,6 +104,10 @@ Python distribution!), just run:
 
     python setup.py build --compiler=mingw32
 	python setup.py install --skip-build
+    
+To install proper mingw download:
+http://downloads.sourceforge.net/mingw/MinGW-5.1.2.exe?modtime=1166577337&big_mirror=1
+and choose Candidate at installation time (Current doesn't work).
 
 3. Binary installer for Windows:
 Double click the installation program.
