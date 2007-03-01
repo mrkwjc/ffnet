@@ -5,7 +5,7 @@ from matplotlib.patches import Circle
 import networkx as NX
 
 # General function making network plot
-def drawffnet(net):
+def drawffnet(net, biases = False):
     """
     Takes ffnet object and draws the network. 
     Networkx layouts and maplotlib buttons are used to control layout. 
@@ -18,8 +18,11 @@ def drawffnet(net):
     with graphviz layouts on Windows.
     """
     
-    G = net.graph
-    BG = net.bgraph
+    #Takes copies of network graphs
+    G = net.graph.copy()
+    if not biases: G.delete_node(0)
+    BG = net.bgraph.copy()
+    
     
     ax = subplot(111)
     subplots_adjust(left=0.25)
@@ -113,7 +116,7 @@ if __name__ == "__main__":
     
     ##conec = mlgraph((3,5,5,3), biases = False)
     from ffnet import imlgraph
-    conec = imlgraph((3,[(3,), (6,3), (3,)],3), biases = False)
+    conec = imlgraph((3,[(3,), (6,3), (3,)],3))
     net = ffnet(conec)
     
     drawffnet(net)
