@@ -53,8 +53,8 @@ try:
     xaxis = [ 0. ] + [ k*2*pi/points for k in xrange(1, points + 1) ]
     sine = [ sin(x) for x in xaxis ]
     cosine = [ cos(x) for x in xaxis ]
-    netsine = [ net([x]) for x in xaxis]
-    netcosine = [ net.derivative([x]) for x in xaxis ]
+    netsine = [ net([x])[0] for x in xaxis]
+    netcosine = [ net.derivative([x])[0][0] for x in xaxis ]
     
     subplot(211)
     plot(xaxis, sine, 'b--', xaxis, netsine, 'k-')
