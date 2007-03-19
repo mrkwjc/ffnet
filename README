@@ -78,7 +78,7 @@ Go to http://ffnet.sourceforge.net to download latest release version
 of ffnet. You can also download development version from ffnet
 subversion repository:
 
-svn co https://svn.sourceforge.net/svnroot/ffnet/trunk ffnet
+svn co https://ffnet.svn.sourceforge.net/svnroot/ffnet/trunk ffnet
 
 
 Installation
@@ -132,11 +132,11 @@ answer = net( [ 0., 0. ] )
 partial_derivatives = net.derivative( [ 0., 0. ] )
 
 Examples with full description can be found in examples directory
-of source distribution.
+of the source distribution.
 
 
 Documentation
 -------------
-1. Go to http://ffnet.sourceforge.net for more info about ffnet.
+1. Go to http://ffnet.sourceforge.net for online documentation.
 2. Read docstrings of ffnet functions and methods.
 
