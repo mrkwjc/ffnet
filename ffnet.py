@@ -373,8 +373,8 @@ class ffnet:
         """Retrieves normalization info from training data and normalizes data"""
         numi = len(self.inno); numo = len(self.outno)
         if input is None and target is None:
-            #self.inlimits  = array( [[0.15, 0.85]]*numi ) #informative only
-            #self.outlimits = array( [[0.15, 0.85]]*numo ) #informative only
+            self.inlimits  = array( [[0.15, 0.85]]*numi ) #informative only
+            self.outlimits = array( [[0.15, 0.85]]*numo ) #informative only
             self.eni = self.dei = array( [[1., 0.]] * numi )
             self.eno = self.deo = array( [[1., 0.]] * numo )
             self.ded = ones(shape = (numo, numi))
@@ -698,17 +698,40 @@ class ffnet:
         return output.transpose().tolist(), regress
 
 def savenet(net, filename):
+    """
+    Saves network to the file using cPickle module.
+    """
     import cPickle
     file = open(filename, 'w')
     cPickle.dump(net, file)
     file.close()
+    return
     
 def loadnet(filename):
+    """
+    Loads network pickled with 'savenet'. 
+    """    
     import cPickle
     file = open(filename, 'r')
     net = cPickle.load(file)
     return net
 
+def exportnet(net, filename, name = 'ffnet', lang = 'fortran'):
+    """
+    Exports network to the compiled language source code.
+    Currently only fortran is supported.
+
+    There are two routines exported: ffnet and dffnet
+    """    
+    from tools import py2f
+    f = open( filename, 'w' )
+    f.write( py2f.fheader( net ) )
+    f.write( py2f.fcomment() )
+    f.write( py2f.ffnetrecall(net, name) )
+    f.write( py2f.fcomment() )
+    f.write( py2f.ffnetdiff(net, 'd' + name) )
+    return
+    
 # TESTS
 import unittest
 
@@ -928,6 +951,44 @@ class TestFfnetSigmoid(unittest.TestCase):
         print "Test of TNC algorithm"
         self.tnet.train_tnc(array(self.input), array(self.target), maxfun = 1000)
         self.tnet.test(self.input, self.target)
+
+class TestSaveLoadExport(unittest.TestCase):
+    def setUp(self):
+        conec = imlgraph( (5,5,5) )
+        self.net = ffnet(conec)
+        
+    def tearDown(self):
+        import os
+        try: os.remove('tmpffnet.f')
+        except: pass
+        try: os.remove('tmpffnet.so')
+        except: pass
+    
+    def testSaveLoad(self):
+        res1 = self.net( [ 1, 2, 3, 4, 5. ] )
+        savenet( self.net, '/tmp/tmpffnet.net' )
+        net = loadnet( '/tmp/tmpffnet.net' )
+        res2 = net( [ 1, 2, 3, 4, 5. ] )
+        for i in xrange(5):
+            self.assertAlmostEqual(res1[i], res2[i], 8)
+        
+    def testExport(self):
+        resA = self.net ( [ 1, 2, 3, 4, 5. ] )
+        resB = self.net.derivative( [ 1, 2, 3, 4, 5. ] )
+        exportnet(self.net, 'tmpffnet.f')
+        #import os; os.chdir('/tmp')
+        from numpy import f2py
+        f = open( 'tmpffnet.f', 'r' ); source = f.read(); f.close()
+        f = open( 'fortran/ffnet.f', 'r' ); source += f.read(); f.close()
+        f2py.compile(source, modulename = 'tmpffnet', extra_args = eargs, verbose = 0)
+        import tmpffnet
+        resA1 = tmpffnet.ffnet( [ 1, 2, 3, 4, 5. ] )
+        resB1 = tmpffnet.dffnet( [ 1, 2, 3, 4, 5. ] )
+        for i in xrange(5):
+            self.assertAlmostEqual(resA[i], resA1[i], 7)
+            for j in xrange(5):
+                self.assertAlmostEqual(resB[i][j], resB1[i][j], 7)
+        
 
 if __name__ == '__main__':
     unittest.main()
