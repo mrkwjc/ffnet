@@ -7,7 +7,7 @@
 ########################################################################
 
 # import raw module 
-import _pikaia
+from fortran import _pikaia
 
 # Wrap main pikaia routine
 def pikaia (ff, n, ff_extra_args = (), \
