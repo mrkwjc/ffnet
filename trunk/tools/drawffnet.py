@@ -1,6 +1,16 @@
-from pylab import *
-from matplotlib.widgets import Slider, Button, RadioButtons
-from matplotlib.patches import Circle
+########################################################################
+##  Copyright (C) 2006 by Marek Wojciechowski
+##  <mwojc@p.lodz.pl>
+##
+##  Distributed under the terms of the GNU General Public License (GPL)
+##  http://www.gnu.org/copyleft/gpl.html
+########################################################################
+try:
+    from pylab import *
+    from matplotlib.widgets import Slider, Button, RadioButtons
+    from matplotlib.patches import Circle
+except:
+    raise ImportError( " Matplotlib not found! " )
 
 import networkx as NX
 

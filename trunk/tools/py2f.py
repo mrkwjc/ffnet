@@ -1,3 +1,11 @@
+########################################################################
+##  Copyright (C) 2006 by Marek Wojciechowski
+##  <mwojc@p.lodz.pl>
+##
+##  Distributed under the terms of the GNU General Public License (GPL)
+##  http://www.gnu.org/copyleft/gpl.html
+########################################################################
+
 """
 Helper functions to create fortran code from within python
 """
@@ -158,6 +166,7 @@ WARNING: You need 'ffnet.f' file distributed with ffnet
               fcomment( '-'*66 ) + \
               netroutine  + \
               fcomment( '-'*66 ) + \
+              flines( 'EXTERNAL normcall' ) + \
               declarations + \
               definitions + fcomment() + \
               callnet + fcomment() + \
