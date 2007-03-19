@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>ffnet</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css"></link>
+</head>
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://ffnet.sourcefoge.net">Feed-forward&nbsp;neural&nbsp;network&nbsp;for&nbsp;python&nbsp;(ffnet)</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <font size="-1"><b class="breadcrumbs">
+        Module&nbsp;ffnet
+      </b></font></br>
+    </td>
+    <td><table cellpadding="0" cellspacing="0">
+      <tr><td align="right"><font size="-2">[<a href="../private/ffnet-module.html">show&nbsp;private</a>&nbsp;|&nbsp;hide&nbsp;private]</font></td></tr>
+      <tr><td align="right"><font size="-2">[<a href="frames.html"target="_top">frames</a>&nbsp;|&nbsp;<a href="ffnet-module.html" target="_top">no&nbsp;frames</a>]</font></td></tr>
+    </table></td>
+</tr></table>
+
+<!-- =========== START OF MODULE DESCRIPTION =========== -->
+<h2 class="module">Module ffnet</h2>
+
+
+<!-- =========== START OF CLASSES =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Classes</th></tr>
+<tr><td width="15%">
+  <b><a href="ffnet.ffnet-class.html"><code>ffnet</code></a></b></td>
+  <td>Feed-forward neural network implementation.</td></tr>
+</table><br />
+
+
+<!-- =========== START OF FUNCTION SUMMARY =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Function Summary</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="ffnet-module.html#bconec" class="summary-sig-name"><code>bconec</code></a>(<span class=summary-sig-arg>conec</span>,
+          <span class=summary-sig-arg>inno</span>)</span></code>
+<br />
+Returns list of adjoint graph (for backprop) edges positions in 
+conec.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="ffnet-module.html#dconec" class="summary-sig-name"><code>dconec</code></a>(<span class=summary-sig-arg>conec</span>,
+          <span class=summary-sig-arg>inno</span>)</span></code>
+<br />
+Return list of edges positions (in conec) of graphs for derivative 
+calculation, all packed in one list (dconecno).</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="ffnet-module.html#ffconec" class="summary-sig-name"><code>ffconec</code></a>(<span class=summary-sig-arg>conec</span>)</span></code>
+<br />
+Checks if conec is acyclic, sorts it if necessary and returns tuple: 
+(conec, inno, hidno, outno) where: conec - sorted input connectivity 
+inno/hidno/outno - lists of input/hidden/ouput units</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="ffnet-module.html#linear" class="summary-sig-name"><code>linear</code></a>(<span class=summary-sig-arg>a</span>,
+          <span class=summary-sig-arg>b</span>,
+          <span class=summary-sig-arg>c</span>,
+          <span class=summary-sig-arg>d</span>)</span></code>
+<br />
+Returns coefficients of linear map from range (a,b) to (c,d)</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><a name="loadnet"></a><span class="summary-sig"><span class="summary-sig-name">loadnet</span>(<span class=summary-sig-arg>filename</span>)</span></code>
+</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="ffnet-module.html#mlgraph" class="summary-sig-name"><code>mlgraph</code></a>(<span class=summary-sig-arg>arch</span>,
+          <span class=summary-sig-arg>biases</span>)</span></code>
+<br />
+Creates standard multilayer network full connectivity list.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="ffnet-module.html#normarray" class="summary-sig-name"><code>normarray</code></a>(<span class=summary-sig-arg>inarray</span>,
+          <span class=summary-sig-arg>coeff</span>)</span></code>
+<br />
+Normalize 2-dimensional array linearly column by column with provided 
+coefficiens.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="ffnet-module.html#norms" class="summary-sig-name"><code>norms</code></a>(<span class=summary-sig-arg>inarray</span>,
+          <span class=summary-sig-arg>lower</span>,
+          <span class=summary-sig-arg>upper</span>)</span></code>
+<br />
+Gets normalization information from an array,for use in ffnet 
+class.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><a name="savenet"></a><span class="summary-sig"><span class="summary-sig-name">savenet</span>(<span class=summary-sig-arg>net</span>,
+          <span class=summary-sig-arg>filename</span>)</span></code>
+</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="ffnet-module.html#tmlgraph" class="summary-sig-name"><code>tmlgraph</code></a>(<span class=summary-sig-arg>arch</span>,
+          <span class=summary-sig-arg>biases</span>)</span></code>
+<br />
+Creates multilayer network full connectivity list, but now layers have 
+connections with all preceding layers (not only the first one)</td></tr>
+</table><br />
+
+
+<!-- =========== START OF FUNCTION DETAILS =========== -->
+<table class="details" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="details">
+  <th colspan="2">Function Details</th></tr>
+</table>
+
+<a name="bconec"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">bconec</span>(<span class=sig-arg>conec</span>,
+          <span class=sig-arg>inno</span>)</span>
+  </h3>
+  Returns list of adjoint graph (for backprop) edges positions in 
+  conec. Conec is assumed to be acyclic.
+  <dl><dt></dt><dd>
+  </dd></dl>
+</td></tr></table>
+
+<a name="dconec"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">dconec</span>(<span class=sig-arg>conec</span>,
+          <span class=sig-arg>inno</span>)</span>
+  </h3>
+  Return list of edges positions (in conec) of graphs for derivative 
+  calculation, all packed in one list (dconecno). Additionaly beginings 
+  of each graph in this list is returned (dconecmk)
+  <dl><dt></dt><dd>
+  </dd></dl>
+</td></tr></table>
+
+<a name="ffconec"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">ffconec</span>(<span class=sig-arg>conec</span>)</span>
+  </h3>
+  Checks if conec is acyclic, sorts it if necessary and returns tuple: 
+  (conec, inno, hidno, outno) where: conec - sorted input connectivity 
+  inno/hidno/outno - lists of input/hidden/ouput units
+  <dl><dt></dt><dd>
+  </dd></dl>
+</td></tr></table>
+
+<a name="linear"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">linear</span>(<span class=sig-arg>a</span>,
+          <span class=sig-arg>b</span>,
+          <span class=sig-arg>c</span>,
+          <span class=sig-arg>d</span>)</span>
+  </h3>
+  Returns coefficients of linear map from range (a,b) to (c,d)
+  <dl><dt></dt><dd>
+  </dd></dl>
+</td></tr></table>
+
+<a name="mlgraph"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">mlgraph</span>(<span class=sig-arg>arch</span>,
+          <span class=sig-arg>biases</span>=<span class=sig-default>True</span>)</span>
+  </h3>
+  Creates standard multilayer network full connectivity list.
+  <dl><dt></dt><dd>
+  </dd></dl>
+</td></tr></table>
+
+<a name="normarray"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">normarray</span>(<span class=sig-arg>inarray</span>,
+          <span class=sig-arg>coeff</span>)</span>
+  </h3>
+  Normalize 2-dimensional array linearly column by column with 
+  provided coefficiens.
+  <dl><dt></dt><dd>
+  </dd></dl>
+</td></tr></table>
+
+<a name="norms"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">norms</span>(<span class=sig-arg>inarray</span>,
+          <span class=sig-arg>lower</span>=<span class=sig-default>0.0</span>,
+          <span class=sig-arg>upper</span>=<span class=sig-default>1.0</span>)</span>
+  </h3>
+  Gets normalization information from an array,for use in ffnet class. 
+  (lower, upper) is a range of normalisation. inarray is 2-dimensional 
+  and normalisation parameters are computed for each column...
+  <dl><dt></dt><dd>
+  </dd></dl>
+</td></tr></table>
+
+<a name="tmlgraph"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">tmlgraph</span>(<span class=sig-arg>arch</span>,
+          <span class=sig-arg>biases</span>=<span class=sig-default>True</span>)</span>
+  </h3>
+  Creates multilayer network full connectivity list, but now layers 
+  have connections with all preceding layers (not only the first one)
+  <dl><dt></dt><dd>
+  </dd></dl>
+</td></tr></table>
+<br />
+
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://ffnet.sourcefoge.net">Feed-forward&nbsp;neural&nbsp;network&nbsp;for&nbsp;python&nbsp;(ffnet)</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td align="left"><font size="-2">Generated by Epydoc 2.1 on Fri Feb  2 00:55:43 2007</font></td>
+    <td align="right"><a href="http://epydoc.sourceforge.net"
+                      ><font size="-2">http://epydoc.sf.net</font></a></td>
+  </tr>
+</table>
+</body>
+</html>
