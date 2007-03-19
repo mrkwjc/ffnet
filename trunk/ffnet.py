@@ -8,7 +8,7 @@
 
 from scipy import array, zeros, ones, random, optimize, sqrt
 import networkx as NX
-import _ffnet as netprop
+from fortran import _ffnet as netprop
 from pikaia import pikaia
 
 def mlgraph(arch, biases = True):
