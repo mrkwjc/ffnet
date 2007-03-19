@@ -980,6 +980,7 @@ class TestSaveLoadExport(unittest.TestCase):
         from numpy import f2py
         f = open( 'tmpffnet.f', 'r' ); source = f.read(); f.close()
         f = open( 'fortran/ffnet.f', 'r' ); source += f.read(); f.close()
+        eargs = ''
         f2py.compile(source, modulename = 'tmpffnet', extra_args = eargs, verbose = 0)
         import tmpffnet
         resA1 = tmpffnet.ffnet( [ 1, 2, 3, 4, 5. ] )
