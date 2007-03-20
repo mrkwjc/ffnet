@@ -344,6 +344,34 @@ class ffnet:
                                  self.units, self.inno, self.outno, self.eni, self.ded, inp)
         return deriv.tolist()
         
+    def sqerror(self, input, target):
+        """
+        Returns 0.5*(sum of squared errors at output)
+        for input and target arrays being first normalized.
+        Might be slow in frequent use, because data normalization is
+        performed at ach call.
+        """
+        input, target = self._testdata(input, target)
+        input = normarray(input, self.eni) #Normalization data might be uninitialized here!
+        target = normarray(target, self.eno)
+        err  = netprop.sqerror(self.weights, self.conec, self.units, \
+                               self.inno, self.outno, input, target)
+        return err
+    
+    def sqgrad(self, input, target):
+        """
+        Returns gradient of sqerror vs. network weights.
+        Input and target arrays are first normalized.
+        Might be slow in frequent use, because data normalization is
+        performed at ach call.
+        """
+        input, target = self._testdata(input, target) 
+        input = normarray(input, self.eni) #Normalization data might be uninitialized here!
+        target = normarray(target, self.eno)
+        g  = netprop.grad(self.weights, self.conec, self.bconecno, self.units, \
+                          self.inno, self.outno, input, target)
+        return g
+    
     def randomweights(self):
         """Randomize weights due to Bottou proposition"""
         nofw = len(self.conec)
@@ -433,14 +461,14 @@ class ffnet:
         if disp:
             err  = netprop.sqerror(self.weights, self.conec, self.units, \
                                    self.inno, self.outno, input, target)
-            print "Initial error --> 0.5*(sum of squared errors at output): %f" %err
+            print "Initial error --> 0.5*(sum of squared errors at output): %.15f" %err
         self.weights = netprop.momentum(self.weights, self.conec, self.bconecno, \
                                         self.units, self.inno, self.outno, input, \
                                         target, eta, momentum, maxiter)
         if disp:
             err  = netprop.sqerror(self.weights, self.conec, self.units, \
                                    self.inno, self.outno, input, target)
-            print "Final error   --> 0.5*(sum of squared errors at output): %f" %err
+            print "Final error   --> 0.5*(sum of squared errors at output): %.15f" %err
 
     def train_rprop(self, input, target, \
                     a = 1.2, b = 0.5, mimin = 0.000001, mimax = 50., \
@@ -465,18 +493,18 @@ class ffnet:
         input, target = self._setnorm(input, target)
         if type(xmi).__name__ in ['float', 'int']:
             xmi = [ xmi ]*len(self.conec)
-            
+        
         if disp:
             err  = netprop.sqerror(self.weights, self.conec, self.units, \
                                    self.inno, self.outno, input, target)
-            print "Initial error --> 0.5*(sum of squared errors at output): %f" %err
+            print "Initial error --> 0.5*(sum of squared errors at output): %.15f" %err
         self.weights, xmi = netprop.rprop(self.weights, self.conec, self.bconecno, \
                                           self.units, self.inno, self.outno, input, \
                                           target, a, b, mimin, mimax, xmi, maxiter)
         if disp:
             err  = netprop.sqerror(self.weights, self.conec, self.units, \
                                    self.inno, self.outno, input, target)
-            print "Final error   --> 0.5*(sum of squared errors at output): %f" %err
+            print "Final error   --> 0.5*(sum of squared errors at output): %.15f" %err
         return xmi
 
     def train_genetic(self, input, target, **kwargs):
@@ -988,6 +1016,25 @@ class TestFfnetSigmoid(unittest.TestCase):
         self.assertAlmostEqual(self.net.derivative([0., 0.])[0][0], 0.1529465741023702, 8)
         self.assertAlmostEqual(self.net.derivative([0., 0.])[0][1], 0.1529465741023702, 8)
         
+    def testSqerror(self):
+        err = self.tnet.sqerror(self.input, self.target)
+        out = [ (self.tnet(self.input[i])[0] - self.target[i][0])**2 \
+                for i in xrange( len(self.input) ) ]
+        pyerr = 0.5 * sum(out)
+        self.assertAlmostEqual(err, pyerr, 8)
+
+    def testSqgrad(self):
+        self.tnet._setnorm(self.input, self.target) # Possible bug, this shouldn't be here
+        g = self.tnet.sqgrad(self.input, self.target)
+        w1 = self.tnet.weights - g
+
+        self.tnet.train_momentum(self.input, self.target, eta=1., momentum=0., maxiter=1)
+        w2 = self.tnet.weights
+        
+        for i in xrange(len(w1)):
+            self.assertAlmostEqual(w1[i], w2[i], 8)
+            
+
     def testTrainGenetic(self):
         print "Test of genetic algorithm optimization"
         self.tnet.train_genetic(self.input, self.target, lower = -50., upper = 50., \
@@ -1001,6 +1048,7 @@ class TestFfnetSigmoid(unittest.TestCase):
 
     def testTrainRprop(self): 
         print "Test of rprop algorithm"
+        self.tnet.randomweights()
         xmi = self.tnet.train_rprop(self.input, self.target, \
                                     a=1.2, b=0.5, mimin=0.000001, mimax=50, \
                                     xmi=0.1, maxiter=10000, disp=1)

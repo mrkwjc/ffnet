@@ -69,5 +69,5 @@ print \
 """
 Note:
 Normalization of input/output data is handled automatically in ffnet.
-Just set your raw data both at trainig and recalling phase. 
+Just use your raw data both at trainig and recalling phase. 
 """
