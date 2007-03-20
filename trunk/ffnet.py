@@ -377,7 +377,7 @@ class ffnet:
             self.outlimits = array( [[0.15, 0.85]]*numo ) #informative only
             self.eni = self.dei = array( [[1., 0.]] * numi )
             self.eno = self.deo = array( [[1., 0.]] * numo )
-            self.ded = ones(shape = (numo, numi))
+            self.ded = ones((numo, numi), 'd')
         else:
             input, target = self._testdata(input, target)
             
@@ -963,11 +963,13 @@ class TestSaveLoadExport(unittest.TestCase):
         except: pass
         try: os.remove('tmpffnet.so')
         except: pass
-    
+        try: os.remove('tmpffnet.net')
+        except: pass
+
     def testSaveLoad(self):
         res1 = self.net( [ 1, 2, 3, 4, 5. ] )
-        savenet( self.net, '/tmp/tmpffnet.net' )
-        net = loadnet( '/tmp/tmpffnet.net' )
+        savenet( self.net, 'tmpffnet.net' )
+        net = loadnet( 'tmpffnet.net' )
         res2 = net( [ 1, 2, 3, 4, 5. ] )
         for i in xrange(5):
             self.assertAlmostEqual(res1[i], res2[i], 8)
@@ -980,7 +982,10 @@ class TestSaveLoadExport(unittest.TestCase):
         from numpy import f2py
         f = open( 'tmpffnet.f', 'r' ); source = f.read(); f.close()
         f = open( 'fortran/ffnet.f', 'r' ); source += f.read(); f.close()
-        eargs = ''
+        import sys
+        if sys.platform == 'win32':
+            eargs = '--compiler=mingw32'
+        else: eargs = ''
         f2py.compile(source, modulename = 'tmpffnet', extra_args = eargs, verbose = 0)
         import tmpffnet
         resA1 = tmpffnet.ffnet( [ 1, 2, 3, 4, 5. ] )

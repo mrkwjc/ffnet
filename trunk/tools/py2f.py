@@ -41,12 +41,16 @@ def farray(arr, fname):
         fshp = '(%i)' %shp[0]
     else:
         fshp = str(shp)
+
     typ = arr.dtype
-    
-    if typ in [ 'int32', 'int64' ]: ftyp = 'INTEGER '
-    elif typ == 'float32': ftyp = 'REAL '
-    elif typ == 'float64': ftyp = 'DOUBLE PRECISION '
-    else: raise TypeError("Unsupported array type")
+    try: typ = typ.str #Needed by older versions of numpy
+    except: pass
+
+    if typ in [ 'int32', 'int64', '<i4', '<i8' ]: ftyp = 'INTEGER '
+    elif typ in [ 'float32', '<f4' ]: ftyp = 'REAL '
+    elif typ in [ 'float64', '<f8' ]: ftyp = 'DOUBLE PRECISION '
+    else: print typ
+    #else: raise TypeError("Unsupported array type")
     
     declaration = flines ( ftyp + fname + fshp )
     
@@ -231,4 +235,20 @@ WARNING: You need 'ffnet.f' file distributed with ffnet
     header = fcomment ( header )
     
     return header
+
+import unittest
+class TestExport2Fortran(unittest.TestCase):  #not finished, just started
+    def setUp(self):
+        from numpy import array
+        self.A = array([[1,2,3], [4,5,6]])
+        self.B = array([[1,2,3], [4,5,6.]])
+        
+    def tearDown(self):
+        pass
     
+    def testArray(self):
+        s1 = farray(self.A, 'test')      
+        s2 = farray(self.B, 'test')
+        
+if __name__ == '__main__':
+    unittest.main()
