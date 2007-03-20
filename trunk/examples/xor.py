@@ -45,5 +45,5 @@ print "Exporting trained network to the fortran source..."
 exportnet(net, "xor.f")
 print "Done..."
 print "Look at the generated xor.f file."
-print "Note, that you must compile it along with the ffnet.f" 
+print "Note: you must compile xor.f along with the ffnet.f" 
 print "file which can be found in ffnet sources."

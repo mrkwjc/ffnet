@@ -484,6 +484,54 @@ c.....update maxiter times
 	  
       return
       end
+      
+c************************************************************************
+      subroutine rprop(x, conec, n, bconecno, bn, units, u, inno, i,  
+     &                 outno, o, Input, Targ, p, 
+     &                 a, b, mimin, mimax, xmi, maxiter)
+c************************************************************************
+c
+c.....Rprop training algorithm
+c
+      implicit none
+c.....variables
+      integer n, bn, u, i, o, p, maxiter
+      integer conec(n,2), bconecno(bn), inno(i), outno(o)
+      double precision x(n), units(u), Input(p,i), Targ(p,o)
+      double precision xprime(n), xprime0(n), xmi(n)
+      double precision a, b, mimax, mimin
+c.....helper variables
+      integer j, k
+c.....f2py statements
+cf2py intent(in, out) x, xmi
+      
+c.....initialize variables
+      do j=1,n
+          xprime0(j) = 0d0
+      enddo
+      k=0
+c.....update maxiter times
+      do while (k.lt.maxiter)
+          call grad(x, conec, n, bconecno, bn, units, u, inno, i,  
+     &              outno, o, Input, Targ, p, xprime)
+	      do j=1,n
+c.............find mi coefficient
+              if ( xprime(j) * xprime0(j) .gt. 0 ) then
+                  xmi(j) = min( a * xmi(j), mimax )
+              elseif ( xprime(j) * xprime0(j) .lt. 0 ) then
+                  xmi(j) = max( b * xmi(j), mimin )
+              else
+                  xmi(j) = xmi(j)
+              endif
+c.............update weights and record gradient components
+              x(j) = x(j) - sign( xmi(j), xprime(j) )
+              xprime0(j) = xprime(j)
+          enddo
+          k=k+1
+      enddo
+	  
+      return
+      end
 c
 cc
 ccc

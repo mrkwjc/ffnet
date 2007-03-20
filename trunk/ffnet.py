@@ -425,7 +425,7 @@ class ffnet:
     
         Allowed parameters:
         eta             - descent scaling parameter (default is 0.2)
-        momentum         - momentum coefficient (default is 0.8)
+        momentum        - momentum coefficient (default is 0.8)
         maxiter         - the maximum number of iterations (default is 10000)
         disp            - print convergence message if non-zero (default is 0)
         """
@@ -441,6 +441,43 @@ class ffnet:
             err  = netprop.sqerror(self.weights, self.conec, self.units, \
                                    self.inno, self.outno, input, target)
             print "Final error   --> 0.5*(sum of squared errors at output): %f" %err
+
+    def train_rprop(self, input, target, \
+                    a = 1.2, b = 0.5, mimin = 0.000001, mimax = 50., \
+                    xmi = 0.1, maxiter = 10000, disp = 0):
+        """
+        Rprop training algorithm.
+        
+        Allowed parameters:
+        a               - training step increasing parameter (default is 1.2)
+        b               - training step decreasing parameter (default is 0.5)
+        mimin           - minimum training step (default is 0.000001)
+        mimax           - maximum training step (default is 50.)
+        xmi             - vector indicating initial training step for weights,
+                          if 'xmi' is a scalar then its value is set for all
+                          weights (default is 0.1)
+        maxiter         - the maximum number of iterations (default is 10000)
+        disp            - print convergence message if non-zero (default is 0)
+        
+        Method updates network weights and returns 'xmi' vector 
+        (after 'maxiter' iterations).
+        """
+        input, target = self._setnorm(input, target)
+        if type(xmi).__name__ in ['float', 'int']:
+            xmi = [ xmi ]*len(self.conec)
+            
+        if disp:
+            err  = netprop.sqerror(self.weights, self.conec, self.units, \
+                                   self.inno, self.outno, input, target)
+            print "Initial error --> 0.5*(sum of squared errors at output): %f" %err
+        self.weights, xmi = netprop.rprop(self.weights, self.conec, self.bconecno, \
+                                          self.units, self.inno, self.outno, input, \
+                                          target, a, b, mimin, mimax, xmi, maxiter)
+        if disp:
+            err  = netprop.sqerror(self.weights, self.conec, self.units, \
+                                   self.inno, self.outno, input, target)
+            print "Final error   --> 0.5*(sum of squared errors at output): %f" %err
+        return xmi
 
     def train_genetic(self, input, target, **kwargs):
         """
@@ -961,7 +998,14 @@ class TestFfnetSigmoid(unittest.TestCase):
         print "Test of backpropagation momentum algorithm"
         self.tnet.train_momentum(self.input, self.target, maxiter=10000)
         self.tnet.test(self.input, self.target)
-    
+
+    def testTrainRprop(self): 
+        print "Test of rprop algorithm"
+        xmi = self.tnet.train_rprop(self.input, self.target, \
+                                    a=1.2, b=0.5, mimin=0.000001, mimax=50, \
+                                    xmi=0.1, maxiter=10000, disp=1)
+        self.tnet.test(self.input, self.target)
+
     def testTrainCg(self):
         print "Test of conjugate gradient algorithm"
         self.tnet.train_cg(self.input, self.target, maxiter=1000, disp=1)
