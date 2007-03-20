@@ -73,9 +73,13 @@ except ImportError:
 print \
 """
 Note:
-You have access to partial derivatives of the network
-outputs vs. its inputs. For example, calling
-net.derivative([3.14]) for a sine network just trained 
-we obtain %s (cosine at 3.14 is -1).
-""" % net.derivative([3.14])
- 
+You can use ffnet network as a python function.
+For example calling net([3.14]) for sine network gives %s
+( sine at 3.14 is 0.00159265291649 )
+
+You have also access to partial derivatives of the network
+outputs vs. its inputs. Calling net.derivative([3.14]) 
+we obtain %s ( cosine at 3.14 is -0.999998731728 ).
+""" % ( net([3.14]), net.derivative([3.14]) )
+
+

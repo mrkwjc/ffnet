@@ -32,16 +32,18 @@ print
 print "TESTING NETWORK..."
 output, regression = net.test(input, target, iprint = 2)
 
-# Save/load network
-from ffnet import savenet, loadnet
+# Save/load/export network
+from ffnet import savenet, loadnet, exportnet
 print "Network is saved..."
 savenet(net, "xor.net")
 print "Network is reloaded..."
 net = loadnet("xor.net")
 print "Network is tested again, but nothing is printed..."
 output, regression = net.test(input, target, iprint = 0)
-
 print
-print "Note:"
-print "You can use ffnet network as a python function."
-print "For example calling net([1, 1]) gives %s:" % net([1, 1])
+print "Exporting trained network to the fortran source..."
+exportnet(net, "xor.f")
+print "Done..."
+print "Look at the generated xor.f file."
+print "Note, that you must compile it along with the ffnet.f" 
+print "file which can be found in ffnet sources."
