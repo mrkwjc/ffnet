@@ -1,9 +1,3 @@
-recursive-include examples *
-prune examples/.svn
-
-recursive-include examples/data *
-prune examples/data/.svn
-
-exclude examples/*.net
-
+recursive-include examples *.py
+recursive-include examples/data *.dat
 include LICENSE
