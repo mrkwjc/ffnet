@@ -9,5 +9,6 @@ from ffnet import ffnet, \
                   tmlgraph, \
                   imlgraph, \
                   savenet, \
-                  loadnet
+                  loadnet, \
+                  exportnet
 from pikaia import pikaia
