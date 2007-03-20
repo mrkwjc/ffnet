@@ -6,6 +6,14 @@
 ##  http://www.gnu.org/copyleft/gpl.html
 ########################################################################
 
+'''
+ffnet - feed-forward neural network for python module. 
+
+See ffnet main class description for usage hints or go to
+http://ffnet.sourceforge.net for docs and examples.
+'''
+
+from version import version
 from scipy import array, zeros, ones, random, optimize, sqrt
 import networkx as NX
 from fortran import _ffnet as netprop

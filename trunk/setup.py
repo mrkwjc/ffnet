@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from numpy.distutils.core import Extension
+from version import version
 
 ext1 = Extension(name = 'ffnet.fortran._ffnet',
                  sources = ['fortran/ffnet.f'])
@@ -11,7 +12,7 @@ ext2 = Extension(name = 'ffnet.fortran._pikaia',
 if __name__ == "__main__":
     from numpy.distutils.core import setup
     setup(name              = 'ffnet',
-          version           = '0.6',
+          version           = version,
           description       = "Feed-forward neural network solution for python",
           author            = "Marek Wojciechowski",
           author_email      = "mwojc@p.lodz.pl",
