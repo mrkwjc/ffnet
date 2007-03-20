@@ -7,7 +7,7 @@
 ########################################################################
 
 '''
-ffnet - feed-forward neural network for python module. 
+ffnet - feed-forward neural network for python. 
 
 See ffnet main class description for usage hints or go to
 http://ffnet.sourceforge.net for docs and examples.
@@ -364,7 +364,14 @@ class ffnet:
         try: target = array(target, 'd')
         except: raise ValueEror("Target cannot be converted to numpy array")
         
-        #Test sizes
+        #Convert 1-d arrays to 2-d (this allows to put 1-d arrays
+        #for training if we have one input and/or one output
+        if len(self.inno) == 1 and len(input.shape) == 1:
+            input = input.reshape( (input.shape[0], 1) )
+        if len(self.outno) == 1 and len(target.shape) == 1:
+            target = target.reshape( (target.shape[0], 1) )        
+
+        #Test some sizes
         numip = input.shape[0]; numop = target.shape[0]
         if numip != numop:
             raise ValueError \
@@ -969,7 +976,13 @@ class TestFfnetSigmoid(unittest.TestCase):
         print "Test of TNC algorithm"
         self.tnet.train_tnc(array(self.input), array(self.target), maxfun = 1000)
         self.tnet.test(self.input, self.target)
-
+        
+    def testTestdata(self):
+        net = ffnet( mlgraph((1, 5, 1)) )
+        input = [1, 2., 5]
+        target = [2, 3, 5.]
+        net.train_tnc(input, target, maxfun = 10)
+        
 class TestSaveLoadExport(unittest.TestCase):
     def setUp(self):
         conec = imlgraph( (5,5,5) )
