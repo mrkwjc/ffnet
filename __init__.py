@@ -1,7 +1,6 @@
 # ffnet package initialization
 
-__version__ = '0.6'
-
+from version import version
 import fortran
 import tools
 from ffnet import ffnet, \
