@@ -727,7 +727,7 @@ def savenet(net, filename):
     
 def loadnet(filename):
     """
-    Loads network pickled with 'savenet'. 
+    Loads network pickled previously with 'savenet'. 
     """    
     import cPickle
     file = open(filename, 'r')
@@ -744,9 +744,9 @@ def exportnet(net, filename, name = 'ffnet', lang = 'fortran'):
     for calculating partial derivatives, have the same name with 'd'
     prefix. 'ffnet' and 'dffnet' are exported at default.
     
-    NOTE: You need 'ffnet.f' file distributed with ffnet-%s
+    NOTE: You need 'ffnet.f' file distributed with ffnet
           sources to get the exported routines to work.
-    """ %version
+    """
     from tools import py2f
     f = open( filename, 'w' )
     f.write( py2f.fheader( net, version = version ) )
