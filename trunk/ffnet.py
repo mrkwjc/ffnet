@@ -326,17 +326,20 @@ class ffnet:
         return output.tolist()
     
     def call(self, inp):
-        """ Returns network answer to input sequence """
+        """Returns network answer to input sequence
+        """
         return self.__call__(inp)
 
     def derivative(self, inp):
-        """ Returns partial derivatives of output vs. input at given input point
-            in the following array:
-                | o1/i1, o1/i2, ..., o1/in |
-                | o2/i1, o2/i2, ..., o2/in |
-                | ...                      |
-                | om/i1, om/i2, ..., om/in |
+        """Returns partial derivatives of the network's 
+           output vs. its input at given input point
+           in the following array:
+               | o1/i1, o1/i2, ..., o1/in |
+               | o2/i1, o2/i2, ..., o2/in |
+               | ...                      |
+               | om/i1, om/i2, ..., om/in |
         """
+
         deriv = netprop.normdiff(self.weights, self.conec, self.dconecno, self.dconecmk, \
                                  self.units, self.inno, self.outno, self.eni, self.ded, inp)
         return deriv.tolist()
@@ -727,17 +730,24 @@ def loadnet(filename):
 def exportnet(net, filename, name = 'ffnet', lang = 'fortran'):
     """
     Exports network to the compiled language source code.
-    Currently only fortran is supported.
 
-    There are two routines exported: ffnet and dffnet
-    """    
+    Currently only fortran is supported.
+    There are two routines exported. First one, for recalling the network,
+    is named as indicated with keyword argument 'name'. The second one,
+    for calculating partial derivatives, have the same name with 'd'
+    prefix. 'ffnet' and 'dffnet' are exported at default.
+    
+    NOTE: You need 'ffnet.f' file distributed with ffnet-%s
+          sources to get the exported routines to work.
+    """ %version
     from tools import py2f
     f = open( filename, 'w' )
-    f.write( py2f.fheader( net ) )
+    f.write( py2f.fheader( net, version = version ) )
     f.write( py2f.fcomment() )
     f.write( py2f.ffnetrecall(net, name) )
     f.write( py2f.fcomment() )
     f.write( py2f.ffnetdiff(net, 'd' + name) )
+    f.close()
     return
     
 # TESTS
