@@ -11,3 +11,9 @@ from ffnet import ffnet, \
                   loadnet, \
                   exportnet
 from pikaia import pikaia
+
+def test():
+   ''' Runs test suite for ffnet modules '''
+   import tests, unittest
+   suite = unittest.TestLoader().loadTestsFromModule(tests)
+   unittest.TextTestRunner(verbosity=2).run(suite)
