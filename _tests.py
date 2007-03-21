@@ -3,6 +3,7 @@ import unittest
 
 
 from ffnet import *
+from ffnet import _linear, _norms, _normarray, _ffconec, _bconec, _dconec
 # ffnet module tests #########################
 class Testmlgraph(unittest.TestCase):
     def testEmpty(self):
@@ -93,28 +94,28 @@ class Testtmlgraph(unittest.TestCase):
 class Testlinear(unittest.TestCase):
     def testEqualInRanges(self):
         #self.assertRaises(ValueError, linear, 1.0, 1.0, 2.0, 3.0)
-        self.assertEqual(linear(1.0, 1.0, 2.0, 3.0), (0, 2.5))
+        self.assertEqual(_linear(1.0, 1.0, 2.0, 3.0), (0, 2.5))
     def testEqualOutRanges(self):
-        self.assertEqual(linear(2.0, 3.0, 1.0, 1.0), (0.0, 1.0))
+        self.assertEqual(_linear(2.0, 3.0, 1.0, 1.0), (0.0, 1.0))
     def testNormalCase(self):
-        self.assertEqual(linear(0.0, 1.0, 0.0, 2.0), (2.0, 0.0))
+        self.assertEqual(_linear(0.0, 1.0, 0.0, 2.0), (2.0, 0.0))
 
 class Testnorms(unittest.TestCase):
     def testEmpty(self):
         inarray = [[], []]
-        n = norms(inarray)
+        n = _norms(inarray)
         for i in xrange(len(n)):
             self.assertEqual(n[i].tolist(), [])
     def testOneColumn(self):
         inarray = [[0.], [1.], [2.]]
-        n = norms(inarray)
+        n = _norms(inarray)
         bool1 = n[0].tolist() == [[0., 2.]]
         bool2 = n[1].tolist() == [[0.5, 0.]]
         bool3 = n[2].tolist() == [[2., 0.]]
         self.assert_(bool1 and bool2 and bool3)
     def testNormalCase(self):
         inarray = [[0.,0.], [0.,1.], [1.,0.], [1.,1.]]
-        n = norms(inarray, lower=0.15, upper=0.85)
+        n = _norms(inarray, lower=0.15, upper=0.85)
         self.assertEqual(n[0].tolist(), [[0., 1.], [0, 1.]])
         self.assertEqual(n[1].tolist(), [[0.7, 0.15], [0.7, 0.15]])
         self.assertAlmostEqual(n[2][0,0], 1.42857143, 8)
@@ -123,33 +124,33 @@ class Testnorms(unittest.TestCase):
 class Testnormarray(unittest.TestCase):
     def testEmpty(self):
         inarray = [[], []]
-        n = normarray(inarray, [])
+        n = _normarray(inarray, [])
         for i in xrange(len(n)):
             self.assertEqual(n[i].tolist(), [])
     
     def testOneColumn(self):
         inarray = [[0.], [1.], [1.], [0.]]
         coeff = [[0.7, 0.15]]
-        n = normarray(inarray, coeff)
+        n = _normarray(inarray, coeff)
         for i in xrange(4):
             self.assertAlmostEqual(n[i,0], coeff[0][0]*inarray[i][0] + coeff[0][1], 8)
             
 class Testffconec(unittest.TestCase):
     def testEmpty(self):
         conec = []
-        self.assertRaises(ValueError, ffconec, conec)
+        self.assertRaises(ValueError, _ffconec, conec)
 
     def testWithCycles(self):
         conec = [(1, 3), (2, 3), (0, 3), (3, 1), \
                  (1, 4), (2, 4), (0, 4), (4, 2), \
                  (3, 5), (4, 5), (0, 5), (5, 1) ]
-        self.assertRaises(TypeError, ffconec, conec)
+        self.assertRaises(TypeError, _ffconec, conec)
 
     def testNoCycles(self):
         conec = [(1, 3), (2, 3), (0, 3), \
                  (1, 4), (2, 4), (0, 4), \
                  (3, 5), (4, 5), (0, 5) ]
-        n = ffconec(conec)
+        n = _ffconec(conec)
         self.assertEqual(sorted(n[2]), [1, 2])
         self.assertEqual(sorted(n[3]), [3, 4])
         self.assertEqual(sorted(n[4]), [5])
@@ -160,7 +161,7 @@ class Testbconec(unittest.TestCase):
                  (1, 4), (2, 4), (0, 4), \
                  (3, 5), (4, 5), (0, 5) ]
         inno = [1,2]
-        n = bconec(conec, inno)
+        n = _bconec(conec, inno)
         self.assertEqual(n[1], [8,7])
         
 class Testdconec(unittest.TestCase):
@@ -169,7 +170,7 @@ class Testdconec(unittest.TestCase):
                  (1, 4), (2, 4), (0, 4), \
                  (3, 5), (4, 5), (0, 5) ]
         inno = [1,2]
-        n = dconec(conec, inno)
+        n = _dconec(conec, inno)
         self.assertEqual(n[1], [1, 4, 7, 8, 2, 5, 7, 8])
         self.assertEqual(n[2], [0, 4, 8])
         
