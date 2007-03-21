@@ -818,7 +818,7 @@ def exportnet(net, filename, name = 'ffnet', lang = 'fortran'):
     NOTE: You need 'ffnet.f' file distributed with ffnet
           sources to get the exported routines to work.
     """
-    from tools import py2f
+    from tools import _py2f as py2f
     f = open( filename, 'w' )
     f.write( py2f.fheader( net, version = version ) )
     f.write( py2f.fcomment() )
