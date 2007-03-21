@@ -1,6 +1,6 @@
 # ffnet package initialization
 
-from version import version
+from _version import version
 import fortran
 import tools
 from ffnet import ffnet, \
@@ -12,6 +12,6 @@ from ffnet import ffnet, \
                   exportnet
 from pikaia import pikaia
 
-from tests import runtest as test
+from _tests import runtest as test
 try: del tests
 except: pass
