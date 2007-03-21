@@ -2,13 +2,11 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-inherit distutils python subversion
-
-ESVN_REPO_URI="https://ffnet.svn.sourceforge.net/svnroot/ffnet/trunk"
-ESVN_PROJECT="ffnet"
+inherit distutils python
 
 DESCRIPTION="Feed-forward neural network for python"
 HOMEPAGE="http://ffnet.soureceforge.net"
+SRC_URI="mirror://sourceforge/${PN}/${P}.tar.gz"
 
 SLOT="0"
 KEYWORDS="~x86"
@@ -20,7 +18,7 @@ DEPEND="virtual/python
 	dev-python/numpy
 	sci-libs/scipy
 	matplotlib? ( dev-python/matplotlib )
-	!dev-python/ffnet"
+	!dev-python/ffnet-svn"
 
 # set environment variable F2PY_FC with proper f2py compiler name
 # or gnu compilers will be used
@@ -40,6 +38,7 @@ src_compile() {
 src_install() {
 	distutils_src_install
 
-	dodoc README
+	#dodoc README
+    cp -r doc ${D}/usr/share/doc/${PF}
 	cp -r examples ${D}/usr/share/doc/${PF}
 }

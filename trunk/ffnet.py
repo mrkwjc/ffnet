@@ -7,7 +7,7 @@
 ########################################################################
 
 '''
-ffnet - feed-forward neural network for python. 
+Feed-forward neural network for python. 
 
 See ffnet main class description for usage hints or go to
 http://ffnet.sourceforge.net for docs and examples.
@@ -827,7 +827,7 @@ def exportnet(net, filename, name = 'ffnet', lang = 'fortran'):
     f.write( py2f.ffnetdiff(net, 'd' + name) )
     f.close()
     return
-    
+
 # TESTS
 import unittest
 
