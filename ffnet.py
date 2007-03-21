@@ -223,20 +223,20 @@ class ffnet:
     Feed-forward neural network implementation.
     
     NETWORK CREATION:
-    Base creation of the network consist in delivering list of connections:
-        coneclist = [[1, 3], [2, 3], [0, 3] 
-                     [1, 4], [2, 4], [0, 4] 
-                     [3, 5], [4, 5], [0, 5]]
-        n = ffnet(coneclist)
-    0 in coneclist is a special unit representing bias. If there is
+    Creation of the network consist in delivering list of connections:
+        conec = [[1, 3], [2, 3], [0, 3] 
+                 [1, 4], [2, 4], [0, 4] 
+                 [3, 5], [4, 5], [0, 5]]
+        net = ffnet(conec)
+    0 (zero) in conec is a special unit representing bias. If there is
     no connection from 0, bias is not considered in the node.
     Only feed-forward directed graphs are allowed. Class makes check
     for cycles in the provided graph and raises TypeError if any.
     All nodes (exept input ones) have sigmoid activation function.
 
-    Generation of coneclist is left to the user. There are however
-    functions: mlgraph and tmlgraph provided to generate coneclist for layered network.
-    See description of these functions.
+    Although generation of conec is left to the user, there are several
+    functions provided to facilitate this task. See description of 
+    the following functions: mlgraph, imlgraph, tmlgraph.
     More architectures may be provided in the future.
     
     Weights are automatically initialized at the network creation. They can
@@ -244,54 +244,58 @@ class ffnet:
     
     TRAINING NETWORK:
     There are several training methods included, currently:
-    train_genetic, train_cg, train_bfgs, train_tnc.
+    train_momentum, train_rprop, train_genetic, train_cg, 
+    train_bfgs, train_tnc.
     The simplest usage is, for example:
-        n.train_tnc(input, target)
-    where 'input' and 'target' is raw data to be learned. Class performs data
-    normalization by itself and records encoding/decoding information to be used
-    during network recalling.
+        net.train_tnc(input, target)
+    where 'input' and 'target' is data to be learned. Class performs data
+    normalization by itself and records encoding/decoding information 
+    to be used during network recalling.
     Class makes basic checks of consistency of data.
     
-    For information about training prameters see appropriate method description.
+    For information about training prameters see appropriate 
+    method description.
     
     RECALLING NETWORK:
-    Usage of the trained network is an simple as function call:
-        ans = n(inp)
+    Usage of the trained network is as simple as function call:
+        ans = net(inp)
     or, alternatively:
-        ans = n.call(inp)
-    where 'inp' - list of network inputs and 'ans' - array of network outputs
-    There is also possibility to retrieve partial derivatives of output vs. input
-    at given input point:
+        ans = net.call(inp)
+    where 'inp' - list of network inputs and 'ans' - list of network outputs
+    There is also possibility to retrieve partial derivatives of 
+    output vs. input at given input point:
         deriv = n.derivative(inp)
-    Output 'deriv' is an array of the form:
+    'deriv' is an array of the form:
         | o1/i1, o1/i2, ..., o1/in |
         | o2/i1, o2/i2, ..., o2/in |
         | ...                      |
         | om/i1, om/i2, ..., om/in |
     
-    LOADING/SAVING NETWORK
-    There are provided two helper functions with this class: savenet and loadnet.
-    Usage:
-        savenet(n, "filename")
-        n = loadnet("filename")
-    These functions use internally cPickle module.
+    LOADING/SAVING/EXPORTING NETWORK
+    There are three helper functions provided with this class:
+    savenet, loadnet and exportnet.
+    Basic usage:
+        savenet(net, filename)   --> pickles network
+        net = loadnet(filename)  --> loads pickled network
+        exportnet(net, filename) --> exports network to fortran source
     
     PLOTS
-    If you have matplotlib installed, the network architecture can be drawn with:
-        import networkx, pylab
-        networkx.draw_circular(n.graph)
+    If you have matplotlib installed, the network architecture can be 
+    drawn with:
+        from ffnet.tools import drawffnet
+        import pylab
+        drawffnet(net)
         pylab.show()
-    This is a very basic solution, network is drawn with circular layout.
+    This is a very basic solution, see drawffnet description for
+    limitations.
     """
     def __init__(self, conec):
         #~ if 'biases' in kwargs: biases = kwargs['biases']
         #~ else: biases = True
-            
         #~ if 'conec'  in kwargs: conec = kwargs['conec']
         #~ elif 'mlp'  in kwargs: conec = mlgraph(kwargs['mlp'], biases = biases)
         #~ elif 'tmlp' in kwargs: conec = tmlgraph(kwargs['tmlp', biases = biases])
         #~ else: raise TypeError("Wrong network definition")
-    
         graph, conec, inno, hidno, outno = ffconec(conec)
         bgraph, bconecno = bconec(conec, inno)
         dgraphs, dconecno, dconecmk = dconec(conec, inno)
@@ -350,7 +354,7 @@ class ffnet:
         for input and target arrays being first normalized.
         Might be slow in frequent use, because data normalization is
         performed at ach call.
-        (_setnorm should be called before sqerror - will be changed)
+        (_setnorm should be called before sqerror - will be changed in future)
         """
         input, target = self._testdata(input, target)
         input = normarray(input, self.eni) #Normalization data might be uninitialized here!
@@ -365,7 +369,7 @@ class ffnet:
         Input and target arrays are first normalized.
         Might be slow in frequent use, because data normalization is
         performed at each call.
-        (_setnorm should be called before sqgrad - will be changed)
+        (_setnorm should be called before sqgrad - will be changed in future)
         """
         input, target = self._testdata(input, target) 
         input = normarray(input, self.eni) #Normalization data might be uninitialized here!
@@ -483,7 +487,7 @@ class ffnet:
         b               - training step decreasing parameter (default is 0.5)
         mimin           - minimum training step (default is 0.000001)
         mimax           - maximum training step (default is 50.)
-        xmi             - vector indicating initial training step for weights,
+        xmi             - vector containing initial training steps for weights;
                           if 'xmi' is a scalar then its value is set for all
                           weights (default is 0.1)
         maxiter         - the maximum number of iterations (default is 10000)
@@ -807,7 +811,7 @@ def exportnet(net, filename, name = 'ffnet', lang = 'fortran'):
     Currently only fortran is supported.
 
     There are two routines exported. First one, for recalling the network,
-    is named as indicated with keyword argument 'name'. The second one,
+    is named as indicated by keyword argument 'name'. The second one,
     for calculating partial derivatives, have the same name with 'd'
     prefix. 'ffnet' and 'dffnet' are exported at default.
     
