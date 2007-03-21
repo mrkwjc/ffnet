@@ -280,7 +280,8 @@ class TestSaveLoadExport(unittest.TestCase):
         resA = self.net ( [ 1, 2, 3, 4, 5. ] )
         resB = self.net.derivative( [ 1, 2, 3, 4, 5. ] )
         exportnet(self.net, 'tmpffnet.f')
-        #import os; os.chdir('/tmp')
+        ## THE BELOW IS PLATFORM AND ffnet.f FILE DEPENDENT 
+        ## SHOULD BE COMMENTED FOR RELEASES ???
         from numpy import f2py
         f = open( 'tmpffnet.f', 'r' ); source = f.read(); f.close()
         f = open( 'fortran/ffnet.f', 'r' ); source += f.read(); f.close()
