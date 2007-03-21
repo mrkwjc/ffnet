@@ -104,7 +104,7 @@ def tmlgraph(arch, biases = True):
                 conec.append((src, trg))
     return conec
 
-def linear(a, b, c, d):
+def _linear(a, b, c, d):
     '''
     Returns coefficients of linear map from range (a,b) to (c,d)
     '''
@@ -117,7 +117,7 @@ def linear(a, b, c, d):
         c2 = c - a * c1
     return c1, c2
 
-def norms(inarray, lower = 0., upper = 1.):
+def _norms(inarray, lower = 0., upper = 1.):
     '''
     Gets normalization information from an array,for use in ffnet class.
     (lower, upper) is a range of normalisation.
@@ -130,11 +130,11 @@ def norms(inarray, lower = 0., upper = 1.):
         maxarr = max(col)
         minarr = min(col)
         limits += [(minarr, maxarr)]
-        en += [linear(minarr, maxarr, lower, upper)]
-        de += [linear(lower, upper, minarr, maxarr)]
+        en += [_linear(minarr, maxarr, lower, upper)]
+        de += [_linear(lower, upper, minarr, maxarr)]
     return array(limits), array(en), array(de)
     
-def normarray(inarray, coeff):
+def _normarray(inarray, coeff):
     ''' 
     Normalize 2-dimensional array linearly column by column 
     with provided coefficiens.
@@ -148,7 +148,7 @@ def normarray(inarray, coeff):
     return inarray.transpose()
     #else: print "Lack of normalization parameters. Nothing done."
 
-def ffconec(conec):
+def _ffconec(conec):
     """
     Checks if conec is acyclic, sorts it if necessary and returns tuple:
     (conec, inno, hidno, outno) where:
@@ -175,7 +175,7 @@ def ffconec(conec):
                     if node != 0: hidno += [node] #bias handling again
     return graph, conec, inno, hidno, outno
 
-def bconec(conec, inno):
+def _bconec(conec, inno):
     """
     Returns list of adjoint graph (for backprop) edges positions
     in conec. Conec is assumed to be acyclic.
@@ -195,7 +195,7 @@ def bconec(conec, inno):
             bconecno.append(idx)
     return bgraph, bconecno
     
-def dconec(conec, inno):
+def _dconec(conec, inno):
     """
     Return list of edges positions (in conec) of graphs for
     derivative calculation, all packed in one list (dconecno). Additionaly
@@ -296,9 +296,9 @@ class ffnet:
         #~ elif 'mlp'  in kwargs: conec = mlgraph(kwargs['mlp'], biases = biases)
         #~ elif 'tmlp' in kwargs: conec = tmlgraph(kwargs['tmlp', biases = biases])
         #~ else: raise TypeError("Wrong network definition")
-        graph, conec, inno, hidno, outno = ffconec(conec)
-        bgraph, bconecno = bconec(conec, inno)
-        dgraphs, dconecno, dconecmk = dconec(conec, inno)
+        graph, conec, inno, hidno, outno = _ffconec(conec)
+        bgraph, bconecno = _bconec(conec, inno)
+        dgraphs, dconecno, dconecmk = _dconec(conec, inno)
         self.graph = graph
         self.bgraph = bgraph
         self.dgraphs = dgraphs
@@ -357,8 +357,8 @@ class ffnet:
         (_setnorm should be called before sqerror - will be changed in future)
         """
         input, target = self._testdata(input, target)
-        input = normarray(input, self.eni) #Normalization data might be uninitialized here!
-        target = normarray(target, self.eno)
+        input = _normarray(input, self.eni) #Normalization data might be uninitialized here!
+        target = _normarray(target, self.eno)
         err  = netprop.sqerror(self.weights, self.conec, self.units, \
                                self.inno, self.outno, input, target)
         return err
@@ -372,8 +372,8 @@ class ffnet:
         (_setnorm should be called before sqgrad - will be changed in future)
         """
         input, target = self._testdata(input, target) 
-        input = normarray(input, self.eni) #Normalization data might be uninitialized here!
-        target = normarray(target, self.eno)
+        input = _normarray(input, self.eni) #Normalization data might be uninitialized here!
+        target = _normarray(target, self.eno)
         g  = netprop.grad(self.weights, self.conec, self.bconecno, self.units, \
                           self.inno, self.outno, input, target)
         return g
@@ -444,13 +444,13 @@ class ffnet:
                     print "Warning: %ith target node takes always a single value of %f." %(i+1, max(col))
             
             #limits are informative only, eni,dei/eno,deo are input/output coding-decoding
-            self.inlimits, self.eni, self.dei = norms(input, lower=0.15, upper=0.85)
-            self.outlimits, self.eno, self.deo = norms(target, lower=0.15, upper=0.85)
+            self.inlimits, self.eni, self.dei = _norms(input, lower=0.15, upper=0.85)
+            self.outlimits, self.eno, self.deo = _norms(target, lower=0.15, upper=0.85)
             self.ded = zeros((numo,numi), 'd')
             for o in xrange(numo):
                 for i in xrange(numi):
                     self.ded[o,i] = self.eni[i,0] * self.deo[o,0]
-            return normarray(input, self.eni), normarray(target, self.eno)
+            return _normarray(input, self.eni), _normarray(target, self.eno)
 
     def train_momentum(self, input, target, eta = 0.2, momentum = 0.8, \
                         maxiter = 10000, disp = 0):
