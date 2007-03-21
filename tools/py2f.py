@@ -256,19 +256,3 @@ NOTE: You need 'ffnet.f' file distributed with ffnet-%s
     
     return header
 
-import unittest
-class TestExport2Fortran(unittest.TestCase):  #not finished, just started
-    def setUp(self):
-        from numpy import array
-        self.A = array([[1,2,3], [4,5,6]])
-        self.B = array([[1,2,3], [4,5,6.]])
-        
-    def tearDown(self):
-        pass
-    
-    def testArray(self):
-        s1 = farray(self.A, 'test')      
-        s2 = farray(self.B, 'test')
-        
-if __name__ == '__main__':
-    unittest.main()
