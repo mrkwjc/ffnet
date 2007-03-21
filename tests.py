@@ -312,6 +312,13 @@ class TestExport2Fortran(unittest.TestCase):  #not finished, just started
         s1 = farray(self.A, 'test')      
         s2 = farray(self.B, 'test')
         
+def runtest():
+   ''' Runs all tests from this module '''
+   import sys
+   suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])
+   unittest.TextTestRunner(verbosity=2).run(suite)        
+        
+
 # run tests
 if __name__ == '__main__':
     unittest.main()
