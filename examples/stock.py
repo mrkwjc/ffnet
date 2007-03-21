@@ -27,7 +27,7 @@
 ##
 ##
 ## So let's try.
-## Attention: training phase might be long as a big network is trained.
+## Attention: training might be a long process as we train a big network.
 
 from ffnet import ffnet, mlgraph
 from scipy.io import read_array
@@ -59,7 +59,7 @@ maxerr = abs( array(output).reshape( len(output) ) - array(target) ).max()
 print "R-squared:           %s  (should be >= 0.999999)" %str(Rsquared)
 print "max. absolute error: %s  (should be <= 0.05)" %str(maxerr)
 print
-print "Is ffnet ready for stock?"
+print "Is ffnet ready for a stock?"
 
 # Make plot if matplotlib is avialble
 try:

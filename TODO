@@ -1,4 +1,4 @@
 o  Add support for frozen weights.
 o  Add other activation functions (also user defined ones).
 o  Refactor fortran code in the light of the above new capabilities.
-o  Add rprop training algorithm.
+o  Random network architecture generation (probably based on mlgraph)

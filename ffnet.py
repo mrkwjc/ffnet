@@ -350,6 +350,7 @@ class ffnet:
         for input and target arrays being first normalized.
         Might be slow in frequent use, because data normalization is
         performed at ach call.
+        (_setnorm should be called before sqerror - will be changed)
         """
         input, target = self._testdata(input, target)
         input = normarray(input, self.eni) #Normalization data might be uninitialized here!
@@ -363,7 +364,8 @@ class ffnet:
         Returns gradient of sqerror vs. network weights.
         Input and target arrays are first normalized.
         Might be slow in frequent use, because data normalization is
-        performed at ach call.
+        performed at each call.
+        (_setnorm should be called before sqgrad - will be changed)
         """
         input, target = self._testdata(input, target) 
         input = normarray(input, self.eni) #Normalization data might be uninitialized here!
@@ -782,7 +784,7 @@ class ffnet:
 
 def savenet(net, filename):
     """
-    Saves network to the file using cPickle module.
+    Saves network to a file using cPickle module.
     """
     import cPickle
     file = open(filename, 'w')
@@ -801,9 +803,9 @@ def loadnet(filename):
 
 def exportnet(net, filename, name = 'ffnet', lang = 'fortran'):
     """
-    Exports network to the compiled language source code.
-
+    Exports network to a compiled language source code.
     Currently only fortran is supported.
+
     There are two routines exported. First one, for recalling the network,
     is named as indicated with keyword argument 'name'. The second one,
     for calculating partial derivatives, have the same name with 'd'
