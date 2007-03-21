@@ -1,8 +1,8 @@
 # FFNET TESTS
 import unittest
-from ffnet import *
-from tools.py2f import *
 
+
+from ffnet import *
 # ffnet module tests #########################
 class Testmlgraph(unittest.TestCase):
     def testEmpty(self):
@@ -297,7 +297,9 @@ class TestSaveLoadExport(unittest.TestCase):
             self.assertAlmostEqual(resA[i], resA1[i], 7)
             for j in xrange(5):
                 self.assertAlmostEqual(resB[i][j], resB1[i][j], 7)
-        
+
+
+from tools._py2f import *
 # tools.py2f module tests #########################
 class TestExport2Fortran(unittest.TestCase):  #not finished, just started
     def setUp(self):

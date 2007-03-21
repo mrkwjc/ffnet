@@ -13,5 +13,3 @@ from ffnet import ffnet, \
 from pikaia import pikaia
 
 from _tests import runtest as test
-try: del tests
-except: pass
