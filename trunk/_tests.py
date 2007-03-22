@@ -266,6 +266,8 @@ class TestSaveLoadExport(unittest.TestCase):
         except: pass
         try: os.remove('tmpffnet.so')
         except: pass
+        try: os.remove('tmpffnet.pyd')
+        except: pass
         try: os.remove('tmpffnet.net')
         except: pass
 
@@ -294,6 +296,7 @@ class TestSaveLoadExport(unittest.TestCase):
         import tmpffnet
         resA1 = tmpffnet.ffnet( [ 1, 2, 3, 4, 5. ] )
         resB1 = tmpffnet.dffnet( [ 1, 2, 3, 4, 5. ] )
+        del tmpffnet
         for i in xrange(5):
             self.assertAlmostEqual(resA[i], resA1[i], 7)
             for j in xrange(5):
