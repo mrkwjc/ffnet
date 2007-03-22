@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from numpy.distutils.core import Extension
-from version import version
+from _version import version
 
 ext1 = Extension(name = 'ffnet.fortran._ffnet',
                  sources = ['fortran/ffnet.f'])
