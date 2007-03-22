@@ -84,6 +84,6 @@ which reaches most of the ffnet requirements: numpy/scipy, matplotlib,
 mingw compilers and contains also many other goodies. 
 NetworkX however have to be installed separately.
 
-It is also very convenient to run ffnet interactively with
+It is also very convenient to use ffnet interactively with
 ipython, an enhanced python shell. See http://ipython.scipy.org/moin.
 
