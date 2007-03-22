@@ -7,10 +7,7 @@
 ########################################################################
 
 '''
-Feed-forward neural network for python. 
-
-See ffnet main class description for usage hints or go to
-http://ffnet.sourceforge.net for docs and examples.
+Module containing ffnet class and utility functions.
 '''
 
 from _version import version
@@ -220,10 +217,11 @@ def _dconec(conec, inno):
 
 class ffnet:
     """
-    Feed-forward neural network implementation.
+    Feed-forward neural network main class.
     
     NETWORK CREATION:
-    Creation of the network consist in delivering list of connections:
+    Creation of the network consist in delivering list of neuron 
+    connections:
         conec = [[1, 3], [2, 3], [0, 3] 
                  [1, 4], [2, 4], [0, 4] 
                  [3, 5], [4, 5], [0, 5]]
@@ -336,7 +334,7 @@ class ffnet:
 
     def derivative(self, inp):
         """Returns partial derivatives of the network's 
-           output vs. its input at given input point
+           output vs its input at given input point
            in the following array:
                | o1/i1, o1/i2, ..., o1/in |
                | o2/i1, o2/i2, ..., o2/in |
