@@ -59,8 +59,11 @@ If you have mingw compilers installed, run:
 
 To install working mingw download:
 http://downloads.sourceforge.net/mingw/MinGW-5.1.3.exe
-and choose Candidate at installation time (Current doesn't work).
-Don't forget to add mingw bin directory to PATH.
+and choose Candidate at installation time (Current
+didn't work - march 2007). Don't forget to add
+C:\MinGW\bin directory to system Path variable.
+Note that python installation directory should
+also be in Path.
 
 3. Binary installers for Windows:
 Double click the installation program. Remember however that binaries
