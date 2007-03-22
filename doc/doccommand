@@ -1,5 +1,0 @@
-#!/bin/bash
-
-rm -R doc/*
-epydoc -n "Feed-forward neural network for python (ffnet)" -u http://ffnet.sourcefoge.net -o doc/html ffnet.py pikaia.py
-epydoc -n "Feed-forward neural network for python (ffnet)" -u http://ffnet.sourcefoge.net -o doc/tex ffnet.py pikaia.py
