@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>ffnet.tools._py2f</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css"></link>
+</head>
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="ffnet-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <font size="-1"><b class="breadcrumbs">
+        <a href="ffnet-module.html">Package&nbsp;ffnet</a> ::
+        <a href="ffnet.tools-module.html">Package&nbsp;tools</a> ::
+        Module&nbsp;_py2f
+      </b></font></br>
+    </td>
+    <td><table cellpadding="0" cellspacing="0">
+      <tr><td align="right"><font size="-2">[<b>show&nbsp;private</b>&nbsp;|&nbsp;hide&nbsp;private]</font></td></tr>
+      <tr><td align="right"><font size="-2">[<a href="frames.html"target="_top">frames</a>&nbsp;|&nbsp;<a href="../private/ffnet.tools._py2f-module.html" target="_top">no&nbsp;frames</a>]</font></td></tr>
+    </table></td>
+</tr></table>
+
+<!-- =========== START OF MODULE DESCRIPTION =========== -->
+<h2 class="module">Module ffnet.tools._py2f</h2>
+
+Functions to create fortran code from within python. Needed for 
+exporting trained network to fortran source.
+<hr/>
+
+<!-- =========== START OF FUNCTION SUMMARY =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Function Summary</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><a name="addfline"></a><span class="summary-sig"><span class="summary-sig-name">addfline</span>(<span class=summary-sig-arg>string</span>)</span></code>
+</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><a name="f2pyline"></a><span class="summary-sig"><span class="summary-sig-name">f2pyline</span>(<span class=summary-sig-arg>string</span>)</span></code>
+</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><a name="farray"></a><span class="summary-sig"><span class="summary-sig-name">farray</span>(<span class=summary-sig-arg>arr</span>,
+          <span class=summary-sig-arg>fname</span>)</span></code>
+</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><a name="fcomment"></a><span class="summary-sig"><span class="summary-sig-name">fcomment</span>(<span class=summary-sig-arg>string</span>,
+          <span class=summary-sig-arg>lstrip</span>)</span></code>
+</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><a name="fexport"></a><span class="summary-sig"><span class="summary-sig-name">fexport</span>(<span class=summary-sig-arg>variable</span>,
+          <span class=summary-sig-arg>fname</span>)</span></code>
+</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/ffnet.tools._py2f-module.html#ffnetdiff" class="summary-sig-name"><code>ffnetdiff</code></a>(<span class=summary-sig-arg>net</span>,
+          <span class=summary-sig-arg>fname</span>)</span></code>
+<br />
+Takes ffnet network instance and returns string representing fortran 
+source of the network derivative routine.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/ffnet.tools._py2f-module.html#ffnetrecall" class="summary-sig-name"><code>ffnetrecall</code></a>(<span class=summary-sig-arg>net</span>,
+          <span class=summary-sig-arg>fname</span>)</span></code>
+<br />
+Takes ffnet network instance and returns string representing fortran 
+source of the recalling routine.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><a name="fheader"></a><span class="summary-sig"><span class="summary-sig-name">fheader</span>(<span class=summary-sig-arg>net</span>,
+          <span class=summary-sig-arg>version</span>)</span></code>
+</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><a name="flines"></a><span class="summary-sig"><span class="summary-sig-name">flines</span>(<span class=summary-sig-arg>string</span>)</span></code>
+</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><a name="fnumber"></a><span class="summary-sig"><span class="summary-sig-name">fnumber</span>(<span class=summary-sig-arg>number</span>,
+          <span class=summary-sig-arg>fname</span>)</span></code>
+</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><a name="fstring"></a><span class="summary-sig"><span class="summary-sig-name">fstring</span>(<span class=summary-sig-arg>string</span>,
+          <span class=summary-sig-arg>fname</span>)</span></code>
+</td></tr>
+</table><br />
+
+
+<!-- =========== START OF FUNCTION DETAILS =========== -->
+<table class="details" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="details">
+  <th colspan="2">Function Details</th></tr>
+</table>
+
+<a name="ffnetdiff"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">ffnetdiff</span>(<span class=sig-arg>net</span>,
+          <span class=sig-arg>fname</span>)</span>
+  </h3>
+  Takes ffnet network instance and returns string representing fortran 
+  source of the network derivative routine.
+  <dl><dt></dt><dd>
+  </dd></dl>
+</td></tr></table>
+
+<a name="ffnetrecall"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">ffnetrecall</span>(<span class=sig-arg>net</span>,
+          <span class=sig-arg>fname</span>)</span>
+  </h3>
+  Takes ffnet network instance and returns string representing fortran 
+  source of the recalling routine.
+  <dl><dt></dt><dd>
+  </dd></dl>
+</td></tr></table>
+<br />
+
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="ffnet-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td align="left"><font size="-2">Generated by Epydoc 2.1 on Thu Mar 22 01:50:57 2007</font></td>
+    <td align="right"><a href="http://epydoc.sourceforge.net"
+                      ><font size="-2">http://epydoc.sf.net</font></a></td>
+  </tr>
+</table>
+</body>
+</html>
