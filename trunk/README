@@ -1,75 +1,28 @@
-This is ffnet README file.
+This is ffnet-0.6 README file.
 Distributed under the terms of the GNU General Public License (GPL)
 http://www.gnu.org/copyleft/gpl.html
 
-Copyright (C) 2006 by Marek Wojciechowski
+Copyright (C) 2007 by Marek Wojciechowski
 <mwojc@p.lodz.pl>
 
 
 Overview
 --------
-ffnet is meant to be an easy and fast feed-forward neural network 
-training solution for python.
-
-Unique features present in ffnet:
-1. Any network connectivity without cycles is allowed; most 
-   avilable software supports layered architecture only.
-2. Training can be performed with use of several optimization 
-   schemes including genetic alorithm based optimization.
-3. There is access to exact partial derivatives of network outputs 
-   vs. its inputs.
-4. Automatic normalization of data; most software avilable 
-   leaves this to the user.
-
-Basic assumptions and limitations:
-1. Network has feed-forward architecture.
-2. Input units have identity activation function, 
-   all other units have sigmoid activation function.
-3. Provided data are automatically normalized, both input and output, 
-   with a linear mapping to the range (0.15, 0.85).
-   Each input and output is treated separately (i.e. linear map is 
-   unique for each input and output).
-4. Function minimized during training is a sum of squared errors 
-   of each output for each training patterns.
-
-Main parts of the project (propagation of the signal, gradient 
-calculus with error backpropagation) are written in fortran 77 for 
-computational speed. Fast scipy optimization routines (also written 
-in fortran)  are used to minimize error of the network predictions. 
-All steering is done using a python class. Usage of the trained
-network is as simple as function call in python.
-
-ffnet uses some external open source software:
-- networkx for handling network architecture as the graph data structure,
-- numpy/scipy for training purposes,
-- pikaia, genetic algorihm based oprimizer in fortran (included
-  in this distribution).
-
-Using ffnet software it's possible to:
-- train/save/load/use feed-forward neural network in python,
-- test new training algorithms for these type of networks,
+ffnet is a fast and easy-to-use feed-forward neural network 
+training solution for python. For documentation and usage examples
+go to http://ffnet.sourceforge.net or browse source distribution of 
+the software.
 
 
 Requirements
 ------------
-ffnet needs python version 2.3 or above and 'not too old' versions of:
+ffnet needs python 2.4 or above and 'not too old'
+(possibly the latest) versions of:
 1. numpy/scipy (http://scipy.org/)
 2. NetworkX (https://networkx.lanl.gov/wiki)
 
 For plots (which apperar in examples) you will also need the
 matplotlib package (http://matplotlib.sourceforge.net/)
-
-Windows users are encouraged to install Enthought Python
-edition (http://code.enthought.com/enthon) which includes numpy/scipy,
-matplotlib and many other goodies (NetworkX however have to be
-installed separately). ffnet binary installer for Windows is built
-using configuration provided by:
-http://code.enthought.com/downloads/enthon-python2.4-1.0.0.exe
-(it means it works only with python an numpy versions included in
-this enthon release).
-
-It is also very convenient to run ffnet interactively with
-ipython, an enhanced python shell. See http://ipython.scipy.org/moin.
 
 
 Download
@@ -83,7 +36,7 @@ svn co https://ffnet.svn.sourceforge.net/svnroot/ffnet/trunk ffnet
 
 Installation
 ------------
-1. Building from source on Linux/Unix:
+1. Building from source on Linux/Unix.
 Unpack ffnet to the directory of your choice, enter this
 directory and run:
 
@@ -91,52 +44,38 @@ directory and run:
 
 ffnet uses numpy.distutils and f2py tool to compile Fortran parts of
 the program. The above will work if you are running Linux/Unix system 
-with gcc and g77 (gfortran).
-If you need to use specific Fortran compiler check for avilable options at:
+with gcc and g77 (gfortran). If you need to use specific Fortran 
+compiler check for avilable options at:
 http://cens.ioc.ee/projects/f2py2e/FAQ.html#q-what-are-supported-platforms-and-compilers
 For example, installing with Intel Fortran looks like:
 
     python setup.py install --fcompiler=intel
 
-2. Building from source on Windows:
-If you have mingw compilers installed (these are included in Enthought
-Python distribution!), just run:
+2. Building from source on Windows.
+If you have mingw compilers installed, run:
 
     python setup.py build --compiler=mingw32
 	python setup.py install --skip-build
-    
-To install proper mingw download:
-http://downloads.sourceforge.net/mingw/MinGW-5.1.2.exe?modtime=1166577337&big_mirror=1
+
+To install working mingw download:
+http://downloads.sourceforge.net/mingw/MinGW-5.1.3.exe
 and choose Candidate at installation time (Current doesn't work).
+Don't forget to add mingw bin directory to PATH.
 
-3. Binary installer for Windows:
-Double click the installation program.
-Important: installation the most probably will not work if you have not installed 
-http://code.enthought.com/downloads/enthon-python2.4-1.0.0.exe.
+3. Binary installers for Windows:
+Double click the installation program. Remember however that binaries
+work only with specific software configuration indicated by installer
+name.
 
 
-Usage
+Notes
 -----
-The basic usage is outlined below:
+Windows users might be interested in installing Enthought Python:
+http://code.enthought.com/downloads/enthon-python2.4-1.0.0.exe
+which reaches most of the ffnet requirements: numpy/scipy, matplotlib, 
+mingw compilers and contains also many other goodies. 
+NetworkX however have to be installed separately.
 
-from ffnet import ffnet, mlgraph, savenet, loadnet
-conec = mlgraph((2,2,1))
-net = ffnet(conec)
-input = [[0.,0.], [0.,1.], [1.,0.], [1.,1.]]
-target  = [[1.], [0.], [0.], [1.]]
-net.train_tnc(input, target, maxfun = 1000)
-net.test(input, target, iprint = 2)
-savenet(net, "xor.net")
-net = loadnet("xor.net")
-answer = net( [ 0., 0. ] )
-partial_derivatives = net.derivative( [ 0., 0. ] )
-
-Examples with full description can be found in examples directory
-of the source distribution.
-
-
-Documentation
--------------
-1. Go to http://ffnet.sourceforge.net for online documentation.
-2. Read docstrings of ffnet functions and methods.
+It is also very convenient to run ffnet interactively with
+ipython, an enhanced python shell. See http://ipython.scipy.org/moin.
 
