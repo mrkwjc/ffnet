@@ -67,6 +67,14 @@ Double click the installation program. Remember however that binaries
 work only with specific software configuration indicated by installer
 name.
 
+Testing
+-------
+Installation can be tested with:
+
+    from ffnet._tests import runtest
+    runtest()
+
+Execute also ffnet examples. They all should work.
 
 Notes
 -----
