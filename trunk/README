@@ -16,12 +16,12 @@ the software.
 
 Requirements
 ------------
-ffnet needs python 2.4 or above and 'not too old'
+ffnet needs python 2.3.5 or above and 'not too old'
 (possibly the latest) versions of:
 1. numpy/scipy (http://scipy.org/)
 2. NetworkX (https://networkx.lanl.gov/wiki)
 
-For plots (which appear in examples) you will need also the
+For plots (which appear in examples) you'll need also the
 matplotlib package (http://matplotlib.sourceforge.net/)
 
 
@@ -57,18 +57,19 @@ If you have mingw compilers installed, run:
     python setup.py build --compiler=mingw32
 	python setup.py install --skip-build
 
-To install working mingw download:
+To install mingw download:
 http://downloads.sourceforge.net/mingw/MinGW-5.1.3.exe
 and choose Candidate at installation time (Current
-didn't work - march 2007). Don't forget to add
-C:\MinGW\bin directory to system Path variable.
-Note that python installation directory should
+don't work - march 2007). Don't forget to check g77 to be
+installed. Remember to add C:\MinGW\bin directory to system 
+variable Path. Note that python installation directory should
 also be in Path.
 
 3. Binary installers for Windows:
 Double click the installation program. Remember however that binaries
-work only with specific software configuration indicated by installer
-name.
+work only for specific software configuration indicated by installer
+name (you need proper versions of python, numpy, scipy, networkx 
+and matplotlib).
 
 Testing
 -------
