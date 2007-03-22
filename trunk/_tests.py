@@ -151,9 +151,10 @@ class Testffconec(unittest.TestCase):
                  (1, 4), (2, 4), (0, 4), \
                  (3, 5), (4, 5), (0, 5) ]
         n = _ffconec(conec)
-        self.assertEqual(sorted(n[2]), [1, 2])
-        self.assertEqual(sorted(n[3]), [3, 4])
-        self.assertEqual(sorted(n[4]), [5])
+        n[2].sort(); n[3].sort(); n[4].sort()
+        self.assertEqual(n[2], [1, 2])
+        self.assertEqual(n[3], [3, 4])
+        self.assertEqual(n[4], [5])
         
 class Testbconec(unittest.TestCase):
     def testNoCycles(self):
