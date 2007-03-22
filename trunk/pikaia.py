@@ -5,6 +5,9 @@
 ##  Distributed under the terms of the GNU General Public License (GPL)
 ##  http://www.gnu.org/copyleft/gpl.html
 ########################################################################
+'''
+Genetic algorithm based optimizer.
+'''
 
 # import raw module 
 from fortran import _pikaia

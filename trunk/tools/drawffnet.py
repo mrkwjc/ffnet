@@ -5,6 +5,10 @@
 ##  Distributed under the terms of the GNU General Public License (GPL)
 ##  http://www.gnu.org/copyleft/gpl.html
 ########################################################################
+'''
+Network architecture visualizations
+'''
+
 try:
     from pylab import *
     from matplotlib.widgets import Slider, Button, RadioButtons
@@ -17,7 +21,7 @@ import networkx as NX
 # General function making network plot
 def drawffnet(net, biases = False):
     """
-    Takes ffnet object and draws the network. 
+    Takes a ffnet class instance and draws the network. 
     Networkx layouts and maplotlib buttons are used to control layout. 
     
     Note:
