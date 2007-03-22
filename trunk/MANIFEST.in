@@ -1,4 +1,9 @@
 recursive-include examples *.py *.f
 recursive-include examples/data *.dat
+
 recursive-include doc/html *
+prune doc/html/.svn 
+prune doc/html/public/.svn 
+prune doc/html/private/.svn
+
 include LICENSE
