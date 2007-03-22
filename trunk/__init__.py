@@ -67,4 +67,4 @@ from ffnet import ffnet, \
                   loadnet, \
                   exportnet
 from pikaia import pikaia
-from _tests import runtest as test
+##from _tests import runtest as test
