@@ -6,7 +6,7 @@ inherit distutils python
 
 DESCRIPTION="NetworkX is a python graph library"
 HOMEPAGE="https://networkx.lanl.gov/"
-SRC_URI="http://networkx.lanl.gov/download/networkx-0.33.tar.gz"
+SRC_URI="http://networkx.lanl.gov/download/${P}.tar.gz"
 
 SLOT="0"
 KEYWORDS="~x86"
