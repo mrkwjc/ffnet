@@ -47,11 +47,11 @@ def farray(arr, fname):
     try: typ = typ.str #Needed by older versions of numpy
     except: pass
 
-    if typ in [ 'int32', 'int64', '<i4', '<i8' ]: ftyp = 'INTEGER '
-    elif typ in [ 'float32', '<f4' ]: ftyp = 'REAL '
-    elif typ in [ 'float64', '<f8' ]: ftyp = 'DOUBLE PRECISION '
-    else: print typ
-    #else: raise TypeError("Unsupported array type")
+    if typ in [ 'int32', 'int64', '<i4', '<i8', '>i4', '>i8' ]: ftyp = 'INTEGER '
+    elif typ in [ 'float32', '<f4', '>f4' ]: ftyp = 'REAL '
+    elif typ in [ 'float64', '<f8', '>f8' ]: ftyp = 'DOUBLE PRECISION '
+    #else: print typ
+    else: raise TypeError("Unsupported array type: %s" %typ)
     
     declaration = flines ( ftyp + fname + fshp )
     
