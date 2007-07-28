@@ -1,4 +1,4 @@
 '''
 Things needed by ffnet.
 '''
-from drawffnet import drawffnet
+#from drawffnet import drawffnet
