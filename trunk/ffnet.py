@@ -718,9 +718,13 @@ class ffnet:
         fprime = netprop.grad
         extra_args = (self.conec, self.bconecno, self.units, \
                            self.inno, self.outno, input, target)
-        self.weights = optimize.fmin_tnc(func, self.weights.tolist(), fprime=fprime, \
-                                         args=extra_args, **kwargs)[-1]
-        self.weights = array(self.weights)
+        res = optimize.fmin_tnc(func, self.weights.tolist(), fprime=fprime, \
+                                         args=extra_args, **kwargs)
+        # workaround for scipy tnc output, not the best but should work
+        if len( res[-1] ) == len( self.weights ):
+            self.weights = array( res[-1] )
+        else:
+            self.weights = array( res[0] )
         self.trained = 'tnc'
         
     def test(self, input, target, iprint = 1, filename = None):
