@@ -12,9 +12,15 @@ Module containing ffnet class and utility functions.
 
 from _version import version
 from scipy import array, zeros, ones, random, optimize, sqrt
+from scipy.version import version as scipyversion
 import networkx as NX
 from fortran import _ffnet as netprop
 from pikaia import pikaia
+
+# Get version numbers of scipy
+scipyversion = scipyversion.split('.')
+scipymajor = int( scipyversion[0] )
+scipyminor = int( scipyversion[1] )
 
 def mlgraph(arch, biases = True):
     '''
@@ -721,7 +727,11 @@ class ffnet:
         res = optimize.fmin_tnc(func, self.weights.tolist(), fprime=fprime, \
                                          args=extra_args, **kwargs)
         # workaround for scipy tnc output, not the best but should work
-        if len( res[-1] ) == len( self.weights ):
+        #~ if len( res[-1] ) == len( self.weights ):
+            #~ self.weights = array( res[-1] )
+        #~ else:
+            #~ self.weights = array( res[0] )
+        if scipymajor == 0 and scipyminor < 6:
             self.weights = array( res[-1] )
         else:
             self.weights = array( res[0] )
