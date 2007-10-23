@@ -10,9 +10,8 @@
 
 from ffnet import ffnet, mlgraph
 
-# Generate standard layered network architecture
+# Generate standard layered network architecture and create network
 conec = mlgraph((2,2,1))
-# Create network
 net = ffnet(conec)
 
 # Define training data

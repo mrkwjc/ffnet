@@ -29,22 +29,20 @@
 ## So let's try.
 ## Attention: training might be a long process as we train a big network.
 
-from ffnet import ffnet, mlgraph
-from scipy.io import read_array
+from ffnet import ffnet, mlgraph, readdata
 from numpy import array
 
-# Generate standard layered network architecture
+# Generate standard layered network architecture and create network
 conec = mlgraph((3,22,12,1))
-# Create network
 net = ffnet(conec)
 
-# Read training data
+# Read training data omitting first column and first line
 print "READING DATA..."
-file = open('data/black-scholes.dat', 'r')
-patterns = len( file.readlines() ); file.seek(0)
-lins = tuple( range( 1, patterns) )
-inpcols = (1, 2, 3); trgcols = (4,); cols = [ inpcols, trgcols ]
-input, target = read_array(file, columns=cols, lines=lins)
+data = readdata( 'data/black-scholes.dat',
+                 columns = ( (1, 5   ), ),
+                 lines =   ( (1, 1531), ) )
+input =  data[:, :3] #first 3 columns
+target = data[:, -1] #last column
 
 print "TRAINING NETWORK..."
 import sys; sys.stdout.flush() #Just to ensure dislpaing the above messages here
@@ -61,6 +59,7 @@ print "max. absolute error: %s  (should be <= 0.05)" %str(maxerr)
 print
 print "Is ffnet ready for a stock?"
 
+#####################################
 # Make plot if matplotlib is avialble
 try:
     from pylab import *
