@@ -21,7 +21,8 @@ if __name__ == "__main__":
           platforms         = 'Posix, Windows',
           packages          = [ 'ffnet', 'ffnet.fortran', 'ffnet.tools' ],
           package_dir       = { 'ffnet': '.' },
+          data_files        = [ ('ffnet/fortran', [ 'fortran/ffnet.f' ]) ],
           ext_modules       = [ ext1, ext2 ]
           )
-
-          #~ py_modules        = ["ffnet", "pikaia"]
+          
+#         ('ffnet/examples/data', [ 'examples/data/ocr.dat' ])],

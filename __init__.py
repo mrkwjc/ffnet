@@ -59,6 +59,7 @@ examples directory of the source distribution.
 from _version import version
 import fortran
 #import tools
+import ffnet as ffnetmodule
 from ffnet import ffnet, \
                   mlgraph, \
                   tmlgraph, \
