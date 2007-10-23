@@ -18,9 +18,9 @@ from fortran import _ffnet as netprop
 from pikaia import pikaia
 
 # Get version numbers of scipy
-scipyversion = scipyversion.split('.')
-scipymajor = int( scipyversion[0] )
-scipyminor = int( scipyversion[1] )
+_scipyversion = scipyversion.split('.')
+_scipymajor = int( _scipyversion[0] )
+_scipyminor = int( _scipyversion[1] )
 
 def mlgraph(arch, biases = True):
     '''
@@ -731,7 +731,7 @@ class ffnet:
             #~ self.weights = array( res[-1] )
         #~ else:
             #~ self.weights = array( res[0] )
-        if scipymajor == 0 and scipyminor < 6:
+        if _scipymajor == 0 and _scipyminor < 6:
             self.weights = array( res[-1] )
         else:
             self.weights = array( res[0] )
