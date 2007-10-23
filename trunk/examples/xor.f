@@ -73,15 +73,15 @@ c
 c      
       outno(1) = 5
 c      
-      weights(1) = -6.90988436734
-      weights(2) = 5.50077280896
-      weights(3) = 6.98962504772
-      weights(4) = 16.5663271689
-      weights(5) = -9.92221728502
-      weights(6) = -16.3831657565
-      weights(7) = 16.8807652379
-      weights(8) = -15.4711903964
-      weights(9) = -15.0463374672
+      weights(1) = 13.1267522738
+      weights(2) = -24.749743273
+      weights(3) = 17.0119833764
+      weights(4) = 5.98913391121
+      weights(5) = 24.4957069442
+      weights(6) = -22.069090425
+      weights(7) = -5.2265158733
+      weights(8) = 3.49155889342
+      weights(9) = 3.47558869393
 c      
       eni(1, 1) = 0.7
       eni(2, 1) = 0.7
@@ -100,7 +100,7 @@ c     ------------------------------------------------------------------
       SUBROUTINE dffnet(input, deriv)
 c     ------------------------------------------------------------------
 c     Returns partial derivatives of the network's 
-c     output vs. its input at given input point
+c     output vs its input at given input point
 c     in the following array:
 c     | o1/i1, o1/i2, ..., o1/in |
 c     | o2/i1, o2/i2, ..., o2/in |
@@ -162,15 +162,15 @@ c
 c      
       outno(1) = 5
 c      
-      weights(1) = -6.90988436734
-      weights(2) = 5.50077280896
-      weights(3) = 6.98962504772
-      weights(4) = 16.5663271689
-      weights(5) = -9.92221728502
-      weights(6) = -16.3831657565
-      weights(7) = 16.8807652379
-      weights(8) = -15.4711903964
-      weights(9) = -15.0463374672
+      weights(1) = 13.1267522738
+      weights(2) = -24.749743273
+      weights(3) = 17.0119833764
+      weights(4) = 5.98913391121
+      weights(5) = 24.4957069442
+      weights(6) = -22.069090425
+      weights(7) = -5.2265158733
+      weights(8) = 3.49155889342
+      weights(9) = 3.47558869393
 c      
       eni(1, 1) = 0.7
       eni(2, 1) = 0.7

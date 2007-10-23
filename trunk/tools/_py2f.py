@@ -78,6 +78,8 @@ def farray(arr, fname):
     definition = ''
     for i in xrange( len(indexes) ):
         fval = str ( arr[ indexes[i] ] )
+        #if ftyp == 'DOUBLE PRECISION ': fval = '%.16g' %( arr[ indexes[i] ] )
+        #else: fval = str ( arr[ indexes[i] ] )
         definition += flines ( fname + findexes[i] + ' = ' + fval )
         
     return declaration, definition
