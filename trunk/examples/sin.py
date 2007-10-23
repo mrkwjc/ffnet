@@ -8,30 +8,24 @@
 
 ### Sine training example for ffnet ###
 
-from ffnet import ffnet, mlgraph
+from ffnet import ffnet
 from math import pi, sin, cos
 
-# Let's create layered network connectivity by hand (architecture (1,4,1))
-# Tip: draw network on a sheet of paper and number its nodes first. :)
-# Remember that biases of nodes are handled as the connections 
-# from special node numbered 0.
-# Order of node numbering has no meaning. Order of links in conec is meaningless too,
-# but the tuples indicating connections have to be from source to target. 
-
+# Let's define network connectivity by hand and then create network.
 conec = [(1, 2), (1, 3), (1, 4), (1, 5), (2, 6), (3, 6), (4, 6), (5, 6), \
          (0, 2), (0, 3), (0, 4), (0, 5), (0, 6)]
-
-# Note1: Adding connection from 0 to 1 will cause it not to be input node any more
-# therefore it is not allowed!
-# Note2: The same connectivity can be obtained using mlgraph function provided with ffnet.
-
-# Create network
+# Note 1: Biases in ffnet are handled as the connections 
+#         from special node numbered 0. Input nodes cannot be biased.
+# Note 2: Node numbering and order of links in conec is meaningless,
+#         but the connections have to be from source to target. 
+# Note 3: The same connectivity can be obtained using mlgraph function 
+#         provided with ffnet (layered architecture (1,4,1)).
 net = ffnet(conec)
 
 # Generate training data (sine values for x from 0 to 2*pi)
 patterns = 16
-input = [ [0.] ] + [ [k*2*pi/patterns] for k in xrange(1, patterns + 1) ]
-target = [[sin(x[0])] for x in input]
+input = [ [ 0. ] ] + [ [ k*2*pi/patterns ] for k in xrange(1, patterns + 1) ]
+target = [ [ sin(x[0]) ] for x in input ]
 
 # Train network
 #first find good starting point with genetic algorithm (not necessary, but may be helpful)
@@ -46,6 +40,7 @@ print
 print "TESTNG NETWORK..."
 output, regression = net.test(input, target, iprint = 2)
 
+#################
 # Make some plots
 try:
     from pylab import *
@@ -74,12 +69,12 @@ print \
 """
 Note:
 You can use ffnet network as a python function.
-For example calling net([3.14]) for sine network gives %s
-( sine at 3.14 is 0.00159265291649 )
+For example calling net([ pi ]) for sine network gives %s
+( sine at 'pi' is 0.0 )
 
 You have also access to partial derivatives of the network
-outputs vs. its inputs. Calling net.derivative([3.14]) 
-we obtain %s ( cosine at 3.14 is -0.999998731728 ).
-""" % ( net([3.14]), net.derivative([3.14]) )
+outputs vs. its inputs. Calling net.derivative([ pi ]) 
+we obtain %s ( cosine at 'pi' is -1.0 ).
+""" % ( net([ pi ]), net.derivative([ pi ]) )
 
 

@@ -8,38 +8,36 @@
 
 ### Digits recognition example for ffnet ###
 
-# The training set is contained in the file data/ocr.dat.
-# The file contains 68 total patterns (first 58 are used for training 
-# and last 10 are used for the test set). Data columns 1 through 64 
-# contain the input node bitmap data and 64 through 74 contain the
-# training targets (10 targets for 10 digits). 
-# Layered network architecture is used: (64, 10, 10, 10)
+# The training data set is contained in the file data/ocr.dat.
+# This file contains 68 patterns - first 58 are used for training 
+# and last 10 are used for testing. Each pattern contains 64 inputs
+# which define 8x8 bitmap of the digit and the last 10 numbers are
+# the targets (10 targets for 10 digits).
+# Layered network architecture is used here: (64, 10, 10, 10)
 
-from ffnet import ffnet, mlgraph
+from ffnet import ffnet, mlgraph, readdata
 
-# Generate standard layered network architecture
+# Generate standard layered network architecture and create network
 conec = mlgraph((64,10,10,10))
-# Create network
 net = ffnet(conec)
 
-# Read training data
-file = open("data/ocr.dat", 'r')
-from scipy.io import read_array
-input_cols = tuple(range(0, 64)); target_cols = tuple(range(64, 74))
-input, target = read_array(file, columns=[input_cols, target_cols])
+# Read data file
+print "READING DATA..."
+data = readdata( 'data/ocr.dat', separator = ' ' )
+input =  data[:, :64] #first 64 columns - bitmap definition
+target = data[:, 64:] #the rest - 10 columns for 10 digits
 
-# Train network
-#train with scipy tnc optimizer
+# Train network with scipy tnc optimizer - 58 lines used for training
 print "TRAINING NETWORK..."
-##net.train_genetic(input, target, individuals=20, generations=500, lower=-1., upper=1.)
 net.train_tnc(input[:58], target[:58], maxfun = 2000, messages=1)
 
-# Test network
+# Test network - remaining 10 lines used for testing
 print
 print "TESTING NETWORK..."
 output, regression = net.test(input[58:], target[58:], iprint = 2)
 
-#Make a plot of a chosen digit along with the network guess
+############################################################
+# Make a plot of a chosen digit along with the network guess
 try:
     from pylab import *
     from random import randint
