@@ -839,3 +839,15 @@ def exportnet(net, filename, name = 'ffnet', lang = 'fortran'):
     f.write( py2f.ffnetdiff(net, 'd' + name) )
     f.close()
     return
+
+def readdata(filename, **kwargs):
+    """
+    Reads arrays of numbers from ASCII file.
+    Accepts all scipy.io.read_array keyword arguments. 
+    Read documentation of read_array function for details.
+    """
+    from scipy.io import read_array
+    file = open(filename, 'r')
+    data = read_array( file, **kwargs )
+    file.close()
+    return data
