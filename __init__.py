@@ -66,6 +66,7 @@ from ffnet import ffnet, \
                   imlgraph, \
                   savenet, \
                   loadnet, \
-                  exportnet
+                  exportnet, \
+                  readdata
 from pikaia import pikaia
 ##from _tests import runtest as test
