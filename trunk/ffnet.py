@@ -858,7 +858,11 @@ def readdata(filename, **kwargs):
     Read documentation of read_array function for details.
     """
     from scipy.io import read_array
-    file = open(filename, 'r')
-    data = read_array( file, **kwargs )
-    file.close()
+    if _scipymajor == 6 and _scipyminor == 0 \
+                and sys.platform.startswith('win'):
+        data = read_array(filename, **kwargs )
+    else:
+        file = open(filename, 'r')
+        data = read_array(file, **kwargs )
+        file.close()
     return data
