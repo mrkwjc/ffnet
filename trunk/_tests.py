@@ -175,6 +175,16 @@ class Testdconec(unittest.TestCase):
         self.assertEqual(n[1], [1, 4, 7, 8, 2, 5, 7, 8])
         self.assertEqual(n[2], [0, 4, 8])
         
+class Testdconec2(unittest.TestCase):
+    def testNoCycles(self):
+        conec = [(1, 3), (2, 3), (0, 3), \
+                 (1, 4), (0, 4), \
+                 (3, 5), (4, 5), (0, 5) ]
+        inno = [1,2]
+        n = _dconec(conec, inno)
+        self.assertEqual(n[1], [1, 4, 6, 7, 2, 6])
+        self.assertEqual(n[2], [0, 4, 6])
+        
 class TestFfnetSigmoid(unittest.TestCase):
     def setUp(self):
         self.conec = [(0, 3), (1, 3), (2, 3), \
@@ -196,7 +206,25 @@ class TestFfnetSigmoid(unittest.TestCase):
     def testDerivative(self):
         self.assertAlmostEqual(self.net.derivative([0., 0.])[0][0], 0.1529465741023702, 8)
         self.assertAlmostEqual(self.net.derivative([0., 0.])[0][1], 0.1529465741023702, 8)
-        
+    
+    def testDerivative2(self):
+        conec = [(1, 3), (2, 3), (0, 3), \
+                 (1, 4), (0, 4), \
+                 (3, 4), (4, 5), (0, 5),
+                 (4, 6), (3, 6), (5, 6) ]
+        net = ffnet(conec)
+        y1n, y2n = net.derivative([1, 1])[0]
+        from scipy import derivative
+        def func1(x):
+            return net([x, 1])[0]
+        def func2(x):
+            return net([1, x])[0]
+        y1 = derivative(func1, 1, dx=0.001)
+        y2 = derivative(func2, 1, dx=0.001)
+        self.assertAlmostEqual(y1n, y1, 7)
+        self.assertAlmostEqual(y2n, y2, 7)
+
+    
     def testSqerror(self):
         err = self.tnet.sqerror(self.input, self.target)
         out = [ (self.tnet(self.input[i])[0] - self.target[i][0])**2 \
@@ -332,7 +360,7 @@ def runtest():
    import sys
    suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])
    unittest.TextTestRunner(verbosity=2).run(suite)        
-        
+    
 
 # run tests
 if __name__ == '__main__':

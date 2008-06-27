@@ -107,6 +107,20 @@ def tmlgraph(arch, biases = True):
                 conec.append((src, trg))
     return conec
 
+def _dependency(G, source):
+    """
+    Returns subgraph of G connecting 'source' with all sinks.
+    """
+    H = G.copy()
+    node_removal = 1
+    while node_removal:
+        node_removal = 0
+        for node in H.nodes():
+            if not H.in_degree(node) and node != source:
+                H.delete_node(node)
+                node_removal = 1
+    return H
+
 def _linear(a, b, c, d):
     '''
     Returns coefficients of linear map from range (a,b) to (c,d)
@@ -208,10 +222,7 @@ def _dconec(conec, inno):
     for idx, i in enumerate(inno):
         dgraph = NX.DiGraph()
         dgraph.add_edges_from(conec)
-        dgraph.delete_nodes_from(inno[0:idx])
-        dgraph.delete_nodes_from(inno[idx+1:])
-        try: dgraph.delete_node(0)  #handling biases
-        except: pass
+        dgraph = _dependency(dgraph, i) 
         dsnodes = NX.topological_sort(dgraph)
         for dnode in dsnodes:
             for dedge in dgraph.in_edges(dnode):
