@@ -16,6 +16,7 @@ from scipy.version import version as scipyversion
 import networkx as NX
 from fortran import _ffnet as netprop
 from pikaia import pikaia
+import sys
 
 # Get version numbers of scipy
 _scipyversion = scipyversion.split('.')
@@ -666,6 +667,8 @@ class ffnet:
            FORTRAN routines for large scale bound constrained optimization (1997),
            ACM Transactions on Mathematical Software, Vol 23, Num. 4, pp. 550 - 560.
         """
+        if sys.platform.startswith('aix'): return
+        
         input, target = self._setnorm(input, target)
         if 'bounds' not in kwargs: kwargs['bounds'] = ((-100., 100.),)*len(self.conec)
         func = netprop.func
