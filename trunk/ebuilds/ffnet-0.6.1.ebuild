@@ -20,25 +20,32 @@ DEPEND="virtual/python
 	matplotlib? ( dev-python/matplotlib )
 	!dev-python/ffnet-svn"
 
-# set environment variable F2PY_FC with proper f2py compiler name
-# or gnu compilers will be used
-if [ ${F2PY_FC} ]; then
-	FCOMPILER="--fcompiler=${F2PY_FC}"
-fi
-	
+pkg_setup() {
+	einfo
+	einfo "This package uses f2py and needs Fortran compiler"
+	einfo "In general it should be detected automatically."
+	einfo "For custom compiler set FC_VENDOR environment"
+	einfo "variable:"
+	einfo "export FC_VENDOR=gnu --> g77"
+	einfo "export FC_VENDOR=gnu95 --> gfortran"
+	einfo "export FC_VENDOR=intel --> ifort"
+	einfo
+}
 
 src_compile() {
 	distutils_src_compile \
 		config_fc \
-		${FCOMPILER} \
-		--opt="${CFLAGS}" \
+		--fcompiler=${FC_VENDOR} \
 		|| die "compilation failed"
 }
 
 src_install() {
 	distutils_src_install
-
-	#dodoc README
-    cp -r doc ${D}/usr/share/doc/${PF}
+	cp -r doc ${D}/usr/share/doc/${PF}
 	cp -r examples ${D}/usr/share/doc/${PF}
 }
+
+pkg_postrm() {
+	python_mod_cleanup
+}
+
