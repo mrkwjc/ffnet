@@ -341,9 +341,11 @@ class ffnet:
         return info
     
     def __call__(self, inp):
-        output = netprop.normcall(self.weights, self.conec, self.units, \
-                                  self.inno, self.outno, self.eni, self.deo, inp)
-        return output.tolist()
+        #~ output = netprop.normcall(self.weights, self.conec, self.units, \
+                                  #~ self.inno, self.outno, self.eni, self.deo, inp)
+        output = netprop.normcall2(self.weights, self.conec, self.units, \
+                                   self.inno, self.outno, self.eni, self.deo, [inp])
+        return output[0].tolist()
     
     def call(self, inp):
         """Returns network answer to input sequence
@@ -359,10 +361,11 @@ class ffnet:
                | ...                      |
                | om/i1, om/i2, ..., om/in |
         """
-
-        deriv = netprop.normdiff(self.weights, self.conec, self.dconecno, self.dconecmk, \
-                                 self.units, self.inno, self.outno, self.eni, self.ded, inp)
-        return deriv.tolist()
+        #~ deriv = netprop.normdiff(self.weights, self.conec, self.dconecno, self.dconecmk, \
+                                 #~ self.units, self.inno, self.outno, self.eni, self.ded, inp)
+        deriv = netprop.normdiff2(self.weights, self.conec, self.dconecno, self.dconecmk, \
+                                 self.units, self.inno, self.outno, self.eni, self.ded, [inp])
+        return deriv[0].tolist()
         
     def sqerror(self, input, target):
         """

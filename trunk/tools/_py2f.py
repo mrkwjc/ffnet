@@ -78,6 +78,7 @@ def farray(arr, fname):
     definition = ''
     for i in xrange( len(indexes) ):
         fval = str ( arr[ indexes[i] ] )
+        fval = fval.replace(',', '.') # numpy-1.1.1 returns array entries with comma!
         #if ftyp == 'DOUBLE PRECISION ': fval = '%.16g' %( arr[ indexes[i] ] )
         #else: fval = str ( arr[ indexes[i] ] )
         definition += flines ( fname + findexes[i] + ' = ' + fval )
