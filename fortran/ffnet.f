@@ -360,7 +360,7 @@ c.....get output
       
       return
       end
-	  
+c
 c************************************************************************
       subroutine normdiff(x, conec, n, dconecno, dn, dconecmk, units,
      &                    u, inno, i, outno, o, eni, ded, input, deriv)
@@ -437,6 +437,75 @@ c.........restore current input
       enddo
 
       RETURN
+      end
+c
+c************************************************************************
+      subroutine normcall2(x, conec, n, units, u, inno, i, outno, o,
+     &                     eni, deo, input, p, output)
+c************************************************************************
+c
+c.....Calls normcall for an array if inputs and return array of outputs
+c
+      implicit none
+c.....variables
+      integer n, u, i, o, conec(n,2), inno(i), outno(o), p
+      double precision x(n), units(u), input(p,i), output(p,o)
+      double precision eni(i,2), deo(o,2)
+c.....helper variables
+      double precision tmpinp(i), tmpout(o)
+      integer j, k
+c.....f2py statements
+cf2py intent(out) output, istat
+
+c.....iterate over input set
+      do j=1,p
+          do k=1,i
+              tmpinp(k) = input(j,k)
+          enddo
+          call normcall(x, conec, n, units, u, inno, i, outno, o,
+     &                  eni, deo, tmpinp, tmpout)
+          do k=1,o
+              output(j,k) = tmpout(k)
+          enddo
+      enddo
+      
+      return
+      end
+c
+c************************************************************************
+      subroutine normdiff2(x, conec, n, dconecno, dn, dconecmk, units,u, 
+     &                     inno, i, outno, o, eni, ded, input, p, deriv)
+c************************************************************************
+c
+c.....Calls normdiff for an array if inputs and return array of derivs
+c
+      implicit none
+c.....variables
+      integer n, dn, u, i, o, p, conec(n,2), dconecno(dn), dconecmk(i+1)
+      integer inno(i), outno(o)
+      double precision x(n), units(u), input(p,i), deriv(p,o,i)
+      double precision eni(i,2), ded(o,i)
+c.....helper variables
+      integer j, k, l
+      double precision tmpinp(i), tmpder(o,i)
+c.....f2py statements
+cf2py intent(out) deriv
+
+c.....iterate over input set
+      do j=1,p
+          do k=1,i
+              tmpinp(k) = input(j,k)
+          enddo
+          call normdiff(x, conec, n, dconecno, dn, dconecmk, units,
+     &                  u, inno, i, outno, o, eni, ded, tmpinp, tmpder)
+          do k=1,o
+              do l=1,i
+                  deriv(j,k,l) = tmpder(k,l)
+              enddo
+          enddo
+      enddo
+      
+      return
       end
 c
 cc
