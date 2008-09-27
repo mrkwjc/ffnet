@@ -202,11 +202,14 @@ class TestFfnetSigmoid(unittest.TestCase):
     def testCall(self):
         self.assertEqual(self.net([0., 0.]), self.net.call([0., 0.]))
         self.assertAlmostEqual(self.net([0., 0.])[0], 0.8495477739862124, 8)
+        self.assertAlmostEqual(self.net([[0., 0.], [0., 0.]])[1, 0], 0.8495477739862124, 8)
         
     def testDerivative(self):
         self.assertAlmostEqual(self.net.derivative([0., 0.])[0][0], 0.1529465741023702, 8)
         self.assertAlmostEqual(self.net.derivative([0., 0.])[0][1], 0.1529465741023702, 8)
-    
+        self.assertAlmostEqual(self.net.derivative([[0., 0.], [0., 0.]])[1, 0, 0], 0.1529465741023702, 8)
+        self.assertAlmostEqual(self.net.derivative([[0., 0.], [0., 0.]])[1, 0, 1], 0.1529465741023702, 8)
+
     def testDerivative2(self):
         conec = [(1, 3), (2, 3), (0, 3), \
                  (1, 4), (0, 4), \
@@ -354,7 +357,7 @@ class TestExport2Fortran(unittest.TestCase):  #not finished, just started
     def testArray(self):
         s1 = farray(self.A, 'test')      
         s2 = farray(self.B, 'test')
-        
+
 def runtest():
    ''' Runs all tests from this module '''
    import sys
