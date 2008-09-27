@@ -11,7 +11,7 @@ Module containing ffnet class and utility functions.
 '''
 
 from _version import version
-from scipy import array, zeros, ones, random, optimize, sqrt
+from scipy import zeros, ones, random, optimize, sqrt, ndarray, array
 from scipy.version import version as scipyversion
 import networkx as NX
 from fortran import _ffnet as netprop
@@ -233,6 +233,7 @@ def _dconec(conec, inno):
         dconecmk.append(len(dconecno))
     return dgraphs, dconecno, dconecmk
 
+
 class ffnet:
     """
     Feed-forward neural network main class.
@@ -339,34 +340,47 @@ class ffnet:
                "outputs: %4i \n" %(len(self.outno)) + \
                "connections and biases: %4i" %(len(self.conec)) 
         return info
-    
+
     def __call__(self, inp):
-        #~ output = netprop.normcall(self.weights, self.conec, self.units, \
-                                  #~ self.inno, self.outno, self.eni, self.deo, inp)
-        output = netprop.normcall2(self.weights, self.conec, self.units, \
-                                   self.inno, self.outno, self.eni, self.deo, [inp])
-        return output[0].tolist()
-    
+        ## Something more sophisticated is needed here?
+        return self.call(inp)
+            
     def call(self, inp):
-        """Returns network answer to input sequence
+        """Returns network answer to input sequence 
+        (for one input sample or 2D array of input samples)
         """
-        return self.__call__(inp)
+        if not isinstance(inp, ndarray): inp = array(inp, 'd')
+        if inp.ndim == 1:
+            output = netprop.normcall(self.weights, self.conec, self.units, \
+                            self.inno, self.outno, self.eni, self.deo, inp)
+            return output #.tolist()
+        if inp.ndim == 2:
+            output = netprop.normcall2(self.weights, self.conec, self.units, \
+                            self.inno, self.outno, self.eni, self.deo, inp)
+            return output
+        raise TypeError("Input is not valid")
 
     def derivative(self, inp):
         """Returns partial derivatives of the network's 
-           output vs its input at given input point
+           output vs its input at given input point 
+           (for one input sample or 2D array of input samples)
            in the following array:
                | o1/i1, o1/i2, ..., o1/in |
                | o2/i1, o2/i2, ..., o2/in |
                | ...                      |
                | om/i1, om/i2, ..., om/in |
         """
-        #~ deriv = netprop.normdiff(self.weights, self.conec, self.dconecno, self.dconecmk, \
-                                 #~ self.units, self.inno, self.outno, self.eni, self.ded, inp)
-        deriv = netprop.normdiff2(self.weights, self.conec, self.dconecno, self.dconecmk, \
-                                 self.units, self.inno, self.outno, self.eni, self.ded, [inp])
-        return deriv[0].tolist()
-        
+        if not isinstance(inp, ndarray): inp = array(inp, 'd')
+        if inp.ndim == 1:
+            deriv = netprop.normdiff(self.weights, self.conec, self.dconecno, self.dconecmk, \
+                            self.units, self.inno, self.outno, self.eni, self.ded, inp)
+            return deriv #.tolist()
+        if inp.ndim == 2:
+            deriv = netprop.normdiff2(self.weights, self.conec, self.dconecno, self.dconecmk, \
+                            self.units, self.inno, self.outno, self.eni, self.ded, inp)
+            return deriv
+        raise TypeError("Input is not valid")
+
     def sqerror(self, input, target):
         """
         Returns 0.5*(sum of squared errors at output)
@@ -412,10 +426,16 @@ class ffnet:
     def _testdata(self, input, target):
         """Tests input and target data"""
         # Test conversion
-        try: input = array(input, 'd')
+        try: 
+            if not isinstance(input, ndarray): input = array(input, 'd')
+            #input = array(input, 'd')
         except: raise ValueEror("Input cannot be converted to numpy array")
-        try: target = array(target, 'd')
+        try: 
+            if not isinstance(target, ndarray): target = array(target, 'd')
+            #target = array(target, 'd')
         except: raise ValueEror("Target cannot be converted to numpy array")
+        
+        #if input.dtype.char != 'd': input = array(input, 'd')
         
         #Convert 1-d arrays to 2-d (this allows to put 1-d arrays
         #for training if we have one input and/or one output
@@ -783,7 +803,7 @@ class ffnet:
         # Test data and get output
         input, target = self._testdata(input, target)
         nump = len(input)
-        output = array([self(inp) for inp in input])
+        output = self(input) #array([self(inp) for inp in input])
         # Calculate regression info
         from scipy.stats import linregress
         numo = len(self.outno)
