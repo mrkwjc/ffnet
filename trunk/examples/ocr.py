@@ -60,8 +60,8 @@ try:
     ylabel("Network outputs")
    
     show()
-except ImportError: 
-    print "Cannot make plots. For plotting install matplotlib..."
+except ImportError, e: 
+    print "Cannot make plots. For plotting install matplotlib.\n%s" % e
     
 print \
 """

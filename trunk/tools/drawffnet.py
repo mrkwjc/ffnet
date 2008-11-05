@@ -13,8 +13,8 @@ try:
     from pylab import *
     from matplotlib.widgets import Slider, Button, RadioButtons
     from matplotlib.patches import Circle
-except:
-    raise ImportError( " Matplotlib not found! " )
+except ImportError, e:
+    raise ImportError( " Matplotlib not found! %s" % e)
 
 import networkx as NX
 
