@@ -429,11 +429,11 @@ class ffnet:
         try: 
             if not isinstance(input, ndarray): input = array(input, 'd')
             #input = array(input, 'd')
-        except: raise ValueEror("Input cannot be converted to numpy array")
+        except: raise ValueError("Input cannot be converted to numpy array")
         try: 
             if not isinstance(target, ndarray): target = array(target, 'd')
             #target = array(target, 'd')
-        except: raise ValueEror("Target cannot be converted to numpy array")
+        except: raise ValueError("Target cannot be converted to numpy array")
         
         #if input.dtype.char != 'd': input = array(input, 'd')
         

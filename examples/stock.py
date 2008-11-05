@@ -70,6 +70,5 @@ try:
     title('Outputs vs. target of trained network.')
     grid(True)
     show()
-except ImportError: 
-    print "Cannot make plots. For plotting install matplotlib..."
- 
+except ImportError, e: 
+    print "Cannot make plots. For plotting install matplotlib.\n%s" % e
