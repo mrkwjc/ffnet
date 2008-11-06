@@ -757,8 +757,12 @@ class ffnet:
         input, target = self._setnorm(input, target)
         if 'messages' not in kwargs: kwargs['messages'] = 0
         if 'bounds' not in kwargs: kwargs['bounds'] = ((-100., 100.),)*len(self.conec)
+        
+        #from ppprop import func, grad
+        #from ppprop import grad as fprime
         func = netprop.func
         fprime = netprop.grad
+        
         extra_args = (self.conec, self.bconecno, self.units, \
                            self.inno, self.outno, input, target)
         res = optimize.fmin_tnc(func, self.weights.tolist(), fprime=fprime, \
