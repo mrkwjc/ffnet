@@ -182,8 +182,13 @@ def _ffconec(conec):
     else:
         conec = []; inno = []; hidno = []; outno = []
         for node in snodes:
-            ins = graph.in_edges(node)
-            outs = graph.out_edges(node)
+            try:  # This is for networkx-0.3x
+                ins = graph.in_edges(node)
+                outs = graph.out_edges(node)
+            except:  # This is for new networkx-0.99
+                ins = (graph.reverse(copy=True)).edges(node)
+                ins = [(v,u) for (u,v) in ins] # reversing back!
+                outs = graph.edges(node)
             if not ins and node != 0 :  # biases handling
                 inno += [node]
             else:
@@ -207,10 +212,16 @@ def _bconec(conec, inno):
     bsnodes = NX.topological_sort(bgraph)
     bconecno = []
     for bnode in bsnodes:
-        for bedge in bgraph.in_edges(bnode):
-            edge = (bedge[1], bedge[0])
-            idx = conec.index(edge) + 1
-            bconecno.append(idx)
+        try:  # This is for networkx-0.3x
+            for bedge in bgraph.in_edges(bnode):
+                edge = (bedge[1], bedge[0])
+                idx = conec.index(edge) + 1
+                bconecno.append(idx)
+        except: # This is for new networkx-0.99
+            for bedge in (bgraph.reverse(copy=True)).edges(bnode):
+                edge = bedge #(bedge[1], bedge[0])
+                idx = conec.index(edge) + 1
+                bconecno.append(idx)
     return bgraph, bconecno
     
 def _dconec(conec, inno):
@@ -226,9 +237,15 @@ def _dconec(conec, inno):
         dgraph = _dependency(dgraph, i) 
         dsnodes = NX.topological_sort(dgraph)
         for dnode in dsnodes:
-            for dedge in dgraph.in_edges(dnode):
-                idx = conec.index(dedge) + 1
-                dconecno.append(idx)
+            try:  # This is for networkx-0.3x
+                for dedge in dgraph.in_edges(dnode):
+                    idx = conec.index(dedge) + 1
+                    dconecno.append(idx)
+            except:  # This is for new networkx-0.99
+                for dedge in (dgraph.reverse(copy=True)).edges(dnode):
+                    dedge = (dedge[1], dedge[0]) #!!!
+                    idx = conec.index(dedge) + 1
+                    dconecno.append(idx)
         dgraphs.append(dgraph)
         dconecmk.append(len(dconecno))
     return dgraphs, dconecno, dconecmk
