@@ -118,7 +118,10 @@ def _dependency(G, source):
         node_removal = 0
         for node in H.nodes():
             if not H.in_degree(node) and node != source:
-                H.delete_node(node)
+                try:  # This is for networkx-0.3x
+                    H.delete_node(node)
+                except:  # This is for networkx >= 0.99
+                    H.remove_node(node)
                 node_removal = 1
     return H
 
@@ -206,9 +209,14 @@ def _bconec(conec, inno):
     bgraph = NX.DiGraph()
     bgraph.add_edges_from(conec)
     bgraph = bgraph.reverse()
-    bgraph.delete_nodes_from(inno)
-    try: bgraph.delete_node(0) #handling biases
-    except: pass
+    try:  # This is for networkx-0.3x
+        bgraph.delete_nodes_from(inno)
+        try: bgraph.delete_node(0) #handling biases
+        except: pass
+    except:  # This is for networkx >= 0.99
+        bgraph.remove_nodes_from(inno)
+        try: bgraph.remove_node(0) #handling biases
+        except: pass
     bsnodes = NX.topological_sort(bgraph)
     bconecno = []
     for bnode in bsnodes:
