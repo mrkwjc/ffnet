@@ -1,0 +1,645 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>ffnet.ffnet'</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="http://ffnet.sourceforge.net">ffnet</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        Package&nbsp;ffnet ::
+        Module&nbsp;ffnet'
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="ffnet.ffnet%27-module.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<!-- ==================== MODULE DESCRIPTION ==================== -->
+<h1 class="epydoc">Module ffnet'</h1><p class="nomargin-top"><span class="codelink"><a href="ffnet.ffnet%27-pysrc.html">source&nbsp;code</a></span></p>
+<p>Module containing ffnet class and utility functions.</p>
+
+<!-- ==================== CLASSES ==================== -->
+<a name="section-Classes"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Classes</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-Classes"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="ffnet.ffnet%27.ffnet-class.html" class="summary-name">ffnet</a><br />
+      Feed-forward neural network main class.
+    </td>
+  </tr>
+</table>
+<!-- ==================== FUNCTIONS ==================== -->
+<a name="section-Functions"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Functions</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-Functions"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="ffnet.ffnet%27-module.html#_bconec" class="summary-sig-name" onclick="show_private();">_bconec</a>(<span class="summary-sig-arg">conec</span>,
+        <span class="summary-sig-arg">inno</span>)</span><br />
+      Returns list of adjoint graph (for backprop) edges positions in 
+      conec.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ffnet.ffnet%27-pysrc.html#_bconec">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="ffnet.ffnet%27-module.html#_dconec" class="summary-sig-name" onclick="show_private();">_dconec</a>(<span class="summary-sig-arg">conec</span>,
+        <span class="summary-sig-arg">inno</span>)</span><br />
+      Return list of edges positions (in conec) of graphs for derivative 
+      calculation, all packed in one list (dconecno).</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ffnet.ffnet%27-pysrc.html#_dconec">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_dependency"></a><span class="summary-sig-name">_dependency</span>(<span class="summary-sig-arg">G</span>,
+        <span class="summary-sig-arg">source</span>)</span><br />
+      Returns subgraph of G connecting 'source' with all sinks.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ffnet.ffnet%27-pysrc.html#_dependency">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_ffconec"></a><span class="summary-sig-name">_ffconec</span>(<span class="summary-sig-arg">conec</span>)</span><br />
+      Checks if conec is acyclic, sorts it if necessary and returns tuple: 
+      (conec, inno, hidno, outno) where: conec - sorted input connectivity 
+      inno/hidno/outno  - lists of input/hidden/ouput units</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ffnet.ffnet%27-pysrc.html#_ffconec">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_linear"></a><span class="summary-sig-name">_linear</span>(<span class="summary-sig-arg">a</span>,
+        <span class="summary-sig-arg">b</span>,
+        <span class="summary-sig-arg">c</span>,
+        <span class="summary-sig-arg">d</span>)</span><br />
+      Returns coefficients of linear map from range (a,b) to (c,d)</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ffnet.ffnet%27-pysrc.html#_linear">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_normarray"></a><span class="summary-sig-name">_normarray</span>(<span class="summary-sig-arg">inarray</span>,
+        <span class="summary-sig-arg">coeff</span>)</span><br />
+      Normalize 2-dimensional array linearly column by column with provided
+      coefficiens.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ffnet.ffnet%27-pysrc.html#_normarray">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="ffnet.ffnet%27-module.html#_norms" class="summary-sig-name" onclick="show_private();">_norms</a>(<span class="summary-sig-arg">inarray</span>,
+        <span class="summary-sig-arg">lower</span>=<span class="summary-sig-default">0.0</span>,
+        <span class="summary-sig-arg">upper</span>=<span class="summary-sig-default">1.0</span>)</span><br />
+      Gets normalization information from an array,for use in ffnet class.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ffnet.ffnet%27-pysrc.html#_norms">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="ffnet.ffnet%27-module.html#exportnet" class="summary-sig-name">exportnet</a>(<span class="summary-sig-arg">net</span>,
+        <span class="summary-sig-arg">filename</span>,
+        <span class="summary-sig-arg">name</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string">ffnet</code><code class="variable-quote">'</code></span>,
+        <span class="summary-sig-arg">lang</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string">fortran</code><code class="variable-quote">'</code></span>)</span><br />
+      Exports network to a compiled language source code.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ffnet.ffnet%27-pysrc.html#exportnet">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="ffnet.ffnet%27-module.html#imlgraph" class="summary-sig-name">imlgraph</a>(<span class="summary-sig-arg">arch</span>,
+        <span class="summary-sig-arg">biases</span>=<span class="summary-sig-default">True</span>)</span><br />
+      Creates special layered network where outputs are independent from 
+      each other.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ffnet.ffnet%27-pysrc.html#imlgraph">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="loadnet"></a><span class="summary-sig-name">loadnet</span>(<span class="summary-sig-arg">filename</span>)</span><br />
+      Loads network pickled previously with 'savenet'.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ffnet.ffnet%27-pysrc.html#loadnet">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="mlgraph"></a><span class="summary-sig-name">mlgraph</span>(<span class="summary-sig-arg">arch</span>,
+        <span class="summary-sig-arg">biases</span>=<span class="summary-sig-default">True</span>)</span><br />
+      Creates standard multilayer network with full connectivity list.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ffnet.ffnet%27-pysrc.html#mlgraph">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="ffnet.ffnet%27-module.html#readdata" class="summary-sig-name">readdata</a>(<span class="summary-sig-arg">filename</span>,
+        <span class="summary-sig-arg">**kwargs</span>)</span><br />
+      Reads arrays of numbers from ASCII file.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ffnet.ffnet%27-pysrc.html#readdata">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="savenet"></a><span class="summary-sig-name">savenet</span>(<span class="summary-sig-arg">net</span>,
+        <span class="summary-sig-arg">filename</span>)</span><br />
+      Saves network to a file using cPickle module.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ffnet.ffnet%27-pysrc.html#savenet">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="tmlgraph"></a><span class="summary-sig-name">tmlgraph</span>(<span class="summary-sig-arg">arch</span>,
+        <span class="summary-sig-arg">biases</span>=<span class="summary-sig-default">True</span>)</span><br />
+      Creates multilayer network full connectivity list, but now layers 
+      have connections with all preceding layers (not only the first one)</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="ffnet.ffnet%27-pysrc.html#tmlgraph">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+</table>
+<!-- ==================== VARIABLES ==================== -->
+<a name="section-Variables"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Variables</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-Variables"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="__package__"></a><span class="summary-name">__package__</span> = <code title="'ffnet'"><code class="variable-quote">'</code><code class="variable-string">ffnet</code><code class="variable-quote">'</code></code>
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="_scipymajor"></a><span class="summary-name">_scipymajor</span> = <code title="0">0</code>
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="_scipyminor"></a><span class="summary-name">_scipyminor</span> = <code title="7">7</code>
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="_scipyversion"></a><span class="summary-name">_scipyversion</span> = <code title="['0', '7', '1']"><code class="variable-group">[</code><code class="variable-quote">'</code><code class="variable-string">0</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">7</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">1</code><code class="variable-quote">'</code><code class="variable-group">]</code></code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="scipyversion"></a><span class="summary-name">scipyversion</span> = <code title="'0.7.1'"><code class="variable-quote">'</code><code class="variable-string">0.7.1</code><code class="variable-quote">'</code></code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="version"></a><span class="summary-name">version</span> = <code title="'0.6.2'"><code class="variable-quote">'</code><code class="variable-string">0.6.2</code><code class="variable-quote">'</code></code>
+    </td>
+  </tr>
+</table>
+<!-- ==================== FUNCTION DETAILS ==================== -->
+<a name="section-FunctionDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Function Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-FunctionDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="_bconec"></a>
+<div class="private">
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">_bconec</span>(<span class="sig-arg">conec</span>,
+        <span class="sig-arg">inno</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="ffnet.ffnet%27-pysrc.html#_bconec">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Returns list of adjoint graph (for backprop) edges positions in conec.
+  Conec is assumed to be acyclic.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="_dconec"></a>
+<div class="private">
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">_dconec</span>(<span class="sig-arg">conec</span>,
+        <span class="sig-arg">inno</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="ffnet.ffnet%27-pysrc.html#_dconec">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Return list of edges positions (in conec) of graphs for derivative 
+  calculation, all packed in one list (dconecno). Additionaly beginings of 
+  each graph in this list is returned (dconecmk)</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="_norms"></a>
+<div class="private">
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">_norms</span>(<span class="sig-arg">inarray</span>,
+        <span class="sig-arg">lower</span>=<span class="sig-default">0.0</span>,
+        <span class="sig-arg">upper</span>=<span class="sig-default">1.0</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="ffnet.ffnet%27-pysrc.html#_norms">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Gets normalization information from an array,for use in ffnet class. 
+  (lower, upper) is a range of normalisation. inarray is 2-dimensional and 
+  normalisation parameters are computed for each column...</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="exportnet"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">exportnet</span>(<span class="sig-arg">net</span>,
+        <span class="sig-arg">filename</span>,
+        <span class="sig-arg">name</span>=<span class="sig-default"><code class="variable-quote">'</code><code class="variable-string">ffnet</code><code class="variable-quote">'</code></span>,
+        <span class="sig-arg">lang</span>=<span class="sig-default"><code class="variable-quote">'</code><code class="variable-string">fortran</code><code class="variable-quote">'</code></span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="ffnet.ffnet%27-pysrc.html#exportnet">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <pre class="literalblock">
+
+Exports network to a compiled language source code.
+Currently only fortran is supported.
+
+There are two routines exported. First one, for recalling the network,
+is named as indicated by keyword argument 'name'. The second one,
+for calculating partial derivatives, have the same name with 'd'
+prefix. 'ffnet' and 'dffnet' are exported at default.
+
+NOTE: You need 'ffnet.f' file distributed with ffnet
+      sources to get the exported routines to work.
+
+</pre>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="imlgraph"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">imlgraph</span>(<span class="sig-arg">arch</span>,
+        <span class="sig-arg">biases</span>=<span class="sig-default">True</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="ffnet.ffnet%27-pysrc.html#imlgraph">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Creates special layered network where outputs are independent from 
+  each other. Exemplary architecture definition: arch = (3, [(4,), (), (6, 
+  3)], 3). With such an arch, imlgraph builds three independent multilayer 
+  graphs: 3-4-1, 3-1, 3-6-3-1 and merges them into one graph with common 
+  input nodes.</p>
+  <p>Simplified version of the above architecture syntax is: arch = (3, 3, 
+  3)  #exactly as in the mlgraph Three nets: 3-3-1, 3-3-1, 3-3-1 are merged
+  in this case.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="readdata"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">readdata</span>(<span class="sig-arg">filename</span>,
+        <span class="sig-arg">**kwargs</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="ffnet.ffnet%27-pysrc.html#readdata">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Reads arrays of numbers from ASCII file. Accepts all 
+  scipy.io.read_array keyword arguments. Read documentation of read_array 
+  function for details.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="http://ffnet.sourceforge.net">ffnet</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Sat Oct 24 22:26:50 2009
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>
