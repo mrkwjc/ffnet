@@ -31,7 +31,8 @@ c
 c     ------------------------------------------------------------------
       SUBROUTINE ffnet(input, output)
 c     ------------------------------------------------------------------
-c     Returns network answer to input sequence
+c     Returns network answer to input sequence 
+c     (for one input sample or 2D array of input samples)
 c     Arguments:
 c     input - 1-d array of length 2
 c     output - 1-d array of length 1
@@ -73,15 +74,15 @@ c
 c      
       outno(1) = 5
 c      
-      weights(1) = -24.3709368771
-      weights(2) = 24.5133960545
-      weights(3) = 24.512817558
-      weights(4) = 7.52646475779
-      weights(5) = -23.9516576214
-      weights(6) = -15.6858551034
-      weights(7) = -5.73459626263
-      weights(8) = 7.46919375104
-      weights(9) = 9.00639364609
+      weights(1) = 0.543930749781
+      weights(2) = -4.80022946662
+      weights(3) = 4.81077596434
+      weights(4) = -5.89214047212
+      weights(5) = 10.9533279573
+      weights(6) = -14.9501231744
+      weights(7) = 8.11010543396
+      weights(8) = -10.0414148967
+      weights(9) = -12.1399724523
 c      
       eni(1, 1) = 0.7
       eni(2, 1) = 0.7
@@ -100,7 +101,8 @@ c     ------------------------------------------------------------------
       SUBROUTINE dffnet(input, deriv)
 c     ------------------------------------------------------------------
 c     Returns partial derivatives of the network's 
-c     output vs its input at given input point
+c     output vs its input at given input point 
+c     (for one input sample or 2D array of input samples)
 c     in the following array:
 c     | o1/i1, o1/i2, ..., o1/in |
 c     | o2/i1, o2/i2, ..., o2/in |
@@ -162,15 +164,15 @@ c
 c      
       outno(1) = 5
 c      
-      weights(1) = -24.3709368771
-      weights(2) = 24.5133960545
-      weights(3) = 24.512817558
-      weights(4) = 7.52646475779
-      weights(5) = -23.9516576214
-      weights(6) = -15.6858551034
-      weights(7) = -5.73459626263
-      weights(8) = 7.46919375104
-      weights(9) = 9.00639364609
+      weights(1) = 0.543930749781
+      weights(2) = -4.80022946662
+      weights(3) = 4.81077596434
+      weights(4) = -5.89214047212
+      weights(5) = 10.9533279573
+      weights(6) = -14.9501231744
+      weights(7) = 8.11010543396
+      weights(8) = -10.0414148967
+      weights(9) = -12.1399724523
 c      
       eni(1, 1) = 0.7
       eni(2, 1) = 0.7
