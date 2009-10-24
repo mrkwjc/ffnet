@@ -39,6 +39,3 @@ if __name__ == "__main__":
                                ('ffnet/fortran',  ['fortran/ffnet.f']),
                                ('ffnet',          ['LICENSE'])]
           )
-
-#          packages          = [ 'ffnet', 'ffnet.fortran', 'ffnet.tools' ],
-#         ('ffnet/examples/data', [ 'examples/data/ocr.dat' ])],
