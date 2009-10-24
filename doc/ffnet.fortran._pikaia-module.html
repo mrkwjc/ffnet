@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>ffnet.fortran._pikaia</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="http://ffnet.sourceforge.net">ffnet</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        Package&nbsp;ffnet ::
+        Package&nbsp;fortran ::
+        Module&nbsp;_pikaia
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="ffnet.fortran._pikaia-module.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<!-- ==================== MODULE DESCRIPTION ==================== -->
+<h1 class="epydoc">Module _pikaia</h1><p class="nomargin-top"></p>
+<pre class="literalblock">
+This module '_pikaia' is auto-generated with f2py (version:2).
+Functions:
+  twod = twod(x,n=len(x))
+  urand = urand()
+  rninit(seed)
+  ran0 = ran0(seed)
+  p = rqsort(a,n=len(a))
+  x,f,status = pikaia(ff,n,ctrl,ff_extra_args=())
+  setctl(ctrl,n,np,ngen,nd,pcross,pmutmn,pmutmx,pmut,imut,fdif,irep,ielite,ivrb,status)
+  report(ivrb,n,nd,oldph,fitns,ifit,pmut,ig,nnew,ndim=shape(oldph,0),np=shape(oldph,1))
+  encode(nd,ph,gn,n=len(ph))
+  decode(nd,gn,ph,n=len(ph))
+  cross(n,nd,pcross,gn1,gn2)
+  mutate(n,nd,pmut,gn,imut)
+  adjmut(n,oldph,fitns,ifit,pmutmn,pmutmx,pmut,imut,ndim=shape(oldph,0),np=shape(oldph,1))
+  select(jfit,fdif,idad,np=len(jfit))
+  rnkpop(arrin,indx,rank_bn,n=len(arrin))
+  genrep(n,ip,ph,newph,ndim=shape(ph,0),np=shape(newph,1))
+  stdrep(ff,n,irep,ielite,ph,oldph,fitns,ifit,jfit,nnew,ndim=shape(ph,0),np=shape(oldph,1),ff_extra_args=())
+  newpop(ff,ielite,n,oldph,newph,ifit,jfit,fitns,nnew,ndim=shape(oldph,0),np=shape(oldph,1),ff_extra_args=())
+COMMON blocks:
+  /rnseed/ iseed
+.
+
+</pre>
+
+<hr />
+<div class="fields">      <p><strong>Version:</strong>
+        $Revision: $
+      </p>
+</div><!-- ==================== VARIABLES ==================== -->
+<a name="section-Variables"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Variables</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-Variables"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="__package__"></a><span class="summary-name">__package__</span> = <code title="None">None</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="adjmut"></a><span class="summary-name">adjmut</span> = <code title="&lt;fortran object at 0x7fa975541170&gt;">&lt;fortran object at 0x7fa975541170&gt;</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="cross"></a><span class="summary-name">cross</span> = <code title="&lt;fortran object at 0x7fa975541468&gt;">&lt;fortran object at 0x7fa975541468&gt;</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="decode"></a><span class="summary-name">decode</span> = <code title="&lt;fortran object at 0x7fa975541378&gt;">&lt;fortran object at 0x7fa975541378&gt;</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="encode"></a><span class="summary-name">encode</span> = <code title="&lt;fortran object at 0x7fa975541f80&gt;">&lt;fortran object at 0x7fa975541f80&gt;</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="genrep"></a><span class="summary-name">genrep</span> = <code title="&lt;fortran object at 0x7fa975541d28&gt;">&lt;fortran object at 0x7fa975541d28&gt;</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="mutate"></a><span class="summary-name">mutate</span> = <code title="&lt;fortran object at 0x7fa975541710&gt;">&lt;fortran object at 0x7fa975541710&gt;</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="newpop"></a><span class="summary-name">newpop</span> = <code title="&lt;fortran object at 0x7fa975541a80&gt;">&lt;fortran object at 0x7fa975541a80&gt;</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="pikaia"></a><span class="summary-name">pikaia</span> = <code title="&lt;fortran object at 0x7fa975541f58&gt;">&lt;fortran object at 0x7fa975541f58&gt;</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="ran0"></a><span class="summary-name">ran0</span> = <code title="&lt;fortran object at 0x7fa9755416e8&gt;">&lt;fortran object at 0x7fa9755416e8&gt;</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="report"></a><span class="summary-name">report</span> = <code title="&lt;fortran object at 0x7fa9755419b8&gt;">&lt;fortran object at 0x7fa9755419b8&gt;</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="rninit"></a><span class="summary-name">rninit</span> = <code title="&lt;fortran object at 0x7fa975541508&gt;">&lt;fortran object at 0x7fa975541508&gt;</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="rnkpop"></a><span class="summary-name">rnkpop</span> = <code title="&lt;fortran object at 0x7fa975541e68&gt;">&lt;fortran object at 0x7fa975541e68&gt;</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="rnseed"></a><span class="summary-name">rnseed</span> = <code title="&lt;fortran object at 0x107b080&gt;">&lt;fortran object at 0x107b080&gt;</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="rqsort"></a><span class="summary-name">rqsort</span> = <code title="&lt;fortran object at 0x7fa975541ad0&gt;">&lt;fortran object at 0x7fa975541ad0&gt;</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="select"></a><span class="summary-name">select</span> = <code title="&lt;fortran object at 0x7fa975541558&gt;">&lt;fortran object at 0x7fa975541558&gt;</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="setctl"></a><span class="summary-name">setctl</span> = <code title="&lt;fortran object at 0x7fa9755417d8&gt;">&lt;fortran object at 0x7fa9755417d8&gt;</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="stdrep"></a><span class="summary-name">stdrep</span> = <code title="&lt;fortran object at 0x7fa975541670&gt;">&lt;fortran object at 0x7fa975541670&gt;</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="twod"></a><span class="summary-name">twod</span> = <code title="&lt;fortran object at 0x7fa975541b48&gt;">&lt;fortran object at 0x7fa975541b48&gt;</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="urand"></a><span class="summary-name">urand</span> = <code title="&lt;fortran object at 0x7fa975541828&gt;">&lt;fortran object at 0x7fa975541828&gt;</code>
+    </td>
+  </tr>
+</table>
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="http://ffnet.sourceforge.net">ffnet</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Sat Oct 24 22:26:50 2009
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>
