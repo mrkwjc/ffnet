@@ -36,6 +36,5 @@ if __name__ == "__main__":
                                                         'examples/stock.py']),
                                ('ffnet/examples/data', ['examples/data/ocr.dat',
                                                         'examples/data/black-scholes.dat']),
-                               ('ffnet/fortran',       ['fortran/ffnet.f']),
-                               ('ffnet',               ['LICENSE'])]
+                               ('ffnet/fortran',       ['fortran/ffnet.f'])]
           )

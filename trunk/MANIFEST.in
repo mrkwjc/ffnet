@@ -1,3 +1,5 @@
+include LICENSE README
+
 # recursive-include examples *.py
 # recursive-include examples/data *.dat
 # prune examples/tmp
@@ -6,5 +8,3 @@
 # prune doc/html/.svn 
 # prune doc/html/public/.svn 
 # prune doc/html/private/.svn
-
-# include LICENSE
