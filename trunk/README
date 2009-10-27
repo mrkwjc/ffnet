@@ -16,20 +16,21 @@ the software.
 
 Requirements
 ------------
-ffnet needs python 2.3.5 or above and 'not too old'
-(possibly the latest) versions of:
-1. numpy and scipy (http://scipy.org/)
-2. NetworkX (https://networkx.lanl.gov/wiki)
+ffnet needs at least:
+* python-2.5
+* numpy-1.3
+* scipy-0.7
+* networkx-0.35
 
 For plots (which appear in examples) you'll need also the
-matplotlib package (http://matplotlib.sourceforge.net/)
+matplotlib package (http://matplotlib.sourceforge.net/). For
+plotting the network architecture graphviz library and pygraphviz
+or pydot wrappers are useful (but are not necessary).
 
 If you're going to compile ffnet from sources you'll need also 
 python header files and C and Fortran 77 compiler.
 Installation of those depends on your operating system (for example
-on Ubuntu Linux you need 'python-dev', 'gcc' and 'g77' or 'gfortran', 
-packages on Gentoo you just 'emerge python' and 'emerge gcc' with 
-USE=fortan enabled ...).
+on Ubuntu Linux you need 'python-dev', 'gcc' and 'g77' or 'gfortran').
 
 
 Download
@@ -44,11 +45,18 @@ In order to grab the latest development snapshot via your web browser go to
 http://ffnet.svn.sourceforge.net/viewvc/ffnet/trunk/
 and download the tarball.
 
-# Be aware: development versions are not guaranteed to be fully functional.
+Be aware that development versions are not guaranteed to be fully functional.
 
 
 Installation
 ------------
+For building from sources you can try:
+
+    easy_install ffnet
+
+If this doesn't work for you (for example you don't have setuptools installed)
+you can try the options below:
+
 1. Building from source on Linux/Unix.
 Unpack ffnet to the directory of your choice, enter this
 directory and run:
@@ -57,32 +65,36 @@ directory and run:
 
 ffnet uses numpy.distutils and f2py tool to compile Fortran parts of
 the program. The above will work if you are running Linux/Unix system 
-with gcc and g77 (gfortran). If you need to use specific Fortran 
-compiler check for avilable options at:
-http://cens.ioc.ee/projects/f2py2e/FAQ.html#q-what-are-supported-platforms-and-compilers
-For example, installing with Intel Fortran looks like:
+with gcc and g77 (gfortran). If you need to use another compiler run:
+
+    f2py -c --help-fcompiler
+
+to see a list of supported compilers.
+For example, installing with Intel Fortran Compiler on 32-bit machine
+looks like:
 
     python setup.py install --fcompiler=intel
 
-2. Building from source on Windows.
+2. Binary packages for Linux/Unix
+You are welcome to produce binary packages for your Linux distributions.
+I will publish them on ffnet download page.
+
+3. Building from source on Windows.
 If you have mingw compilers installed, run:
 
     python setup.py build --compiler=mingw32
-	python setup.py install --skip-build
+    python setup.py install --skip-build
 
 To install mingw download:
-http://downloads.sourceforge.net/mingw/MinGW-5.1.3.exe
-and choose Candidate at installation time (Current
-don't work - March 2007). Don't forget to check g77 to be
-installed. Remember to add C:\MinGW\bin directory to system 
-variable Path. Note that python installation directory should
-also be in Path.
+http://downloads.sourceforge.net/mingw/MinGW-5.1.6.exe.
+Don't forget to check g77 to be installed and remember to add 
+C:\MinGW\bin directory to system variable Path. 
+Note that python installation directory should also be in Path.
 
-3. Binary installers for Windows:
-Double click the installation program. Remember however that binaries
-work only for specific software configuration indicated by installer
-name (you need proper versions of python, numpy, scipy, networkx 
-and matplotlib).
+4. Binary installers for Windows:
+Double click the installation program. 
+Attention: Binary packages work only for python versions indicated by installer name.
+
 
 Testing
 -------
@@ -110,11 +122,9 @@ Basic usage
 
 Notes
 -----
-Windows users might be interested in installing Enthought Python:
-http://www.enthought.com/products/epddownload.php
-which reaches most of the ffnet requirements: numpy/scipy, matplotlib, 
-mingw compilers and contains also many other goodies. 
-NetworkX however have to be installed separately.
+Windows users might be interested in installing Enthought Python Distribution:
+http://www.enthought.com/products/getepd.php
+which reaches all ffnet requirements and is free for non-commercial use.
 
 It is also very convenient to use ffnet interactively with
 ipython, an enhanced python shell. See http://ipython.scipy.org/moin.
