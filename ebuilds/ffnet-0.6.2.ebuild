@@ -9,7 +9,7 @@ HOMEPAGE="http://ffnet.soureceforge.net"
 SRC_URI="mirror://sourceforge/${PN}/${P}.tar.gz"
 
 SLOT="0"
-KEYWORDS="~x86"
+KEYWORDS="~x86 ~amd64"
 LICENSE="GPL-2"
 IUSE="matplotlib"
 
@@ -18,7 +18,7 @@ DEPEND="virtual/python
 	dev-python/numpy
 	sci-libs/scipy
 	matplotlib? ( dev-python/matplotlib )
-	!dev-python/ffnet-svn"
+        pygraphviz? ( dev-python/pygraphviz )"
 
 pkg_setup() {
 	einfo
@@ -41,8 +41,9 @@ src_compile() {
 
 src_install() {
 	distutils_src_install
-	cp -r doc ${D}/usr/share/doc/${PF}
+	# cp -r doc ${D}/usr/share/doc/${PF}
 	cp -r examples ${D}/usr/share/doc/${PF}
+        dodoc README LICENSE
 }
 
 pkg_postrm() {
