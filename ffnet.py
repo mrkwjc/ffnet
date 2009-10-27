@@ -19,9 +19,9 @@ from pikaia import pikaia
 import sys
 
 # Get version numbers of scipy
-_scipyversion = scipyversion.split('.')
-_scipymajor = int( _scipyversion[0] )
-_scipyminor = int( _scipyversion[1] )
+# _scipyversion = scipyversion.split('.')
+# _scipymajor = int( _scipyversion[0] )
+# _scipyminor = int( _scipyversion[1] )
 
 def mlgraph(arch, biases = True):
     '''
@@ -92,7 +92,7 @@ def tmlgraph(arch, biases = True):
     '''
     Creates multilayer network full connectivity list,
     but now layers have connections with all preceding layers
-    (not only the first one)
+    (not only "the nearest" one).
     '''
     nofl = len(arch)
     conec = []; srclist = []
@@ -110,7 +110,7 @@ def tmlgraph(arch, biases = True):
 
 def _dependency(G, source):
     """
-    Returns subgraph of G connecting 'source' with all sinks.
+    Returns subgraph of G connecting source with all sinks.
     """
     H = G.copy()
     node_removal = 1
@@ -140,9 +140,9 @@ def _linear(a, b, c, d):
 
 def _norms(inarray, lower = 0., upper = 1.):
     '''
-    Gets normalization information from an array,for use in ffnet class.
-    (lower, upper) is a range of normalisation.
-    inarray is 2-dimensional and normalisation parameters are computed
+    Gets normalization information from an array, for use in ffnet class.
+    (lower, upper) is a range of normalization.
+    inarray is 2-dimensional, normalization parameters are computed
     for each column...
     '''
     limits = []; en = []; de = []
@@ -203,8 +203,8 @@ def _ffconec(conec):
 
 def _bconec(conec, inno):
     """
-    Returns list of adjoint graph (for backprop) edges positions
-    in conec. Conec is assumed to be acyclic.
+    Returns positions of edges of reversed graph in conec (for backprop). 
+    Conec is assumed to be acyclic.
     """
     bgraph = NX.DiGraph()
     bgraph.add_edges_from(conec)
@@ -234,7 +234,7 @@ def _bconec(conec, inno):
     
 def _dconec(conec, inno):
     """
-    Return list of edges positions (in conec) of graphs for
+    Return positions of edges (in conec) of graphs for
     derivative calculation, all packed in one list (dconecno). Additionaly
     beginings of each graph in this list is returned (dconecmk)
     """
@@ -332,12 +332,6 @@ class ffnet:
     limitations.
     """
     def __init__(self, conec):
-        #~ if 'biases' in kwargs: biases = kwargs['biases']
-        #~ else: biases = True
-        #~ if 'conec'  in kwargs: conec = kwargs['conec']
-        #~ elif 'mlp'  in kwargs: conec = mlgraph(kwargs['mlp'], biases = biases)
-        #~ elif 'tmlp' in kwargs: conec = tmlgraph(kwargs['tmlp', biases = biases])
-        #~ else: raise TypeError("Wrong network definition")
         graph, conec, inno, hidno, outno = _ffconec(conec)
         bgraph, bconecno = _bconec(conec, inno)
         dgraphs, dconecno, dconecmk = _dconec(conec, inno)
@@ -371,7 +365,8 @@ class ffnet:
         return self.call(inp)
             
     def call(self, inp):
-        """Returns network answer to input sequence 
+        """
+        Returns network answer (numpy array) to input sequence 
         (for one input sample or 2D array of input samples)
         """
         if not isinstance(inp, ndarray): inp = array(inp, 'd')
@@ -386,14 +381,15 @@ class ffnet:
         raise TypeError("Input is not valid")
 
     def derivative(self, inp):
-        """Returns partial derivatives of the network's 
-           output vs its input at given input point 
-           (for one input sample or 2D array of input samples)
-           in the following array:
-               | o1/i1, o1/i2, ..., o1/in |
-               | o2/i1, o2/i2, ..., o2/in |
-               | ...                      |
-               | om/i1, om/i2, ..., om/in |
+        """
+        Returns partial derivatives of the network's 
+        output vs its input at given input point 
+        (for one input sample or 2D array of input samples)
+        in the following array:
+            | o1/i1, o1/i2, ..., o1/in |
+            | o2/i1, o2/i2, ..., o2/in |
+            | ...                      |
+            | om/i1, om/i2, ..., om/in |
         """
         if not isinstance(inp, ndarray): inp = array(inp, 'd')
         if inp.ndim == 1:
@@ -411,8 +407,10 @@ class ffnet:
         Returns 0.5*(sum of squared errors at output)
         for input and target arrays being first normalized.
         Might be slow in frequent use, because data normalization is
-        performed at ach call.
-        (_setnorm should be called before sqerror - will be changed in future)
+        performed at each call.
+        
+        Warning:
+        _setnorm should be called before sqerror - will be changed in future.
         """
         input, target = self._testdata(input, target)
         input = _normarray(input, self.eni) #Normalization data might be uninitialized here!
@@ -427,7 +425,9 @@ class ffnet:
         Input and target arrays are first normalized.
         Might be slow in frequent use, because data normalization is
         performed at each call.
-        (_setnorm should be called before sqgrad - will be changed in future)
+        
+        Warning:
+        _setnorm should be called before sqgrad - will be changed in future.
         """
         input, target = self._testdata(input, target) 
         input = _normarray(input, self.eni) #Normalization data might be uninitialized here!
@@ -437,7 +437,9 @@ class ffnet:
         return g
     
     def randomweights(self):
-        """Randomize weights due to Bottou proposition"""
+        """
+        Randomize weights due to Bottou proposition.
+        """
         nofw = len(self.conec)
         weights = zeros(nofw, 'd')
         for w in xrange(nofw):
@@ -449,7 +451,9 @@ class ffnet:
         self.trained = False
 
     def _testdata(self, input, target):
-        """Tests input and target data"""
+        """
+        Tests input and target data.
+        """
         # Test conversion
         try: 
             if not isinstance(input, ndarray): input = array(input, 'd')
@@ -486,7 +490,9 @@ class ffnet:
         return input, target
 
     def _setnorm(self, input = None, target = None):
-        """Retrieves normalization info from training data and normalizes data"""
+        """
+        Retrieves normalization info from training data and normalizes data.
+        """
         numi = len(self.inno); numo = len(self.outno)
         if input is None and target is None:
             self.inlimits  = array( [[0.15, 0.85]]*numi ) #informative only
@@ -639,21 +645,16 @@ class ffnet:
     
     def train_cg(self, input, target, **kwargs):
         """
-        Train network with conjugate gradient algorithm using the
-        nonlinear conjugate gradient algorithm of Polak and Ribiere.
-        See Wright, and Nocedal 'Numerical Optimization', 1999, pg. 120-122.
-
-        Allowed parameters:
-        gtol         - stop when norm of gradient is less than gtol
-                       (default is 1e-5)
-        norm         - order of vector norm to use (default is infinity)
-        maxiter      - the maximum number of iterations (default is 10000)
-        disp         - print convergence message at the end of training
-                       if non-zero (default is 1)
-    
-        Note: this procedure does not produce any output during training.
-        Note: optimization routine used here is part of scipy.optimize.
-        """
+        Train network with conjugate gradient algorithm.
+        scipy.optimize.fmin_cg keyword arguments are accepted, except:
+            args
+            fprime 
+        
+        NOTE: This procedure does produce no output by default.
+        
+    Documentation of scipy.optimize.fmin_cg:
+    ----------------------------------------
+    """
         if 'maxiter' not in kwargs: kwargs['maxiter'] = 10000
         input, target = self._setnorm(input, target)
         func = netprop.func
@@ -663,58 +664,21 @@ class ffnet:
         self.weights = optimize.fmin_cg(func, self.weights, fprime=fprime, \
                                         args=extra_args, **kwargs)
         self.trained = 'cg'
+    train_cg.__doc__ += optimize.fmin_cg.__doc__ # paste __doc__
 
     def train_bfgs(self, input, target, **kwargs):
         """
-        Train network with constrained version of quasi-Newton method
-        of Broyden, Fletcher, Goldfarb, and Shanno (BFGS). Algorithm is
-        called L_BFGS_B.
-    
-        Allowed parameters:
-        bounds  -- a list of (min, max) pairs for each weight, defining
-                   the bounds on that parameter. Use None for one of min or max
-                   when there is no bound in that direction. At default all weights
-                   are bounded to (-100, 100)
-        m       -- the maximum number of variable metric corrections
-                   used to define the limited memory matrix. (the limited memory BFGS
-                   method does not store the full hessian but uses this many terms in an
-                   approximation to it). Default is 10.
-        factr   -- The iteration stops when
-                   (f^k - f^{k+1})/max{|f^k|,|f^{k+1}|,1} <= factr*epsmch
-                   where f is current cost function value and
-                   epsmch is the machine precision, which is automatically
-                   generated by the code. Typical values for factr: 1e12 for
-                   low accuracy; 1e7 for moderate accuracy; 10.0 for extremely
-                   high accuracy. Default is 1e7.
-        pgtol   -- The iteration will stop when
-                   max{|proj g_i | i = 1, ..., n} <= pgtol
-                   where pg_i is the ith component of the projected gradient.
-                   Default is 1e-5.
-        iprint  -- controls the frequency of output. <0 means no output.
-                   Default is -1.
-        maxfun  -- maximum number of cost function evaluations. Default is 15000.
-    
-        Note: optimization routine used here is part of scipy.optimize.
-        Note: there exist copyright notice for original optimization code:
-
-        License of L-BFGS-B (Fortran code)
-        ==================================
-        The version included here (in fortran code) is 2.1 (released in 1997). It was
-        written by Ciyou Zhu, Richard Byrd, and Jorge Nocedal <nocedal@ece.nwu.edu>. It
-        carries the following condition for use:
-
-        This software is freely available, but we expect that all publications
-        describing  work using this software , or all commercial products using it,
-        quote at least one of the references given below.
-
-        References
-        * R. H. Byrd, P. Lu and J. Nocedal. A Limited Memory Algorithm for Bound
-          Constrained Optimization, (1995), SIAM Journal on Scientific and
-          Statistical Computing , 16, 5, pp. 1190-1208.
-        * C. Zhu, R. H. Byrd and J. Nocedal. L-BFGS-B: Algorithm 778: L-BFGS-B,
-           FORTRAN routines for large scale bound constrained optimization (1997),
-           ACM Transactions on Mathematical Software, Vol 23, Num. 4, pp. 550 - 560.
-        """
+        Train network with constrained version of BFGS algorithm.
+        scipy.optimize.fmin_l_bfgs_b keyword arguments are accepted, except:
+            args
+            fprime 
+        Bounds are set for all weights as (-100., 100.) by default.
+        
+        NOTE: This procedure does produce no output by default.
+        
+    Documentation of scipy.optimize.fmin_l_bfgs_b:
+    ------------------------------------------
+    """
         if sys.platform.startswith('aix'): return
         
         input, target = self._setnorm(input, target)
@@ -726,59 +690,21 @@ class ffnet:
         self.weights = optimize.fmin_l_bfgs_b(func, self.weights, fprime=fprime, \
                                               args=extra_args, **kwargs)[0]
         self.trained = 'bfgs'
+    train_bfgs.__doc__ += optimize.fmin_l_bfgs_b.__doc__ # paste __doc__
 
     def train_tnc(self, input, target, **kwargs):
         """
-        Train network with a TNC algorithm.
-        TNC is a C implementation of TNBC, a truncated newton
-        optimization package originally developed by Stephen G. Nash in Fortran.
-    
-        Allowed parameters:
-        bounds    : a list of (min, max) pairs for each weight, defining
-                    the bounds on that parameter. Use None for one of min or max
-                    when there is no bound in that direction. At default all weights
-                    are bounded to (-100, 100)
-        scale      : scaling factors to apply to each weight (a list of floats)
-                    if None, the factors are up-low for interval bounded weights
-                    and 1+|weight| for the others.
-                    defaults to None
-        messages  : bit mask used to select messages display during minimization
-                    0: 'No messages',
-                    1: 'One line per iteration',
-                    2: 'Informational messages',
-                    4: 'Version info',
-                    8: 'Exit reasons',
-                    15: 'All messages'
-                    defaults to 0.
-        maxCGit   : max. number of hessian*vector evaluation per main iteration
-                    if maxCGit == 0, the direction chosen is -gradient
-                    if maxCGit < 0, maxCGit is set to max(1,min(50,n/2))
-                    defaults to -1
-        maxfun    : max. number of function evaluation
-                    if None, maxnfeval is set to max(1000, 100*len(x0))
-                    defaults to None
-        eta       : severity of the line search. if < 0 or > 1, set to 0.25
-                    defaults to -1
-        stepmx    : maximum step for the line search. may be increased during call
-                    if too small, will be set to 10.0
-                    defaults to 0
-        accuracy  : relative precision for finite difference calculations
-                    if <= machine_precision, set to sqrt(machine_precision)
-                    defaults to 0
-        fmin      : minimum cost function value estimate
-                    defaults to 0
-        ftol      : precision goal for the value of f in the stopping criterion
-                    relative to the machine precision and the value of f.
-                    if ftol < 0.0, ftol is set to 0.0
-                    defaults to 0
-        rescale   : Scaling factor (in log10) used to trigger rescaling
-                    if 0, rescale at each iteration
-                    if a large value, never rescale
-                    if < 0, rescale is set to 1.3.
-                    default to -1
-    
-        Note: optimization routine used here is part of scipy.optimize.
-        """
+        Train network with constrained truncated Newton algorithm (TNC).
+        scipy.optimize.fmin_tnc keyword arguments are accepted, except:
+            args
+            fprime 
+        Bounds are set for all weights as (-100., 100.) by default.
+        
+        NOTE: This procedure does produce no output by default.
+        
+    Documentation of scipy.optimize.fmin_tnc:
+    -----------------------------------------
+    """
         input, target = self._setnorm(input, target)
         if 'messages' not in kwargs: kwargs['messages'] = 0
         if 'bounds' not in kwargs: kwargs['bounds'] = ((-100., 100.),)*len(self.conec)
@@ -792,16 +718,12 @@ class ffnet:
                            self.inno, self.outno, input, target)
         res = optimize.fmin_tnc(func, self.weights.tolist(), fprime=fprime, \
                                          args=extra_args, **kwargs)
-        # workaround for scipy tnc output, not the best but should work
-        #~ if len( res[-1] ) == len( self.weights ):
-            #~ self.weights = array( res[-1] )
-        #~ else:
-            #~ self.weights = array( res[0] )
-        if _scipymajor == 0 and _scipyminor < 6:
-            self.weights = array( res[-1] )
-        else:
-            self.weights = array( res[0] )
+        #if _scipymajor == 0 and _scipyminor < 6:
+        #    self.weights = array( res[-1] )
+        #else:
+        self.weights = array( res[0] )
         self.trained = 'tnc'
+    train_tnc.__doc__ += optimize.fmin_tnc.__doc__ # paste __doc__
         
     def test(self, input, target, iprint = 1, filename = None):
         """
@@ -891,7 +813,7 @@ def exportnet(net, filename, name = 'ffnet', lang = 'fortran'):
     There are two routines exported. First one, for recalling the network,
     is named as indicated by keyword argument 'name'. The second one,
     for calculating partial derivatives, have the same name with 'd'
-    prefix. 'ffnet' and 'dffnet' are exported at default.
+    prefix. 'ffnet' and 'dffnet' are exported by default.
     
     NOTE: You need 'ffnet.f' file distributed with ffnet
           sources to get the exported routines to work.
@@ -908,16 +830,13 @@ def exportnet(net, filename, name = 'ffnet', lang = 'fortran'):
 
 def readdata(filename, **kwargs):
     """
-    Reads arrays of numbers from ASCII file.
-    Accepts all scipy.io.read_array keyword arguments. 
-    Read documentation of read_array function for details.
+    Reads arrays from ASCII files. Just calls numpy.loadtxt ...
+    
+    Documentation of numpy.loadtxt:
+    -------------------------------
     """
-    from scipy.io import read_array
-    if _scipymajor == 6 and _scipyminor == 0 \
-                and sys.platform.startswith('win'):
-        data = read_array(filename, **kwargs )
-    else:
-        file = open(filename, 'r')
-        data = read_array(file, **kwargs )
-        file.close()
+    from numpy import loadtxt
+    data = loadtxt(filename, **kwargs)
     return data
+import numpy
+readdata.__doc__ += numpy.loadtxt.__doc__ # paste __doc__
