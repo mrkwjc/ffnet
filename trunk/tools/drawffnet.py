@@ -25,16 +25,14 @@ def drawffnet(net, biases = False):
     Networkx layouts and maplotlib buttons are used to control layout. 
     
     Note:
-    This is draft solution.
-    Function seems not to work with older versions of matplotlib 
-    (below 0.87.7, e.g. in enthought python we have 0.87.3 and
-    there are problems). There might occur also problems
-    with graphviz layouts on Windows.
+    This is very draft solution and it may not work for you.
     """
     
     #Takes copies of network graphs
     G = net.graph.copy()
-    if not biases: G.delete_node(0)
+    if not biases: 
+        try: G.delete_node(0)
+        except: G.remove_node(0)
     BG = net.bgraph.copy()
     
     
@@ -58,7 +56,7 @@ def drawffnet(net, biases = False):
     text(0., 1., "Network layouts")
     radio_layout = RadioButtons(rax, \
                     ('dot', 'neato', 'fdp', 'twopi', 'circo', \
-                    'circular', 'random', 'spring', 'spectral', 'shell'), \
+                    'circular', 'random', 'spring', 'shell'), \
                     active=active)
     radio_layout.layout = layout
     def layoutfunc(label):
@@ -73,7 +71,7 @@ def drawffnet(net, biases = False):
             if label == 'circular': layout = NX.circular_layout(G)
             if label == 'random': layout = NX.random_layout(G)
             if label == 'spring': layout = NX.spring_layout(G, iterations=15)
-            if label == 'spectral': layout = NX.spectral_layout(G, iterations=50)
+            # if label == 'spectral': layout = NX.spectral_layout(G, iterations=50)
             if label == 'shell': layout = NX.shell_layout(G)
     
             radio_layout.layout = layout
@@ -81,7 +79,7 @@ def drawffnet(net, biases = False):
             draw()
         except:
             setp(ax, xlim = (0,1), ylim = (0,1))
-            text(0.5, 0.5, "Layout is not avilable.\n(Not working graphviz?)", \
+            text(0.5, 0.5, "Layout is not avilable.\n(Not working graphviz?) \n (Not installed pygraphviz?)", \
                 fontsize=14, color='r', horizontalalignment='center')
     radio_layout.on_clicked(layoutfunc)
     

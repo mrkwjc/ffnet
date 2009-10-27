@@ -7,7 +7,7 @@
 ########################################################################
 
 """
-Functions to create fortran code from within python.
+Functions to create fortran code.
 Needed for exporting trained network to fortran source.
 """
 
