@@ -23,7 +23,7 @@ net = ffnet(conec)
 
 # Read data file
 print "READING DATA..."
-data = readdata( 'data/ocr.dat', separator = ' ' )
+data = readdata( 'data/ocr.dat', delimiter = ' ' )
 input =  data[:, :64] #first 64 columns - bitmap definition
 target = data[:, 64:] #the rest - 10 columns for 10 digits
 
