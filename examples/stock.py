@@ -39,8 +39,8 @@ net = ffnet(conec)
 # Read training data omitting first column and first line
 print "READING DATA..."
 data = readdata( 'data/black-scholes.dat',
-                 columns = ( (1, 5   ), ),
-                 lines =   ( (1, 1531), ) )
+                 usecols  = (1, 2, 3, 4),
+                 skiprows =  1)
 input =  data[:, :3] #first 3 columns
 target = data[:, -1] #last column
 
