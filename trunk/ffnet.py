@@ -830,7 +830,8 @@ def exportnet(net, filename, name = 'ffnet', lang = 'fortran'):
 
 def readdata(filename, **kwargs):
     """
-    Reads arrays from ASCII files. Just calls numpy.loadtxt ...
+    Reads arrays from ASCII files. Just calls numpy.loadtxt passing
+    all keyword arguments.
     
     Documentation of numpy.loadtxt:
     -------------------------------

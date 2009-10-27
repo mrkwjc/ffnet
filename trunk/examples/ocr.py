@@ -8,12 +8,11 @@
 
 ### Digits recognition example for ffnet ###
 
-# The training data set is contained in the file data/ocr.dat.
-# This file contains 68 patterns - first 58 are used for training 
-# and last 10 are used for testing. Each pattern contains 64 inputs
-# which define 8x8 bitmap of the digit and the last 10 numbers are
-# the targets (10 targets for 10 digits).
-# Layered network architecture is used here: (64, 10, 10, 10)
+# Training file (data/ocr.dat) contains 68 patterns - first 58 
+# are used for training and last 10 are used for testing. 
+# Each pattern contains 64 inputs which define 8x8 bitmap of 
+# the digit and last 10 numbers are the targets (10 targets for 10 digits).
+# Layered network architecture is used here: (64, 10, 10, 10).
 
 from ffnet import ffnet, mlgraph, readdata
 
