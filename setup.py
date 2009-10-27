@@ -30,12 +30,12 @@ if __name__ == "__main__":
                                'ffnet.tools._py2f',
                                'ffnet.tools.drawffnet'],
           ext_modules       = [ext1, ext2],
-          data_files        = [('ffnet/examples',     ['examples/xor.py',
-                                                       'examples/ocr.py',
-                                                       'examples/sin.py',
-                                                       'examples/stock.py']),
-                               ('ffnet/examples/doc', ['examples/data/ocr.dat',
-                                                       'examples/data/black-scholes.dat']),
-                               ('ffnet/fortran',      ['fortran/ffnet.f']),
-                               ('ffnet',              ['LICENSE'])]
+          data_files        = [('ffnet/examples',      ['examples/xor.py',
+                                                        'examples/ocr.py',
+                                                        'examples/sin.py',
+                                                        'examples/stock.py']),
+                               ('ffnet/examples/data', ['examples/data/ocr.dat',
+                                                        'examples/data/black-scholes.dat']),
+                               ('ffnet/fortran',       ['fortran/ffnet.f']),
+                               ('ffnet',               ['LICENSE'])]
           )
