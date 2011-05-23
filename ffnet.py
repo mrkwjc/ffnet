@@ -351,6 +351,7 @@ class ffnet:
         self.randomweights()
         # set initial normalization parameters
         self._setnorm()
+        self._renormalize = True
         
     def __repr__(self):
         info = "Feed-forward neural network: \n" + \
@@ -514,12 +515,15 @@ class ffnet:
                     print "Warning: %ith target node takes always a single value of %f." %(i+1, max(col))
             
             #limits are informative only, eni,dei/eno,deo are input/output coding-decoding
-            self.inlimits, self.eni, self.dei = _norms(input, lower=0.15, upper=0.85)
-            self.outlimits, self.eno, self.deo = _norms(target, lower=0.15, upper=0.85)
-            self.ded = zeros((numo,numi), 'd')
-            for o in xrange(numo):
-                for i in xrange(numi):
-                    self.ded[o,i] = self.eni[i,0] * self.deo[o,0]
+            if self._renormalize:
+                self.inlimits, self.eni, self.dei = _norms(input, lower=0.15, upper=0.85)
+                self.outlimits, self.eno, self.deo = _norms(target, lower=0.15, upper=0.85)
+                self.ded = zeros((numo,numi), 'd')
+                for o in xrange(numo):
+                    for i in xrange(numi):
+                        self.ded[o,i] = self.eni[i,0] * self.deo[o,0]
+                self._renormalize = False
+                
             return _normarray(input, self.eni), _normarray(target, self.eno)
 
     def train_momentum(self, input, target, eta = 0.2, momentum = 0.8, \
