@@ -1,5 +1,10 @@
+#!/usr/bin/env python
+
 # FFNET TESTS
 import unittest
+import sys; import os
+sys.path = [os.path.realpath('..')] + sys.path  # prepend parent directory to path
+os.chdir('..')
 
 
 from ffnet import *
@@ -141,10 +146,11 @@ class Testffconec(unittest.TestCase):
         self.assertRaises(ValueError, _ffconec, conec)
 
     def testWithCycles(self):
+        from networkx import NetworkXUnfeasible
         conec = [(1, 3), (2, 3), (0, 3), (3, 1), \
                  (1, 4), (2, 4), (0, 4), (4, 2), \
                  (3, 5), (4, 5), (0, 5), (5, 1) ]
-        self.assertRaises(TypeError, _ffconec, conec)
+        self.assertRaises(NetworkXUnfeasible, _ffconec, conec)
 
     def testNoCycles(self):
         conec = [(1, 3), (2, 3), (0, 3), \
@@ -336,7 +342,7 @@ class TestSaveLoadExport(unittest.TestCase):
                 
 class TestDataReader(unittest.TestCase):
     def setUp(self):
-        self.filename = 'examples/data/ocr.dat'
+        self.filename = '../examples/data/ocr.dat'
     
     def testReadData(self):
         data = readdata( self.filename )
@@ -367,4 +373,5 @@ def runtest():
 
 # run tests
 if __name__ == '__main__':
-    unittest.main()
+    unittest.main(verbosity = 2)
+    
