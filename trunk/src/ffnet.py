@@ -12,16 +12,10 @@ Module containing ffnet class and utility functions.
 
 from _version import version
 from scipy import zeros, ones, random, optimize, sqrt, ndarray, array
-from scipy.version import version as scipyversion
 import networkx as NX
 from fortran import _ffnet as netprop
 from pikaia import pikaia
 import sys
-
-# Get version numbers of scipy
-# _scipyversion = scipyversion.split('.')
-# _scipymajor = int( _scipyversion[0] )
-# _scipyminor = int( _scipyversion[1] )
 
 def mlgraph(arch, biases = True):
     '''
@@ -118,10 +112,7 @@ def _dependency(G, source):
         node_removal = 0
         for node in H.nodes():
             if not H.in_degree(node) and node != source:
-                try:  # This is for networkx-0.3x
-                    H.delete_node(node)
-                except:  # This is for networkx >= 0.99
-                    H.remove_node(node)
+                H.remove_node(node)
                 node_removal = 1
     return H
 
@@ -185,13 +176,8 @@ def _ffconec(conec):
     else:
         conec = []; inno = []; hidno = []; outno = []
         for node in snodes:
-            try:  # This is for networkx-0.3x
-                ins = graph.in_edges(node)
-                outs = graph.out_edges(node)
-            except:  # This is for new networkx-0.99
-                ins = (graph.reverse(copy=True)).edges(node)
-                ins = [(v,u) for (u,v) in ins] # reversing back!
-                outs = graph.edges(node)
+            ins = graph.in_edges(node)
+            outs = graph.out_edges(node)
             if not ins and node != 0 :  # biases handling
                 inno += [node]
             else:
@@ -209,27 +195,16 @@ def _bconec(conec, inno):
     bgraph = NX.DiGraph()
     bgraph.add_edges_from(conec)
     bgraph = bgraph.reverse()
-    try:  # This is for networkx-0.3x
-        bgraph.delete_nodes_from(inno)
-        try: bgraph.delete_node(0) #handling biases
-        except: pass
-    except:  # This is for networkx >= 0.99
-        bgraph.remove_nodes_from(inno)
-        try: bgraph.remove_node(0) #handling biases
-        except: pass
+    bgraph.remove_nodes_from(inno)
+    try: bgraph.remove_node(0) #handling biases
+    except: pass
     bsnodes = NX.topological_sort(bgraph)
     bconecno = []
     for bnode in bsnodes:
-        try:  # This is for networkx-0.3x
-            for bedge in bgraph.in_edges(bnode):
-                edge = (bedge[1], bedge[0])
-                idx = conec.index(edge) + 1
-                bconecno.append(idx)
-        except: # This is for new networkx-0.99
-            for bedge in (bgraph.reverse(copy=True)).edges(bnode):
-                edge = bedge #(bedge[1], bedge[0])
-                idx = conec.index(edge) + 1
-                bconecno.append(idx)
+        for bedge in bgraph.in_edges(bnode):
+            edge = (bedge[1], bedge[0])
+            idx = conec.index(edge) + 1
+            bconecno.append(idx)
     return bgraph, bconecno
     
 def _dconec(conec, inno):
@@ -245,15 +220,9 @@ def _dconec(conec, inno):
         dgraph = _dependency(dgraph, i) 
         dsnodes = NX.topological_sort(dgraph)
         for dnode in dsnodes:
-            try:  # This is for networkx-0.3x
-                for dedge in dgraph.in_edges(dnode):
-                    idx = conec.index(dedge) + 1
-                    dconecno.append(idx)
-            except:  # This is for new networkx-0.99
-                for dedge in (dgraph.reverse(copy=True)).edges(dnode):
-                    dedge = (dedge[1], dedge[0]) #!!!
-                    idx = conec.index(dedge) + 1
-                    dconecno.append(idx)
+            for dedge in dgraph.in_edges(dnode):
+                idx = conec.index(dedge) + 1
+                dconecno.append(idx)
         dgraphs.append(dgraph)
         dconecmk.append(len(dconecno))
     return dgraphs, dconecno, dconecmk
