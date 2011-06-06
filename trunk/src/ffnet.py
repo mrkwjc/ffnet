@@ -170,21 +170,18 @@ def _ffconec(conec):
     if len(conec) == 0: raise ValueError("Empty connectivity list")
     graph = NX.DiGraph()
     graph.add_edges_from(conec)
-    snodes = NX.topological_sort(graph)
-    if not snodes:
-        raise TypeError("Network has cycles.")
-    else:
-        conec = []; inno = []; hidno = []; outno = []
-        for node in snodes:
-            ins = graph.in_edges(node)
-            outs = graph.out_edges(node)
-            if not ins and node != 0 :  # biases handling
-                inno += [node]
-            else:
-                conec += ins   #Maybe + [(0,node)] i.e. bias
-                if not outs: outno += [node]
-                else: 
-                    if node != 0: hidno += [node] #bias handling again
+    snodes = NX.topological_sort(graph) # raises NetworkXUnfeasible if cycles are found
+    conec = []; inno = []; hidno = []; outno = []
+    for node in snodes:
+        ins = graph.in_edges(node)
+        outs = graph.out_edges(node)
+        if not ins and node != 0 :  # biases handling
+            inno += [node]
+        else:
+            conec += ins   #Maybe + [(0,node)] i.e. bias
+            if not outs: outno += [node]
+            else: 
+                if node != 0: hidno += [node] #bias handling again
     return graph, conec, inno, hidno, outno
 
 def _bconec(conec, inno):
