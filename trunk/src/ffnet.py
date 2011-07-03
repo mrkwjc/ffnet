@@ -683,6 +683,10 @@ class ffnet:
         #from ppprop import grad as fprime
         func = netprop.func
         fprime = netprop.grad
+        ## The below is almost as fast as above!
+        #def func(*args): return netprop.func(*args)
+        #def fprime(*args): return netprop.grad(*args)
+        
         
         extra_args = (self.conec, self.bconecno, self.units, \
                            self.inno, self.outno, input, target)
@@ -694,7 +698,25 @@ class ffnet:
         self.weights = array( res[0] )
         self.trained = 'tnc'
     train_tnc.__doc__ += optimize.fmin_tnc.__doc__ # paste __doc__
-        
+
+    def train_tnc_multi(self, input, target, **kwargs):
+        input, target = self._setnorm(input, target)
+        if 'messages' not in kwargs: kwargs['messages'] = 0
+        if 'bounds' not in kwargs: kwargs['bounds'] = ((-100., 100.),)*len(self.conec)
+
+        from multiprop import splitdata, func, fprime
+        from multiprocessing import Manager
+        # Create shared version of extra_args
+        m = Manager()
+        inptrg = splitdata(input, target)
+        extra_args = m.list((self.conec, self.bconecno, self.units, \
+                             self.inno, self.outno, inptrg))
+
+        res = optimize.fmin_tnc(func, self.weights.tolist(), fprime=fprime, \
+                                         args=extra_args, **kwargs)
+        self.weights = array( res[0] )
+        self.trained = 'tnc_multi'
+
     def test(self, input, target, iprint = 1, filename = None):
         """
         Calculates output and parameters of regression line of targets vs. outputs.
