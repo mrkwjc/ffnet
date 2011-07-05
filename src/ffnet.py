@@ -662,7 +662,7 @@ class ffnet:
         self.trained = 'bfgs'
     train_bfgs.__doc__ += optimize.fmin_l_bfgs_b.__doc__ # paste __doc__
 
-    def train_tnc(self, input, target, **kwargs):
+    def train_tnc(self, input, target, nproc = 1, **kwargs):
         """
         Train network with constrained truncated Newton algorithm (TNC).
         scipy.optimize.fmin_tnc keyword arguments are accepted, except:
@@ -674,30 +674,60 @@ class ffnet:
         
     Documentation of scipy.optimize.fmin_tnc:
     -----------------------------------------
-    """
+    """        
         input, target = self._setnorm(input, target)
         if 'messages' not in kwargs: kwargs['messages'] = 0
         if 'bounds' not in kwargs: kwargs['bounds'] = ((-100., 100.),)*len(self.conec)
-        
-        #from ppprop import func, grad
-        #from ppprop import grad as fprime
+       
+        # multiprocessing version if nproc > 1
+        if (isinstance(nproc, int) and nproc > 1) or nproc in (None, 'ncpu'):
+            if nproc == 'ncpu': nproc = None
+            self._train_tnc_mp(input, target, nproc = nproc, **kwargs)
+            return
+            
+        # single process version
         func = netprop.func
-        fprime = netprop.grad
-        ## The below is almost as fast as above!
-        #def func(*args): return netprop.func(*args)
-        #def fprime(*args): return netprop.grad(*args)
-        
-        
+        fprime = netprop.grad       
         extra_args = (self.conec, self.bconecno, self.units, \
                            self.inno, self.outno, input, target)
         res = optimize.fmin_tnc(func, self.weights.tolist(), fprime=fprime, \
                                          args=extra_args, **kwargs)
-        #if _scipymajor == 0 and _scipyminor < 6:
-        #    self.weights = array( res[-1] )
-        #else:
         self.weights = array( res[0] )
         self.trained = 'tnc'
     train_tnc.__doc__ += optimize.fmin_tnc.__doc__ # paste __doc__
+    
+    def _train_tnc_mp(self, input, target, nproc = None, **kwargs):        
+        # register training data at mpprop module level
+        # this have to be done *BEFORE* creating pool
+        import mpprop
+        try: key = max(mpprop.nets) + 1
+        except ValueError: key = 0  #uniqe identifier for this training
+        mpprop.nets[key] = self 
+        mpprop.inputs[key] = input
+        mpprop.targets[key] = target
+
+        # create processing pool
+        from multiprocessing import Pool, cpu_count
+        if nproc is None: nproc = cpu_count()
+        pool = Pool(nproc)
+        
+        # generate splitters for training data
+        splitters = mpprop.splitdata(len(input), nproc)
+        
+        # train
+        func = mpprop.mpfunc
+        fprime = mpprop.mpgrad
+        
+        if 'messages' not in kwargs: kwargs['messages'] = 0
+        if 'bounds' not in kwargs: kwargs['bounds'] = ((-100., 100.),)*len(self.conec)
+        res = optimize.fmin_tnc(func, self.weights, fprime = fprime, \
+                                args = (pool, splitters, key), **kwargs)
+        self.weights = res[0]
+        
+        # remove references from mpprop
+        del mpprop.nets[key] 
+        del mpprop.inputs[key]
+        del mpprop.targets[key]
 
     def test(self, input, target, iprint = 1, filename = None):
         """

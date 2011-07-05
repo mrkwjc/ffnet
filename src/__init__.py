@@ -68,6 +68,5 @@ from ffnet import ffnet, \
                   loadnet, \
                   exportnet, \
                   readdata
-from ffnet_multi import ffnet_multi
 from pikaia import pikaia
 ##from _tests import runtest as test
