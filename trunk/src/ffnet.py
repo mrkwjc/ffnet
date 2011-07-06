@@ -709,8 +709,16 @@ class ffnet:
         # create processing pool
         from multiprocessing import Pool, cpu_count
         if nproc is None: nproc = cpu_count()
-        pool = Pool(nproc)
-        
+        if sys.platform.startswith('win'):
+            # we have to initialize processes in pool on Windows, because
+            # each process reimports mpprop thus the registering
+            # made above is not enough
+            # WARNING: this is slow and memory hungry
+            # (no shared memory, all is serialized and copied)
+            initargs = [key, self, input, target]
+            pool = Pool(nproc, initializer = mpprop.initializer, initargs=initargs)
+        else:
+            pool = Pool(nproc)
         # generate splitters for training data
         splitters = mpprop.splitdata(len(input), nproc)
         
