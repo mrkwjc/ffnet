@@ -5,6 +5,19 @@ nets = {}
 inputs = {}
 targets = {}
 
+# this initializer will be used on Windows only
+# key, net, input, target have to be serialized to reach this place
+# this means that:
+# a) initialization process might be time consuming
+# b) each process receives its own copy of data so the whole training might
+#    be memory hungry
+# these drawbacks can only be ommited if net, input, target
+# will live in shared memory
+def initializer(key, net, input, target):
+    nets[key] = net
+    inputs[key] = input
+    targets[key] = target
+
 # Data splitter function
 def splitdata(N, nproc):
     n = N / nproc
