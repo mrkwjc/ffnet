@@ -2,13 +2,13 @@
 # -*- coding: utf-8 -*-
 
 from numpy.distutils.core import Extension
-from _version import version
+from src._version import version
 
 ext1 = Extension(name = 'ffnet.fortran._ffnet',
-                 sources = ['fortran/ffnet.f'])
+                 sources = ['src/fortran/ffnet.f'])
 
 ext2 = Extension(name = 'ffnet.fortran._pikaia',
-                 sources = ['fortran/pikaia.f'])
+                 sources = ['src/fortran/pikaia.f'])
 
 if __name__ == "__main__":
     from numpy.distutils.core import setup
@@ -21,10 +21,10 @@ if __name__ == "__main__":
           url               = 'ffnet.sourceforge.net',
           license           = 'GPL',
           platforms         = 'Posix, Windows',
-          package_dir       = {'ffnet': '.'},
+          package_dir       = {'ffnet': 'src'},
           py_modules        = ['ffnet.ffnet', 
                                'ffnet.pikaia', 
-                               'ffnet._tests', 
+                               'ffnet.tests._tests', 
                                'ffnet._version',
                                'ffnet.fortran.__init__',
                                'ffnet.tools._py2f',
