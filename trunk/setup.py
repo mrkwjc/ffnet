@@ -37,6 +37,6 @@ if __name__ == "__main__":
                                                          'examples/stock.py']),
                                ('ffnet/examples/data',  ['examples/data/ocr.dat',
                                                          'examples/data/black-scholes.dat']),
-                               ('ffnet/fortran',        ['fortran/ffnet.f']),
-                               ('ffnet/java/org/ffnet', ['java/org/ffnet/FFNet.java'])]
+                               ('ffnet/fortran',        ['src/fortran/ffnet.f']),
+                               ('ffnet/java/org/ffnet', ['src/java/org/ffnet/FFNet.java'])]
           )
