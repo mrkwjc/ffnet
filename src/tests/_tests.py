@@ -286,12 +286,18 @@ class TestFfnetSigmoid(unittest.TestCase):
         print "Test of TNC algorithm"
         self.tnet.train_tnc(array(self.input), array(self.target), maxfun = 1000)
         self.tnet.test(self.input, self.target)
-        
+
+    def testTrainTncMp(self):
+        print "Test of TNC parallel algorithm"
+        self.tnet.train_tnc(array(self.input), array(self.target), nproc = 2, maxfun = 1000)
+        self.tnet.test(self.input, self.target)
+
     def testTestdata(self):
         net = ffnet( mlgraph((1, 5, 1)) )
         input = [1, 2., 5]
         target = [2, 3, 5.]
         net.train_tnc(input, target, maxfun = 10)
+        
         
 class TestSaveLoadExport(unittest.TestCase):
     def setUp(self):
@@ -302,7 +308,9 @@ class TestSaveLoadExport(unittest.TestCase):
         import os
         try: os.remove('tmpffnet.f')
         except: pass
-        try: os.remove('tmpffnet.so')
+        try: 
+            os.remove('tmpffnet.so')
+            os.remove('tmpffnet2.so')
         except: pass
         try: os.remove('tmpffnet.pyd')
         except: pass
@@ -317,9 +325,7 @@ class TestSaveLoadExport(unittest.TestCase):
         for i in xrange(5):
             self.assertAlmostEqual(res1[i], res2[i], 8)
         
-    def testExport(self):
-        resA = self.net ( [ 1, 2, 3, 4, 5. ] )
-        resB = self.net.derivative( [ 1, 2, 3, 4, 5. ] )
+    def testExportWithDerivative(self):
         exportnet(self.net, 'tmpffnet.f')
         ## THE BELOW IS PLATFORM AND ffnet.f FILE DEPENDENT 
         ## SHOULD BE COMMENTED FOR RELEASES ???
@@ -335,11 +341,32 @@ class TestSaveLoadExport(unittest.TestCase):
         resA1 = tmpffnet.ffnet( [ 1, 2, 3, 4, 5. ] )
         resB1 = tmpffnet.dffnet( [ 1, 2, 3, 4, 5. ] )
         del tmpffnet
+        resA = self.net ( [ 1, 2, 3, 4, 5. ] )
+        resB = self.net.derivative( [ 1, 2, 3, 4, 5. ] )
         for i in xrange(5):
             self.assertAlmostEqual(resA[i], resA1[i], 7)
             for j in xrange(5):
                 self.assertAlmostEqual(resB[i][j], resB1[i][j], 7)
-                
+
+    def testExportNoDerivative(self):
+        exportnet(self.net, 'tmpffnet.f', derivative = False)
+        ## THE BELOW IS PLATFORM AND ffnet.f FILE DEPENDENT 
+        ## SHOULD BE COMMENTED FOR RELEASES ???
+        from numpy import f2py
+        f = open( 'tmpffnet.f', 'r' ); source = f.read(); f.close()
+        f = open( 'fortran/ffnet.f', 'r' ); source += f.read(); f.close()
+        import sys
+        if sys.platform == 'win32':
+            eargs = '--compiler=mingw32'
+        else: eargs = ''
+        f2py.compile(source, modulename = 'tmpffnet2', extra_args = eargs, verbose = 0)
+        import tmpffnet2
+        resA1 = tmpffnet2.ffnet( [ 1, 2, 3, 4, 5. ] )
+        resA = self.net ( [ 1, 2, 3, 4, 5. ] )
+        for i in xrange(5):
+            self.assertAlmostEqual(resA[i], resA1[i], 7)
+        self.assertRaises(AttributeError, lambda: tmpffnet2.dffnet([ 1, 2, 3, 4, 5. ]))
+
 class TestDataReader(unittest.TestCase):
     def setUp(self):
         self.filename = '../examples/data/ocr.dat'

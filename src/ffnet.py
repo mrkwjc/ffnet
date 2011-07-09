@@ -297,20 +297,26 @@ class ffnet:
     This is a very basic solution, see drawffnet description for
     limitations.
     """
-    def __init__(self, conec):
+    def __init__(self, conec, lazy_derivative = True):
         graph, conec, inno, hidno, outno = _ffconec(conec)
-        bgraph, bconecno = _bconec(conec, inno)
-        dgraphs, dconecno, dconecmk = _dconec(conec, inno)
-        self.graph = graph
-        self.bgraph = bgraph
-        self.dgraphs = dgraphs
+        self.graph = graph        
         self.conec = array(conec)
         self.inno = array(inno)
         self.hidno = array(hidno)
-        self.outno = array(outno)
+        self.outno = array(outno)        
+        
+        bgraph, bconecno = _bconec(conec, self.inno)
+        self.bgraph = bgraph
         self.bconecno = array(bconecno)
-        self.dconecno = array(dconecno)
-        self.dconecmk = array(dconecmk)
+        
+        # Ommit creating data for derivatives here (which is expensive for large nets)
+        if lazy_derivative:
+            self.dgraphs = None
+            self.dconecno = None
+            self.dconecmk = None
+        else:
+            self._set_dconec()
+
         #max(graph) below needed if graph lacks some numbers
         self.units = zeros(max(graph), 'd')
         # initialize weights
@@ -330,7 +336,14 @@ class ffnet:
     def __call__(self, inp):
         ## Something more sophisticated is needed here?
         return self.call(inp)
-            
+
+    def _set_dconec(self):
+        conec = [tuple(c) for c in self.conec] # maybe rather some changes in _dconec?
+        dgraphs, dconecno, dconecmk = _dconec(conec, self.inno)
+        self.dgraphs = dgraphs
+        self.dconecno = array(dconecno)
+        self.dconecmk = array(dconecmk)
+        
     def call(self, inp):
         """
         Returns network answer (numpy array) to input sequence 
@@ -358,6 +371,9 @@ class ffnet:
             | ...                      |
             | om/i1, om/i2, ..., om/in |
         """
+        if self.dconecno is None:  #create dconecno (only od demand)
+            self._set_dconec()
+           
         if not isinstance(inp, ndarray): inp = array(inp, 'd')
         if inp.ndim == 1:
             deriv = netprop.normdiff(self.weights, self.conec, self.dconecno, self.dconecmk, \
@@ -817,14 +833,16 @@ def loadnet(filename):
     net = cPickle.load(file)
     return net
 
-def exportfortran(net, filename, name):
+def exportfortran(net, filename, name, derivative = True):
     from tools import _py2f as py2f
     f = open( filename, 'w' )
     f.write( py2f.fheader( net, version = version ) )
     f.write( py2f.fcomment() )
     f.write( py2f.ffnetrecall(net, name) )
-    f.write( py2f.fcomment() )
-    f.write( py2f.ffnetdiff(net, 'd' + name) )
+    if derivative:
+        if net.dconecno is None: net._set_dconec() #set on demand
+        f.write( py2f.fcomment() )
+        f.write( py2f.ffnetdiff(net, 'd' + name) )
     f.close()
     
 def exportjava(net, filename):
@@ -833,7 +851,7 @@ def exportjava(net, filename):
     f.write(py2j.java(filename, net, version))
     f.close()
     
-def exportnet(net, filename, name = 'ffnet', lang = None):
+def exportnet(net, filename, name = 'ffnet', lang = None, derivative = True):
     """
     Exports network to a compiled language source code.
     Currently only fortran and java are supported.
@@ -866,7 +884,7 @@ def exportnet(net, filename, name = 'ffnet', lang = None):
             lang = 'java'
 
     if lang == 'fortran':
-        exportfortran(net, filename, name)
+        exportfortran(net, filename, name, derivative = derivative)
     elif lang == 'java':
         exportjava(net, filename)
     else:

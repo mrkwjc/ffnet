@@ -17,7 +17,8 @@ target = rand(10000, 1)
 conec = mlgraph((10,300,1))
 net = ffnet(conec)
 
-if __name__=='__main__':
+# Test training speed-up
+if __name__=='__main__':    # THIS if IS NECESSARY ONLY ON WINDOWS
     print "Training in single process:"
     from time import time
     t0 = time()
@@ -28,14 +29,14 @@ if __name__=='__main__':
     print
 
     from multiprocessing import cpu_count
-    print "Trainig at all %s cpus:" %cpu_count()
+    print "Trainig in %s processes:" %cpu_count()
     net.randomweights()
     t0 = time()
     net.train_tnc(input, target, nproc = 'ncpu', maxfun=50, messages=1) 
     t1 = time()
-    allcpus_time = t1-t0
+    allproc_time = t1-t0
 
     print
     print 'Train time, single process:', single_time
-    print 'Train time, all cpus:      ', allcpus_time
+    print 'Train time, %s processes:' %cpu_count(), allproc_time
 
