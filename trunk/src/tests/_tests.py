@@ -291,6 +291,20 @@ class TestFfnetSigmoid(unittest.TestCase):
         print "Test of TNC parallel algorithm"
         self.tnet.train_tnc(array(self.input), array(self.target), nproc = 2, maxfun = 1000)
         self.tnet.test(self.input, self.target)
+        
+    def testRenormalize(self):
+        self.tnet._setnorm(self.input, self.target)
+        a = self.tnet([1., 1.])
+        input2 = [[0.,0.], [0.,2.], [2.,0.], [2.,2.]]
+        target2  = [[2.], [0.], [0.], [2.]]
+        self.tnet._setnorm(input2, target2)
+        b = self.tnet([1., 1.])
+        self.assertAlmostEqual(a, b, 15)
+        
+        self.tnet.renormalize = True
+        self.tnet._setnorm(input2, target2)
+        c = self.tnet([1., 1.])
+        self.assertNotAlmostEqual(a, c, 15)
 
     def testTestdata(self):
         net = ffnet( mlgraph((1, 5, 1)) )

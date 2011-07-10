@@ -323,7 +323,6 @@ class ffnet:
         self.randomweights()
         # set initial normalization parameters
         self._setnorm()
-        self._renormalize = True
         
     def __repr__(self):
         info = "Feed-forward neural network: \n" + \
@@ -475,6 +474,7 @@ class ffnet:
     def _setnorm(self, input = None, target = None):
         """
         Retrieves normalization info from training data and normalizes data.
+        This method sets self.renormalize attribute to control normalization.
         """
         numi = len(self.inno); numo = len(self.outno)
         if input is None and target is None:
@@ -483,6 +483,7 @@ class ffnet:
             self.eni = self.dei = array( [[1., 0.]] * numi )
             self.eno = self.deo = array( [[1., 0.]] * numo )
             self.ded = ones((numo, numi), 'd')
+            self.renormalize = True  # this is set by __init__
         else:
             input, target = self._testdata(input, target)
             
@@ -497,14 +498,14 @@ class ffnet:
                     print "Warning: %ith target node takes always a single value of %f." %(i+1, max(col))
             
             #limits are informative only, eni,dei/eno,deo are input/output coding-decoding
-            if self._renormalize:
+            if self.renormalize: 
                 self.inlimits, self.eni, self.dei = _norms(input, lower=0.15, upper=0.85)
                 self.outlimits, self.eno, self.deo = _norms(target, lower=0.15, upper=0.85)
                 self.ded = zeros((numo,numi), 'd')
                 for o in xrange(numo):
                     for i in xrange(numi):
                         self.ded[o,i] = self.eni[i,0] * self.deo[o,0]
-                self._renormalize = False
+                self.renormalize = False
                 
             return _normarray(input, self.eni), _normarray(target, self.eno)
 
