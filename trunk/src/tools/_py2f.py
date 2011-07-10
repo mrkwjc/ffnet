@@ -36,22 +36,21 @@ def f2pyline(string=' '):  # not very smart solution (should be in flines?)
     if string == '': string == ' '
     return 'cf2py ' + string + '\n'
 
+def fval2string(val, ftyp):
+    if 'INTEGER' in ftyp: return '%i' %val
+    if 'REAL' in ftyp: return '%+.7e' %val
+    if 'DOUBLE' in ftyp: return ('%+.15e' %val).replace('e', 'd')
+
 def farray(arr, fname):
     shp = arr.shape
-    if len(shp) == 1: 
-        fshp = '(%i)' %shp[0]
-    else:
-        fshp = str(shp)
+    if len(shp) == 1: fshp = '(%i)' %shp[0]
+    else: fshp = str(shp)
 
-    typ = arr.dtype
-    try: typ = typ.str #Needed by older versions of numpy
-    except: pass
-
-    if typ in [ 'int32', 'int64', '<i4', '<i8', '>i4', '>i8' ]: ftyp = 'INTEGER '
-    elif typ in [ 'float32', '<f4', '>f4' ]: ftyp = 'REAL '
-    elif typ in [ 'float64', '<f8', '>f8' ]: ftyp = 'DOUBLE PRECISION '
-    #else: print typ
-    else: raise TypeError("Unsupported array type: %s" %typ)
+    from numpy import dtype
+    if arr.dtype == dtype('int'): ftyp = 'INTEGER '
+    elif arr.dtype == dtype('float32'): ftyp = 'REAL '
+    elif arr.dtype == dtype('float64'): ftyp = 'DOUBLE PRECISION '
+    else: raise TypeError("Unsupported array type: %s" (arr.dtype,))
     
     declaration = flines ( ftyp + fname + fshp )
     
@@ -77,10 +76,7 @@ def farray(arr, fname):
     
     definition = ''
     for i in xrange( len(indexes) ):
-        fval = str ( arr[ indexes[i] ] )
-        fval = fval.replace(',', '.') # numpy-1.1.1 returns array entries with comma!
-        #if ftyp == 'DOUBLE PRECISION ': fval = '%.16g' %( arr[ indexes[i] ] )
-        #else: fval = str ( arr[ indexes[i] ] )
+        fval = fval2string(arr[indexes[i]], ftyp)
         definition += flines ( fname + findexes[i] + ' = ' + fval )
         
     return declaration, definition
@@ -91,7 +87,7 @@ def fnumber(number, fname):
     elif typ == 'float': ftyp = 'DOUBLE PRECISION '
     else: raise TypeError("Unsupported variable type")
 
-    fval = str(number)
+    fval = fval2string(number, ftyp)
     
     declaration = flines ( ftyp + fname )
     definition = flines ( fname + ' = ' + fval )
