@@ -352,7 +352,7 @@ class ffnet:
         if inp.ndim == 1:
             output = netprop.normcall(self.weights, self.conec, self.units, \
                             self.inno, self.outno, self.eni, self.deo, inp)
-            return output #.tolist()
+            return output
         if inp.ndim == 2:
             output = netprop.normcall2(self.weights, self.conec, self.units, \
                             self.inno, self.outno, self.eni, self.deo, inp)
@@ -377,7 +377,7 @@ class ffnet:
         if inp.ndim == 1:
             deriv = netprop.normdiff(self.weights, self.conec, self.dconecno, self.dconecmk, \
                             self.units, self.inno, self.outno, self.eni, self.ded, inp)
-            return deriv #.tolist()
+            return deriv 
         if inp.ndim == 2:
             deriv = netprop.normdiff2(self.weights, self.conec, self.dconecno, self.dconecmk, \
                             self.units, self.inno, self.outno, self.eni, self.ded, inp)
@@ -707,7 +707,7 @@ class ffnet:
         fprime = netprop.grad       
         extra_args = (self.conec, self.bconecno, self.units, \
                            self.inno, self.outno, input, target)
-        res = optimize.fmin_tnc(func, self.weights.tolist(), fprime=fprime, \
+        res = optimize.fmin_tnc(func, self.weights, fprime=fprime, \
                                          args=extra_args, **kwargs)
         self.weights = array( res[0] )
         self.trained = 'tnc'
@@ -743,8 +743,8 @@ class ffnet:
         func = mpprop.mpfunc
         fprime = mpprop.mpgrad
         
-        if 'messages' not in kwargs: kwargs['messages'] = 0
-        if 'bounds' not in kwargs: kwargs['bounds'] = ((-100., 100.),)*len(self.conec)
+        #if 'messages' not in kwargs: kwargs['messages'] = 0
+        #if 'bounds' not in kwargs: kwargs['bounds'] = ((-100., 100.),)*len(self.conec)
         res = optimize.fmin_tnc(func, self.weights, fprime = fprime, \
                                 args = (pool, splitters, key), **kwargs)
         self.weights = res[0]
@@ -753,13 +753,16 @@ class ffnet:
         del mpprop.nets[key] 
         del mpprop.inputs[key]
         del mpprop.targets[key]
+        pool.terminate()
+        del pool
 
     def test(self, input, target, iprint = 1, filename = None):
         """
         Calculates output and parameters of regression line of targets vs. outputs.
         Returns: (output, regress)
         where regress contains regression line parameters for each output node. These
-        parameters are (slope, intercept, r, two-tailed prob, stderr-of-the-estimate).
+        parameters are: 
+        (slope, intercept, r-value, p-value, stderr-of-slope, stderr-of-estimate).
         
         Optional parameters:
         iprint   - verbosity level:
@@ -798,14 +801,21 @@ class ffnet:
                 print "Targets vs. outputs:"
                 for p in xrange(nump):
                     print "%4i % 13.6f % 13.6f" %(p+1, target[o,p], output[o,p])
-            r = linregress(target[o], output[o])
+            x = target[o]; y = output[o]
+            r = linregress(x, y)
+            # linregress calculates stderr of the slope instead of the estimate, even 
+            # though the docs say something else. we calculate the thing here manually
+            sstd = r[-1]
+            estd = sstd * sqrt( ( ( x-x.mean() )**2 ).sum() )
+            r += (estd,)
             if iprint:
                 print "Regression line parameters:"
-                print "slope       = % f" % r[0] 
-                print "intercept   = % f" % r[1]
-                print "correlation = % f" % r[2]
-                print "tailprob    = % f" % r[3]
-                print "stderr      = % f" % r[4]
+                print "slope         = % f" % r[0] 
+                print "intercept     = % f" % r[1]
+                print "r-value       = % f" % r[2]
+                print "p-value       = % f" % r[3]
+                print "slope stderr  = % f" % r[4]
+                print "estim. stderr = % f" % r[5]
             regress.append(r)
             if iprint: print
         # Close file and restore stdout
@@ -813,7 +823,7 @@ class ffnet:
             file.close()
             sys.stdout = saveout
             
-        return output.transpose().tolist(), regress
+        return output.transpose(), regress
 
 def savenet(net, filename):
     """
