@@ -343,7 +343,7 @@ class TestSaveLoadExport(unittest.TestCase):
         exportnet(self.net, 'tmpffnet.f')
         ## THE BELOW IS PLATFORM AND ffnet.f FILE DEPENDENT 
         ## SHOULD BE COMMENTED FOR RELEASES ???
-        from numpy import f2py
+        from numpy import f2py, array
         f = open( 'tmpffnet.f', 'r' ); source = f.read(); f.close()
         f = open( 'fortran/ffnet.f', 'r' ); source += f.read(); f.close()
         import sys
@@ -358,9 +358,9 @@ class TestSaveLoadExport(unittest.TestCase):
         resA = self.net ( [ 1, 2, 3, 4, 5. ] )
         resB = self.net.derivative( [ 1, 2, 3, 4, 5. ] )
         for i in xrange(5):
-            self.assertAlmostEqual(resA[i], resA1[i], 7)
+            self.assertAlmostEqual(resA[i], resA1[i], 15)
             for j in xrange(5):
-                self.assertAlmostEqual(resB[i][j], resB1[i][j], 7)
+                self.assertAlmostEqual(resB[i][j], resB1[i][j], 15)
 
     def testExportNoDerivative(self):
         exportnet(self.net, 'tmpffnet.f', derivative = False)
@@ -378,7 +378,7 @@ class TestSaveLoadExport(unittest.TestCase):
         resA1 = tmpffnet2.ffnet( [ 1, 2, 3, 4, 5. ] )
         resA = self.net ( [ 1, 2, 3, 4, 5. ] )
         for i in xrange(5):
-            self.assertAlmostEqual(resA[i], resA1[i], 7)
+            self.assertAlmostEqual(resA[i], resA1[i], 15)
         self.assertRaises(AttributeError, lambda: tmpffnet2.dffnet([ 1, 2, 3, 4, 5. ]))
 
 class TestDataReader(unittest.TestCase):
