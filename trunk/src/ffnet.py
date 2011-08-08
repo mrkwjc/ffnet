@@ -696,7 +696,7 @@ class ffnet:
     def _train_tnc_mp(self, input, target, nproc = None, **kwargs):        
         # register training data at mpprop module level
         # this have to be done *BEFORE* creating pool
-        import mpprop
+        import _mpprop as mpprop
         try: key = max(mpprop.nets) + 1
         except ValueError: key = 0  # uniqe identifier for this training
         mpprop.nets[key] = self 
@@ -828,7 +828,7 @@ def loadnet(filename):
     return net
 
 def exportfortran(net, filename, name, derivative = True):
-    from tools import _py2f as py2f
+    import _py2f as py2f
     f = open( filename, 'w' )
     f.write( py2f.fheader( net, version = version ) )
     f.write( py2f.fcomment() )
