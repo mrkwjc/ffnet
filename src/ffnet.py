@@ -286,16 +286,6 @@ class ffnet:
         savenet(net, filename)   --> pickles network
         net = loadnet(filename)  --> loads pickled network
         exportnet(net, filename) --> exports network to fortran source
-    
-    PLOTS
-    If you have matplotlib installed, the network architecture can be 
-    drawn with:
-        from ffnet.tools import drawffnet
-        import pylab
-        drawffnet(net)
-        pylab.show()
-    This is a very basic solution, see drawffnet description for
-    limitations.
     """
     def __init__(self, conec, lazy_derivative = True):
         graph, conec, inno, hidno, outno = _ffconec(conec)
@@ -759,9 +749,12 @@ class ffnet:
     def test(self, input, target, iprint = 1, filename = None):
         """
         Calculates output and parameters of regression line of targets vs. outputs.
+        
         Returns: (output, regress)
+        
         where regress contains regression line parameters for each output node. These
         parameters are: 
+        
         (slope, intercept, r-value, p-value, stderr-of-slope, stderr-of-estimate).
         
         Optional parameters:
