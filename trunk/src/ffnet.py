@@ -827,7 +827,7 @@ def loadnet(filename):
     net = cPickle.load(file)
     return net
 
-def exportfortran(net, filename, name, derivative = True):
+def _exportfortran(net, filename, name, derivative = True):
     import _py2f as py2f
     f = open( filename, 'w' )
     f.write( py2f.fheader( net, version = version ) )
@@ -862,7 +862,7 @@ def exportnet(net, filename, name = 'ffnet', lang = None, derivative = True):
             lang = 'fortran'
 
     if lang == 'fortran':
-        exportfortran(net, filename, name, derivative = derivative)
+        _exportfortran(net, filename, name, derivative = derivative)
     else:
         if lang:
             raise TypeError("Unsupported language " + lang)
