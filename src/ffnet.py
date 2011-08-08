@@ -849,18 +849,12 @@ def exportfortran(net, filename, name, derivative = True):
         f.write( py2f.ffnetdiff(net, 'd' + name) )
     f.close()
     
-def exportjava(net, filename):
-    from tools import _py2j as py2j
-    f = open(filename, 'w')
-    f.write(py2j.java(filename, net, version))
-    f.close()
-    
 def exportnet(net, filename, name = 'ffnet', lang = None, derivative = True):
     """
     Exports network to a compiled language source code.
-    Currently only fortran and java are supported.
+    Currently only fortran is supported.
 
-    For Fortran, there are two routines exported. First one, for
+    There are two routines exported. First one, for
     recalling the network, is named as indicated by keyword argument
     'name'. The second one, for calculating partial derivatives, have
     the same name with 'd' prefix. 'ffnet' and 'dffnet' are exported
@@ -868,29 +862,17 @@ def exportnet(net, filename, name = 'ffnet', lang = None, derivative = True):
     
     NOTE: You need 'ffnet.f' file distributed with ffnet
           sources to get the exported routines to work.
-
-    For Java, the file name argument specifies the package/class to be
-    exported. This class will contain one function, call(), which
-    takes the input vector as a double precision array and returns the
-    result also as double precision array.
-
-    NOTE: You need the class org.ffnet.FFNet distributed with ffnet
-          sources in Java build path for the exported class to work.
     """
 
     # Determine language if not specified
     if not lang:
         import os.path
         fname, ext = os.path.splitext(filename)
-        if ext == '.f':
+        if ext in ['.f', '.for', '.f90']:
             lang = 'fortran'
-        elif ext == '.java':
-            lang = 'java'
 
     if lang == 'fortran':
         exportfortran(net, filename, name, derivative = derivative)
-    elif lang == 'java':
-        exportjava(net, filename)
     else:
         if lang:
             raise TypeError("Unsupported language " + lang)
