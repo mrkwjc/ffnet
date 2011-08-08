@@ -2,9 +2,12 @@
 
 # FFNET TESTS
 import unittest
-#import sys; import os
+import sys; import os
 from ffnet import *
 from ffnet import _linear, _norms, _normarray, _ffconec, _bconec, _dconec
+
+# Get ffnet module realpath
+ffnetpath = os.path.dirname(os.path.realpath(__file__)) + '/'
 
 # ffnet module tests #########################
 class Testmlgraph(unittest.TestCase):
@@ -337,12 +340,13 @@ class TestSaveLoadExport(unittest.TestCase):
             self.assertAlmostEqual(res1[i], res2[i], 8)
         
     def testExportWithDerivative(self):
+        print os.getcwd()
         exportnet(self.net, 'tmpffnet.f')
         ## THE BELOW IS PLATFORM AND ffnet.f FILE DEPENDENT 
         ## SHOULD BE COMMENTED FOR RELEASES ???
         from numpy import f2py, array
         f = open( 'tmpffnet.f', 'r' ); source = f.read(); f.close()
-        f = open( 'fortran/ffnet.f', 'r' ); source += f.read(); f.close()
+        f = open( ffnetpath + 'fortran/ffnet.f', 'r' ); source += f.read(); f.close()
         import sys
         if sys.platform == 'win32':
             eargs = '--compiler=mingw32'
@@ -365,7 +369,7 @@ class TestSaveLoadExport(unittest.TestCase):
         ## SHOULD BE COMMENTED FOR RELEASES ???
         from numpy import f2py
         f = open( 'tmpffnet.f', 'r' ); source = f.read(); f.close()
-        f = open( 'fortran/ffnet.f', 'r' ); source += f.read(); f.close()
+        f = open( ffnetpath + 'fortran/ffnet.f', 'r' ); source += f.read(); f.close()
         import sys
         if sys.platform == 'win32':
             eargs = '--compiler=mingw32'
@@ -379,11 +383,12 @@ class TestSaveLoadExport(unittest.TestCase):
         self.assertRaises(AttributeError, lambda: tmpffnet2.dffnet([ 1, 2, 3, 4, 5. ]))
 
 class TestDataReader(unittest.TestCase):
-    def setUp(self):
-        self.filename = 'examples/data/ocr.dat'
+    #def setUp(self):
+        #self.filename = ffnetpath + 'examples/data/ocr.dat'
     
     def testReadData(self):
-        data = readdata( self.filename )
+        try: data = readdata( ffnetpath + 'examples/data/ocr.dat' )
+        except: data = readdata( ffnetpath + '../examples/data/ocr.dat')
         self.assertEqual(data.shape, (68, 74))
         self.assertEqual(data.dtype.name, 'float64')
 

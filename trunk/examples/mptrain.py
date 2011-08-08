@@ -20,6 +20,8 @@ net = ffnet(conec)
 # Test training speed-up
 # Note that the below *if* is necessary only on Windows
 if __name__=='__main__':    
+    stored_weights = net.weights.copy()
+    
     print "Training in single process:"
     from time import time
     t0 = time()
@@ -31,7 +33,7 @@ if __name__=='__main__':
 
     from multiprocessing import cpu_count
     print "Trainig in %s processes:" %cpu_count()
-    net.randomweights()
+    net.weights = stored_weights # Just to start from the same point
     t0 = time()
     net.train_tnc(input, target, nproc = 'ncpu', maxfun=50, messages=1) # THAT'S IT!
     t1 = time()
