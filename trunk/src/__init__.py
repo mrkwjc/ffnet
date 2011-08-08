@@ -58,7 +58,6 @@ examples directory of the source distribution.
 
 from _version import version
 import fortran
-#import tools
 import ffnet as ffnetmodule
 from ffnet import ffnet, \
                   mlgraph, \
@@ -69,4 +68,4 @@ from ffnet import ffnet, \
                   exportnet, \
                   readdata
 from pikaia import pikaia
-##from _tests import runtest as test
+import _tests
