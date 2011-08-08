@@ -2,13 +2,10 @@
 
 # FFNET TESTS
 import unittest
-import sys; import os
-sys.path = [os.path.realpath('..')] + sys.path  # prepend parent directory to path
-os.chdir('..')
-
-
+#import sys; import os
 from ffnet import *
 from ffnet import _linear, _norms, _normarray, _ffconec, _bconec, _dconec
+
 # ffnet module tests #########################
 class Testmlgraph(unittest.TestCase):
     def testEmpty(self):
@@ -383,15 +380,15 @@ class TestSaveLoadExport(unittest.TestCase):
 
 class TestDataReader(unittest.TestCase):
     def setUp(self):
-        self.filename = '../examples/data/ocr.dat'
+        self.filename = 'examples/data/ocr.dat'
     
     def testReadData(self):
         data = readdata( self.filename )
         self.assertEqual(data.shape, (68, 74))
         self.assertEqual(data.dtype.name, 'float64')
 
-from tools._py2f import *
-# tools.py2f module tests #########################
+from _py2f import *
+# _py2f module tests #########################
 class TestExport2Fortran(unittest.TestCase):  #not finished, just started
     def setUp(self):
         from numpy import array

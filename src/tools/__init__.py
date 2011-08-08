@@ -1,4 +1,0 @@
-'''
-Things needed by ffnet.
-'''
-
