@@ -380,13 +380,8 @@ class ffnet:
         for input and target arrays being first normalized.
         Might be slow in frequent use, because data normalization is
         performed at each call.
-        
-        Warning:
-        _setnorm should be called before sqerror - will be changed in future.
         """
-        input, target = self._testdata(input, target)
-        input = _normarray(input, self.eni) #Normalization data might be uninitialized here!
-        target = _normarray(target, self.eno)
+        input, target = self._setnorm(input, target)
         err  = netprop.sqerror(self.weights, self.conec, self.units, \
                                self.inno, self.outno, input, target)
         return err
@@ -397,13 +392,8 @@ class ffnet:
         Input and target arrays are first normalized.
         Might be slow in frequent use, because data normalization is
         performed at each call.
-        
-        Warning:
-        _setnorm should be called before sqgrad - will be changed in future.
         """
-        input, target = self._testdata(input, target) 
-        input = _normarray(input, self.eni) #Normalization data might be uninitialized here!
-        target = _normarray(target, self.eno)
+        input, target = self._setnorm(input, target) 
         g  = netprop.grad(self.weights, self.conec, self.bconecno, self.units, \
                           self.inno, self.outno, input, target)
         return g
@@ -600,10 +590,10 @@ class ffnet:
         verbosity    - printed output 0/1/2=None/Minimal/Verbose
                        (default is 0)
     
-        Note: this optimization routine is a python port of fortran pikaia code.
+        Note: this optimization routine is a python wrapper for fortran pikaia code.
     
         For more info see pikaia homepage and documentation:
-        http://www.hao.ucar.edu/Public/models/pikaia/pikaia.html
+        http://www.hao.ucar.edu/modeling/pikaia/pikaia.php
         """
         input, target = self._setnorm(input, target)
         lower = -25.
@@ -708,7 +698,7 @@ class ffnet:
         # this have to be done *BEFORE* creating pool
         import mpprop
         try: key = max(mpprop.nets) + 1
-        except ValueError: key = 0  #uniqe identifier for this training
+        except ValueError: key = 0  # uniqe identifier for this training
         mpprop.nets[key] = self 
         mpprop.inputs[key] = input
         mpprop.targets[key] = target
@@ -720,7 +710,7 @@ class ffnet:
             # we have to initialize processes in pool on Windows, because
             # each process reimports mpprop thus the registering
             # made above is not enough
-            # WARNING: this is slow and memory hungry
+            # WARNING: this might be slow and memory hungry
             # (no shared memory, all is serialized and copied)
             initargs = [key, self, input, target]
             pool = Pool(nproc, initializer = mpprop.initializer, initargs=initargs)

@@ -27,9 +27,7 @@ if __name__ == "__main__":
                                'ffnet.tests._tests', 
                                'ffnet._version',
                                'ffnet.fortran.__init__',
-                               'ffnet.tools._py2f',
-                               'ffnet.tools._py2j',
-                               'ffnet.tools.drawffnet'],
+                               'ffnet.tools._py2f'],
           ext_modules       = [ext1, ext2],
           data_files        = [('ffnet/examples',       ['examples/xor.py',
                                                          'examples/ocr.py',
@@ -37,6 +35,5 @@ if __name__ == "__main__":
                                                          'examples/stock.py']),
                                ('ffnet/examples/data',  ['examples/data/ocr.dat',
                                                          'examples/data/black-scholes.dat']),
-                               ('ffnet/fortran',        ['src/fortran/ffnet.f']),
-                               ('ffnet/java/org/ffnet', ['src/java/org/ffnet/FFNet.java'])]
+                               ('ffnet/fortran',        ['src/fortran/ffnet.f'])]
           )
