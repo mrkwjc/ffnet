@@ -1,15 +1,15 @@
-This is ffnet-0.6 README file.
+This is ffnet-0.7 README file.
 Distributed under the terms of the GNU General Public License (GPL)
 http://www.gnu.org/copyleft/gpl.html
 
-Copyright (C) 2007 by Marek Wojciechowski
+Copyright (C) 2011 by Marek Wojciechowski
 <mwojc@p.lodz.pl>
 
 
 Overview
 --------
 ffnet is a fast and easy-to-use feed-forward neural network 
-training solution for python. For documentation and usage examples
+training solution for python. For usage examples
 go to http://ffnet.sourceforge.net or browse source distribution of 
 the software.
 
@@ -17,20 +17,17 @@ the software.
 Requirements
 ------------
 ffnet needs at least:
-* python-2.5
-* numpy-1.3
-* scipy-0.7
-* networkx-0.35
+* python-2.6 (or 2.4, 2.5 + multiprocessing package)
+* numpy-1.4
+* scipy-0.8
+* networkx-1.3
 
 For plots (which appear in examples) you'll need also the
-matplotlib package (http://matplotlib.sourceforge.net/). For
-plotting the network architecture graphviz library and pygraphviz
-or pydot wrappers are useful (but are not necessary).
+matplotlib package (http://matplotlib.sourceforge.net/). 
 
 If you're going to compile ffnet from sources you'll need also 
 python header files and C and Fortran 77 compiler.
-Installation of those depends on your operating system (for example
-on Ubuntu Linux you need 'python-dev', 'gcc' and 'g77' or 'gfortran').
+Installation of those depends on your operating system.
 
 
 Download
@@ -59,7 +56,7 @@ you can try the options below:
 
 1. Building from source on Linux/Unix.
 Unpack ffnet to the directory of your choice, enter this
-directory and run:
+directory and run as root:
 
     python setup.py install
 
@@ -76,24 +73,16 @@ looks like:
     python setup.py install --fcompiler=intel
 
 2. Binary packages for Linux/Unix
-You are welcome to produce binary packages for your Linux distributions.
-I will publish them on ffnet download page.
+You are welcome to produce binary packages for your Linux distribution.
 
-3. Building from source on Windows.
+3. Building from source on Windows (32-bit).
 If you have mingw compilers installed, run:
 
     python setup.py build --compiler=mingw32
     python setup.py install --skip-build
 
-To install mingw download:
-http://downloads.sourceforge.net/mingw/MinGW-5.1.6.exe.
-Don't forget to check g77 to be installed and remember to add 
-C:\MinGW\bin directory to system variable Path. 
-Note that python installation directory should also be in Path.
-
 4. Binary installers for Windows:
-Double click the installation program. 
-Attention: Binary packages work only for python versions indicated by installer name.
+You are welcome to produce binary packages for Windows.
 
 
 Testing
@@ -104,6 +93,7 @@ Installation can be tested with:
     runtest()
 
 Execute also ffnet examples. They all should work.
+
 
 Basic usage
 -----------
@@ -119,6 +109,7 @@ Basic usage
 >>> net = loadnet("xor.net")
 >>> answer = net( [ 0., 0. ] )
 >>> partial_derivatives = net.derivative( [ 0., 0. ] )
+
 
 Notes
 -----

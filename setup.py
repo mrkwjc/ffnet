@@ -37,5 +37,5 @@ if __name__ == "__main__":
                                                          'examples/mptrain.py']),
                                ('ffnet/examples/data',  ['examples/data/ocr.dat',
                                                          'examples/data/black-scholes.dat']),
-                               ('ffnet/fortran',        ['src/fortran/ffnet.f'])]
+                               ('ffnet/fortran',        ['src/fortran/ffnet.f', 'src/fortran/pikaia.f'])]
           )
