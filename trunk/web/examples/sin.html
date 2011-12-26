@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="Generator" content="Kate, the KDE Advanced Text Editor" />
+<title>sin.py</title>
+</head>
+<body>
+<pre style='color:#181615;background-color:#ffffff;'>
+<i><span style='color:#898887;'>#####################################################################</span></i><b><span style='color:#bf0303;background:#f7e6e6;'>###</span></b>
+<i><span style='color:#898887;'>##  Copyright (C) 2006 by Marek Wojciechowski</span></i>
+<i><span style='color:#898887;'>##  &lt;mwojc@p.lodz.pl&gt;</span></i>
+<i><span style='color:#898887;'>##</span></i>
+<i><span style='color:#898887;'>##  Distributed under the terms of the GNU General Public License (GPL)</span></i>
+<i><span style='color:#898887;'>##  http://www.gnu.org/copyleft/gpl.html</span></i>
+<i><span style='color:#898887;'>#####################################################################</span></i><b><span style='color:#bf0303;background:#f7e6e6;'>###</span></b>
+
+<i><span style='color:#898887;'>### Sine training example for ffnet </span></i><b><span style='color:#bf0303;background:#f7e6e6;'>###</span></b>
+
+<span style='color:#ff80e0;'>from</span> ffnet <span style='color:#ff80e0;'>import</span> ffnet
+<span style='color:#ff80e0;'>from</span> math <span style='color:#ff80e0;'>import</span> pi, sin, cos
+
+<i><span style='color:#898887;'># Let's define network connectivity by hand:</span></i>
+conec <b>=</b> [(<span style='color:#b08000;'>1</span>, <span style='color:#b08000;'>2</span>), (<span style='color:#b08000;'>1</span>, <span style='color:#b08000;'>3</span>), (<span style='color:#b08000;'>1</span>, <span style='color:#b08000;'>4</span>), (<span style='color:#b08000;'>1</span>, <span style='color:#b08000;'>5</span>), (<span style='color:#b08000;'>2</span>, <span style='color:#b08000;'>6</span>), (<span style='color:#b08000;'>3</span>, <span style='color:#b08000;'>6</span>), (<span style='color:#b08000;'>4</span>, <span style='color:#b08000;'>6</span>), (<span style='color:#b08000;'>5</span>, <span style='color:#b08000;'>6</span>), <b>\</b>
+         (<span style='color:#b08000;'>0</span>, <span style='color:#b08000;'>2</span>), (<span style='color:#b08000;'>0</span>, <span style='color:#b08000;'>3</span>), (<span style='color:#b08000;'>0</span>, <span style='color:#b08000;'>4</span>), (<span style='color:#b08000;'>0</span>, <span style='color:#b08000;'>5</span>), (<span style='color:#b08000;'>0</span>, <span style='color:#b08000;'>6</span>)]
+<i><span style='color:#898887;'># Note 1: Biases in ffnet are handled as the connections </span></i>
+<i><span style='color:#898887;'>#         from special node numbered 0. Input nodes cannot be biased.</span></i>
+<i><span style='color:#898887;'># Note 2: Node numbering and order of links in conec is meaningless,</span></i>
+<i><span style='color:#898887;'>#         but the connections have to be from source to target. </span></i>
+<i><span style='color:#898887;'># Note 3: The same connectivity can be obtained using mlgraph function </span></i>
+<i><span style='color:#898887;'>#         provided with ffnet (layered architecture (1,4,1)).</span></i>
+
+<i><span style='color:#898887;'># Network creation</span></i>
+net <b>=</b> ffnet(conec)
+
+<i><span style='color:#898887;'># Generation of training data (sine values for x from 0 to 2*pi)</span></i>
+patterns <b>=</b> <span style='color:#b08000;'>16</span>
+<span style='color:#0057ae;'>input</span> <b>=</b> [ [ <span style='color:#b08000;'>0.</span> ] ] <b>+</b> [ [ k<b>*</b><span style='color:#b08000;'>2</span><b>*</b>pi<b>/</b>patterns ] <b>for</b> k <b>in</b> <span style='color:#0057ae;'>xrange</span>(<span style='color:#b08000;'>1</span>, patterns <b>+</b> <span style='color:#b08000;'>1</span>) ]
+target <b>=</b> [ [ sin(x[<span style='color:#b08000;'>0</span>]) ] <b>for</b> x <b>in</b> <span style='color:#0057ae;'>input</span> ]
+
+<i><span style='color:#898887;'># Training network</span></i>
+<i><span style='color:#898887;'>#first find good starting point with genetic algorithm (not necessary, but may be helpful)</span></i>
+<b>print</b> <span style='color:#bf0303;'>&quot;FINDING STARTING WEIGHTS WITH GENETIC ALGORITHM...&quot;</span>
+net.train_genetic(<span style='color:#0057ae;'>input</span>, target, individuals<b>=</b><span style='color:#b08000;'>20</span>, generations<b>=</b><span style='color:#b08000;'>500</span>)
+<i><span style='color:#898887;'>#then train with scipy tnc optimizer</span></i>
+<b>print</b> <span style='color:#bf0303;'>&quot;TRAINING NETWORK...&quot;</span>
+net.train_tnc(<span style='color:#0057ae;'>input</span>, target, maxfun <b>=</b> <span style='color:#b08000;'>5000</span>, messages<b>=</b><span style='color:#b08000;'>1</span>)
+
+<i><span style='color:#898887;'># Testing network</span></i>
+<b>print</b>
+<b>print</b> <span style='color:#bf0303;'>&quot;TESTNG NETWORK...&quot;</span>
+output, regression <b>=</b> net.test(<span style='color:#0057ae;'>input</span>, target, iprint <b>=</b> <span style='color:#b08000;'>2</span>)
+
+<i><span style='color:#898887;'>##############</span></i><b><span style='color:#bf0303;background:#f7e6e6;'>###</span></b>
+<i><span style='color:#898887;'># Make some plots</span></i>
+<b>try</b>:
+    <span style='color:#ff80e0;'>from</span> pylab <span style='color:#ff80e0;'>import</span> <b>*</b>
+    points <b>=</b> <span style='color:#b08000;'>128</span>
+    xaxis <b>=</b> [ <span style='color:#b08000;'>0.</span> ] <b>+</b> [ k<b>*</b><span style='color:#b08000;'>2</span><b>*</b>pi<b>/</b>points <b>for</b> k <b>in</b> <span style='color:#0057ae;'>xrange</span>(<span style='color:#b08000;'>1</span>, points <b>+</b> <span style='color:#b08000;'>1</span>) ]
+    sine <b>=</b> [ sin(x) <b>for</b> x <b>in</b> xaxis ]
+    cosine <b>=</b> [ cos(x) <b>for</b> x <b>in</b> xaxis ]
+    netsine <b>=</b> [ net([x])[<span style='color:#b08000;'>0</span>] <b>for</b> x <b>in</b> xaxis]
+    netcosine <b>=</b> [ net.derivative([x])[<span style='color:#b08000;'>0</span>][<span style='color:#b08000;'>0</span>] <b>for</b> x <b>in</b> xaxis ]
+    
+    subplot(<span style='color:#b08000;'>211</span>)
+    plot(xaxis, sine, <span style='color:#bf0303;'>'b--'</span>, xaxis, netsine, <span style='color:#bf0303;'>'k-'</span>)
+    legend((<span style='color:#bf0303;'>'sine'</span>, <span style='color:#bf0303;'>'network output'</span>))
+    grid(<span style='color:#006e28;'>True</span>)
+    title(<span style='color:#bf0303;'>'Outputs of trained network.'</span>)
+    
+    subplot(<span style='color:#b08000;'>212</span>)
+    plot(xaxis, cosine, <span style='color:#bf0303;'>'b--'</span>, xaxis, netcosine, <span style='color:#bf0303;'>'k-'</span>)
+    legend((<span style='color:#bf0303;'>'cosine'</span>, <span style='color:#bf0303;'>'network derivative'</span>))
+    grid(<span style='color:#006e28;'>True</span>)
+    show()
+<b>except</b> <b><span style='color:#054d00;'>ImportError</span></b>: 
+    <b>print</b> <span style='color:#bf0303;'>&quot;Cannot make plots. For plotting install matplotlib...&quot;</span>
+
+<b>print</b> <b>\</b>
+<i><span style='color:#898887;'>&quot;&quot;&quot;</span></i>
+<i><span style='color:#898887;'>Note:</span></i>
+<i><span style='color:#898887;'>You can use ffnet network as regular python function.</span></i>
+<i><span style='color:#898887;'>For example calling net([ pi ]) for sine network gives %s</span></i>
+<i><span style='color:#898887;'>( sine at 'pi' is 0.0 )</span></i>
+
+<i><span style='color:#898887;'>You have also access to partial derivatives of the network</span></i>
+<i><span style='color:#898887;'>outputs vs. its inputs. For example calling net.derivative([ pi ]) </span></i>
+<i><span style='color:#898887;'>we obtain %s ( cosine at 'pi' is -1.0 ).</span></i>
+<i><span style='color:#898887;'>&quot;&quot;&quot;</span></i> <b>%</b> ( net([ pi ]), net.derivative([ pi ]) )
+
+
+</pre>
+</body>
+</html>

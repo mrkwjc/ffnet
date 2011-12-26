@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="Generator" content="Kate, the KDE Advanced Text Editor" />
+<title>xor.py</title>
+</head>
+<body>
+<pre style='color:#181615;background-color:#ffffff;'>
+<i><span style='color:#898887;'>#####################################################################</span></i><b><span style='color:#bf0303;background:#f7e6e6;'>###</span></b>
+<i><span style='color:#898887;'>##  Copyright (C) 2006 by Marek Wojciechowski</span></i>
+<i><span style='color:#898887;'>##  &lt;mwojc@p.lodz.pl&gt;</span></i>
+<i><span style='color:#898887;'>##</span></i>
+<i><span style='color:#898887;'>##  Distributed under the terms of the GNU General Public License (GPL)</span></i>
+<i><span style='color:#898887;'>##  http://www.gnu.org/copyleft/gpl.html</span></i>
+<i><span style='color:#898887;'>#####################################################################</span></i><b><span style='color:#bf0303;background:#f7e6e6;'>###</span></b>
+
+<i><span style='color:#898887;'>### XOR problem example for ffnet </span></i><b><span style='color:#bf0303;background:#f7e6e6;'>###</span></b>
+
+<span style='color:#ff80e0;'>from</span> ffnet <span style='color:#ff80e0;'>import</span> ffnet, mlgraph
+
+<i><span style='color:#898887;'># Generate standard layered network architecture and create network</span></i>
+conec <b>=</b> mlgraph((<span style='color:#b08000;'>2</span>,<span style='color:#b08000;'>2</span>,<span style='color:#b08000;'>1</span>))
+net <b>=</b> ffnet(conec)
+
+<i><span style='color:#898887;'># Define training data</span></i>
+<span style='color:#0057ae;'>input</span> <b>=</b> [[<span style='color:#b08000;'>0.</span>,<span style='color:#b08000;'>0.</span>], [<span style='color:#b08000;'>0.</span>,<span style='color:#b08000;'>1.</span>], [<span style='color:#b08000;'>1.</span>,<span style='color:#b08000;'>0.</span>], [<span style='color:#b08000;'>1.</span>,<span style='color:#b08000;'>1.</span>]]
+target  <b>=</b> [[<span style='color:#b08000;'>1.</span>], [<span style='color:#b08000;'>0.</span>], [<span style='color:#b08000;'>0.</span>], [<span style='color:#b08000;'>1.</span>]]
+
+<i><span style='color:#898887;'># Train network</span></i>
+<i><span style='color:#898887;'>#first find good starting point with genetic algorithm (not necessary, but may be helpful)</span></i>
+<b>print</b> <span style='color:#bf0303;'>&quot;FINDING STARTING WEIGHTS WITH GENETIC ALGORITHM...&quot;</span>
+net.train_genetic(<span style='color:#0057ae;'>input</span>, target, individuals<b>=</b><span style='color:#b08000;'>20</span>, generations<b>=</b><span style='color:#b08000;'>500</span>)
+<i><span style='color:#898887;'>#then train with scipy tnc optimizer</span></i>
+<b>print</b> <span style='color:#bf0303;'>&quot;TRAINING NETWORK...&quot;</span>
+net.train_tnc(<span style='color:#0057ae;'>input</span>, target, maxfun <b>=</b> <span style='color:#b08000;'>1000</span>, messages<b>=</b><span style='color:#b08000;'>1</span>)
+
+<i><span style='color:#898887;'># Test network</span></i>
+<b>print</b>
+<b>print</b> <span style='color:#bf0303;'>&quot;TESTING NETWORK...&quot;</span>
+output, regression <b>=</b> net.test(<span style='color:#0057ae;'>input</span>, target, iprint <b>=</b> <span style='color:#b08000;'>2</span>)
+
+<i><span style='color:#898887;'># Save/load/export network</span></i>
+<span style='color:#ff80e0;'>from</span> ffnet <span style='color:#ff80e0;'>import</span> savenet, loadnet, exportnet
+<b>print</b> <span style='color:#bf0303;'>&quot;Network is saved...&quot;</span>
+savenet(net, <span style='color:#bf0303;'>&quot;xor.net&quot;</span>)
+<b>print</b> <span style='color:#bf0303;'>&quot;Network is reloaded...&quot;</span>
+net <b>=</b> loadnet(<span style='color:#bf0303;'>&quot;xor.net&quot;</span>)
+<b>print</b> <span style='color:#bf0303;'>&quot;Network is tested again, but nothing is printed...&quot;</span>
+output, regression <b>=</b> net.test(<span style='color:#0057ae;'>input</span>, target, iprint <b>=</b> <span style='color:#b08000;'>0</span>)
+<b>print</b>
+<b>print</b> <span style='color:#bf0303;'>&quot;Exporting trained network to the fortran source...&quot;</span>
+exportnet(net, <span style='color:#bf0303;'>&quot;xor.f&quot;</span>)
+<b>print</b> <span style='color:#bf0303;'>&quot;Done...&quot;</span>
+<b>print</b> <span style='color:#bf0303;'>&quot;Look at the generated xor.f file.&quot;</span>
+<b>print</b> <span style='color:#bf0303;'>&quot;Note: you must compile xor.f along with the ffnet.f&quot;</span> 
+<b>print</b> <span style='color:#bf0303;'>&quot;file which can be found in ffnet sources.&quot;</span>
+</pre>
+</body>
+</html>
