@@ -1,0 +1,927 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<meta name="Keywords" content="neural networks, neural network, neural, network, ann, ai, machine learning,
+                               python, fortran, f2py, feedforward, feed-forward, feed forward,
+                               artificial neural network, artificial neural networks" /> 
+<meta name="Description" content="Feed-forward neural network for python" /> 
+<meta name="Author" content="Marek Wojciechowski" />
+<head>
+    <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+    <title>ffnet</title>
+</head>
+
+
+<body>
+<a href="http://sourceforge.net"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=182429&amp;type=1" alt="SourceForge.net Logo" border="0"></a><a href="http://sourceforge.net"><span></span></a> &nbsp;&nbsp;&nbsp;
+
+</span><span><a href="http://sourceforge.net/donate/index.php?group_id=182429"><img src="http://images.sourceforge.net/images/project-support.jpg" alt="Support This Project" border="0" height="32" width="88"></a></span> <br>
+
+<h1> <a class="mozTocH1" name="mozTocId986163"></a>Feed-forward neural network for python (ffnet) </h1>
+Author: <a href="mwojc.html">Marek Wojciechowski</a><br>
+License: <a href="http://www.gnu.org/copyleft/gpl.html">GPL</a><br><br>
+
+
+<!--<h2><a class="mozTocH2" name="mozTocId567441"></a>Table of contents</h2>
+<ol id="mozToc">-->
+<!--mozToc h1 1 h2 2 h3 3 h4 4 h5 5 h6 6--><!--<li><a href="#mozTocId986163">Feed-forward
+neural&nbsp;network for python (ffnet)</a>
+
+    <ol>
+
+      <li><a href="#mozTocId567441">Table of contents</a></li>
+
+      <li><a href="#mozTocId217788">News</a></li>
+
+      <li><a href="#mozTocId808324">Overview</a></li>
+
+      <li><a href="#mozTocId740468">Examples</a></li>
+
+      <li><a href="#mozTocId301877">Documentation</a></li>
+
+      <li><a href="#mozTocId271889">Download</a></li>
+
+      <li><a href="#mozTocId887214">Installation</a></li>
+
+      <li><a href="#mozTocId297204">Reporting bugs</a></li>
+
+      <li><a href="#mozTocId913365">Notes</a></li>
+    
+    </ol>
+
+  </li>
+
+</ol>-->
+
+
+
+<span></span>
+<h2><a class="mozTocH2" name="mozTocId217788"></a><span>News</span></h2>
+
+<span><span style="text-decoration: underline;">09/08/2011</span></span><br>
+        <span>ffnet version 0.7 has been released and is available for download at <A href="https://sourceforge.net/projects/ffnet"> https://sourceforge.net/projects/ffnet</A>.<br>
+
+This release contains couple of important changes:<br>
+    - neural network can be trained now using the power of multi-processor
+      systems (see example mptrain.py)<br>
+    - attributes which are necessary for calculation of network derivatives 
+      are now generated only on demand;<br>
+    - data normalization limits are not changed when retrainig with new
+      data set; net.renormalize = True have to be set first;<br>
+    - compatibility with newest versions of numpy, scipy and networkx
+      is enhanced;<br>
+    - support for *export to java* and *drawing network with drawffnet*
+      is dropped.<br>
+Basic API is left almost untouched. Exactly the same trainig scripts 
+as for older versions should work without problems. <br><br>
+
+<a href="older_news.html">Older news</a><br>
+
+
+
+</span><span style="text-decoration: underline;"></span></span><span><span style="font-weight: bold;"></span></span><span></span>
+<h2><a class="mozTocH3" name="mozTocId808324"></a><span>Overview</span></h2>
+
+
+
+
+
+
+
+ffnet is a fast and easy-to-use feed-forward neural<br>
+
+
+
+
+
+
+
+network training solution for python.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+Unique features:<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+1. Any network connectivity without cycles is allowed.<br>
+
+
+
+
+
+
+
+2. Training can be performed with use of several optimization <br>
+
+
+
+
+
+
+
+&nbsp;&nbsp; schemes including: standard backpropagation with momentum, rprop,<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp; conjugate gradient, bfgs, tnc (with multiprocessing), genetic alorithm <br>
+&nbsp;&nbsp; based optimization.<br>
+
+
+
+
+
+
+
+3. There is access to exact partial derivatives of network outputs <br>
+
+
+
+
+
+
+
+&nbsp;&nbsp; vs. its inputs.<br>
+
+
+
+
+
+
+
+4. Automatic normalization of data.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+Basic assumptions and limitations:<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+1. Network has feed-forward architecture.<br>
+
+
+
+
+
+
+
+2. Input units have identity activation function, <br>
+
+
+
+
+
+
+
+&nbsp;&nbsp; all other units have sigmoid activation function.<br>
+
+
+
+
+
+
+
+3. Provided data are automatically normalized, both input and output, <br>
+
+
+
+
+
+
+
+&nbsp;&nbsp; with a linear mapping to the range (0.15, 0.85).<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp; Each input and output is treated separately (i.e. linear map is <br>
+
+
+
+
+
+
+
+&nbsp;&nbsp; unique for each input and output).<br>
+
+
+
+
+
+
+
+4. Function minimized during training is a sum of squared errors <br>
+
+
+
+
+
+
+
+&nbsp;&nbsp; of each output for each training pattern.<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp; <br>
+
+
+
+
+
+
+
+Performance:<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+Excellent computational performance is achieved implementing core<br>
+functions in fortran 77 and wrapping them with f2py. ffnet outstands<br>
+in performance pure python training packages and is competitive to<br>
+'compiled language' software. Incorporation of multiprocessing capabilities<br>
+(tnc algorithm so far) makes ffnet ideal for large scale (really!)<br>
+problems. Moreover, a trained network can be exported to fortran sources,<br> 
+compiled and called from many programming languages.<br>
+
+<br>
+
+
+
+
+
+
+
+Usage:<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+Basic usage of the package is outlined below. Read package docstrings and examples for more info.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; from ffnet import ffnet, mlgraph, savenet, loadnet, exportnet<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; conec = mlgraph( (2,2,1) )<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; net = ffnet(conec)<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; input = [ [0.,0.], [0.,1.], [1.,0.], [1.,1.] ]<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; target&nbsp; = [ [1.], [0.], [0.], [1.] ]<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; net.train_tnc(input, target, maxfun = 1000)<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; net.test(input, target, iprint = 2)<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; savenet(net, "xor.net")<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; exportnet(net, "xor.f")<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; net = loadnet("xor.net")<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; answer = net( [ 0., 0. ] )<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; partial_derivatives = net.derivative( [ 0., 0. ] )<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<h2><a class="mozTocH3" name="mozTocId740468"></a>Examples</h2>
+
+
+
+
+
+
+
+Training script examples (included in the source distribution):<br>
+
+
+
+
+
+
+
+1. <span></span><a href="examples/ocr.html">Pattern
+recognition</a> example (see also plots: <a href="figures/digit2.png">image1</a>, <a href="figures/digit7.png">image2</a>)<br>
+
+
+
+
+
+
+
+2.&nbsp;<a href="examples/sin.html">Sine training</a> example
+(see also plots:&nbsp;<a href="figures/netderiv.png">image1</a>)<br>
+
+
+
+
+
+
+
+3. <a href="examples/xor.html">XOR problem</a> example (see&nbsp;generated fortan source code <a href="examples/xor.f.html">xor.f </a>)<br>
+
+
+
+
+
+
+
+4. <a href="examples/stock.html">Emulating Black-Scholes</a> stock prices (see <a href="figures/stock.png">fitness</a> achieved with ffnet)<br>
+
+
+5. <span></span><a href="examples/mptrain.html">Parallel
+training</a> example (see also <a href="figures/mptrain.png">speedup</a> plot).
+
+
+
+<br><br>
+
+
+
+
+
+
+
+Network architecture examples:<br>
+
+
+
+
+
+
+
+1. <a href="figures/mlgraph.png">mlgraph</a> (standard multilayer)<br>
+
+
+
+
+
+
+
+2. <a href="figures/tmlgraph.png">tmlgraph</a><br>
+
+
+
+
+
+
+
+3. <a href="figures/imlgraph.png">imlgraph</a><br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<h2><a class="mozTocH2" name="mozTocId301877"></a>Documentation</h2>
+<!--Automatically generated documentation of ffnet modules is avilable <a href="doc/index.html">on-line</a>.<br>-->
+At the time you are encouraged to read package docstrings.
+<br><br>
+
+
+
+
+
+
+
+
+
+<h2><a class="mozTocH3" name="mozTocId271889"></a>Download</h2>
+
+
+
+
+
+
+
+Go to <a href="http://sourceforge.net/projects/ffnet">sourceforge download page</a>.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<a class="mozTocH3" name="mozTocId551689"></a>You can also checkout development version of the source code<br>
+
+
+
+
+
+
+
+from the project
+
+
+
+
+
+
+
+
+
+
+
+subversion repository:<br>
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span>svn co https://ffnet.svn.sourceforge.net/svnroot/ffnet/trunk ffnet<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+</span>
+<h2><a class="mozTocH3" name="mozTocId887214"></a>Installation</h2>
+
+
+
+
+
+
+
+Installation instructions can be found in <a href="https://sourceforge.net/projects/ffnet/files/ffnet/ffnet-0.7/README">README</a>.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<span></span>
+<h2><a class="mozTocH2" name="mozTocId297204"></a>Reporting bugs</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+This project is hosted by sourceforge.&nbsp;Bug tracker, forum and a mailing list<br>
+
+
+
+
+
+
+
+
+
+
+
+are avilable at:<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a href="https://sourceforge.net/projects/ffnet">https://sourceforge.net/projects/ffnet</a><span>
+<br>
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+</span><span></span>
+<h2><a class="mozTocH2" name="mozTocId913365"></a>Notes</h2>
+
+
+
+
+
+
+
+
+
+
+
+ffnet was created "in the hope that it will be useful". If you find it really is<br>
+
+
+
+
+
+
+
+
+
+
+
+and you are going to publish some ffnet generated results, please&nbsp;cite it:<br>
+
+
+
+
+
+
+
+
+
+
+
+<br style="font-style: italic;">
+
+
+
+
+
+
+
+
+
+
+
+<span style="font-style: italic;">\bibitem[FFNET, 2011]{FFNET} Wojciechowski, M.,</span><br style="font-style: italic;">
+
+
+
+
+
+
+
+
+
+
+
+<span style="font-style: italic;">Feed-forward neural network for python,</span><br style="font-style: italic;">
+
+
+
+
+
+
+
+
+
+
+
+<span style="font-style: italic;">Technical University of Lodz (Poland),</span><br style="font-style: italic;">
+
+
+
+
+
+
+
+
+
+
+
+<span style="font-style: italic;">Department of Civil Engineering, Architecture and Environmental Engineering,</span><br style="font-style: italic;">
+
+
+
+
+
+
+
+
+
+
+
+<span style="font-style: italic;">http://ffnet.sourceforge.net/, ffnet-0.7, August 2011</span><br>
+
+
+
+
+
+
+
+
+
+
+
+<span>
+
+
+
+
+
+</span>
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span><br>
+
+
+
+
+
+
+<span>Last modified: 09/08/2011<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</span><span style="text-decoration: underline;"></span>
+<a href="http://sourceforge.net"><span></span></a><script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script><script type="text/javascript">
+var pageTracker = _gat._getTracker("UA-5523152-1");
+pageTracker._trackPageview();
+</script>
+
+
+</body>
+</html>

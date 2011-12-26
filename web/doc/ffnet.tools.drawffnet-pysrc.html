@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>ffnet.tools.drawffnet</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="ffnet-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="http://ffnet.sourceforge.net">ffnet</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="ffnet-module.html">Package&nbsp;ffnet</a> ::
+        Package&nbsp;tools ::
+        Module&nbsp;drawffnet
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="ffnet.tools.drawffnet-pysrc.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="ffnet.tools.drawffnet-module.html">Module ffnet.tools.drawffnet</a></h1>
+<pre class="py-src">
+<a name="L1"></a><tt class="py-lineno">  1</tt>  <tt class="py-line"><tt class="py-comment">########################################################################</tt> </tt>
+<a name="L2"></a><tt class="py-lineno">  2</tt>  <tt class="py-line"><tt class="py-comment">##  Copyright (C) 2006 by Marek Wojciechowski</tt> </tt>
+<a name="L3"></a><tt class="py-lineno">  3</tt>  <tt class="py-line"><tt class="py-comment">##  &lt;mwojc@p.lodz.pl&gt;</tt> </tt>
+<a name="L4"></a><tt class="py-lineno">  4</tt>  <tt class="py-line"><tt class="py-comment">##</tt> </tt>
+<a name="L5"></a><tt class="py-lineno">  5</tt>  <tt class="py-line"><tt class="py-comment">##  Distributed under the terms of the GNU General Public License (GPL)</tt> </tt>
+<a name="L6"></a><tt class="py-lineno">  6</tt>  <tt class="py-line"><tt class="py-comment">##  http://www.gnu.org/copyleft/gpl.html</tt> </tt>
+<a name="L7"></a><tt class="py-lineno">  7</tt>  <tt class="py-line"><tt class="py-comment">########################################################################</tt> </tt>
+<a name="L8"></a><tt class="py-lineno">  8</tt>  <tt class="py-line"><tt class="py-docstring">'''</tt> </tt>
+<a name="L9"></a><tt class="py-lineno">  9</tt>  <tt class="py-line"><tt class="py-docstring">Network architecture visualizations</tt> </tt>
+<a name="L10"></a><tt class="py-lineno"> 10</tt>  <tt class="py-line"><tt class="py-docstring">'''</tt> </tt>
+<a name="L11"></a><tt class="py-lineno"> 11</tt>  <tt class="py-line"> </tt>
+<a name="L12"></a><tt class="py-lineno"> 12</tt>  <tt class="py-line"><tt class="py-keyword">try</tt><tt class="py-op">:</tt> </tt>
+<a name="L13"></a><tt class="py-lineno"> 13</tt>  <tt class="py-line">    <tt class="py-keyword">from</tt> <tt class="py-name">pylab</tt> <tt class="py-keyword">import</tt> <tt class="py-op">*</tt> </tt>
+<a name="L14"></a><tt class="py-lineno"> 14</tt>  <tt class="py-line">    <tt class="py-keyword">from</tt> <tt class="py-name">matplotlib</tt><tt class="py-op">.</tt><tt class="py-name">widgets</tt> <tt class="py-keyword">import</tt> <tt class="py-name">Slider</tt><tt class="py-op">,</tt> <tt class="py-name">Button</tt><tt class="py-op">,</tt> <tt class="py-name">RadioButtons</tt> </tt>
+<a name="L15"></a><tt class="py-lineno"> 15</tt>  <tt class="py-line">    <tt class="py-keyword">from</tt> <tt class="py-name">matplotlib</tt><tt class="py-op">.</tt><tt class="py-name">patches</tt> <tt class="py-keyword">import</tt> <tt class="py-name">Circle</tt> </tt>
+<a name="L16"></a><tt class="py-lineno"> 16</tt>  <tt class="py-line"><tt class="py-keyword">except</tt> <tt class="py-name">ImportError</tt><tt class="py-op">,</tt> <tt class="py-name">e</tt><tt class="py-op">:</tt> </tt>
+<a name="L17"></a><tt class="py-lineno"> 17</tt>  <tt class="py-line">    <tt class="py-keyword">raise</tt> <tt class="py-name">ImportError</tt><tt class="py-op">(</tt> <tt class="py-string">" Matplotlib not found! %s"</tt> <tt class="py-op">%</tt> <tt class="py-name">e</tt><tt class="py-op">)</tt> </tt>
+<a name="L18"></a><tt class="py-lineno"> 18</tt>  <tt class="py-line"> </tt>
+<a name="L19"></a><tt class="py-lineno"> 19</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt class="py-name">networkx</tt> <tt class="py-keyword">as</tt> <tt class="py-name">NX</tt> </tt>
+<a name="L20"></a><tt class="py-lineno"> 20</tt>  <tt class="py-line"> </tt>
+<a name="L21"></a><tt class="py-lineno"> 21</tt>  <tt class="py-line"><tt class="py-comment"># General function making network plot</tt> </tt>
+<a name="drawffnet"></a><div id="drawffnet-def"><a name="L22"></a><tt class="py-lineno"> 22</tt> <a class="py-toggle" href="#" id="drawffnet-toggle" onclick="return toggle('drawffnet');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="ffnet.tools.drawffnet-module.html#drawffnet">drawffnet</a><tt class="py-op">(</tt><tt class="py-param">net</tt><tt class="py-op">,</tt> <tt class="py-param">biases</tt> <tt class="py-op">=</tt> <tt class="py-name">False</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="drawffnet-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="drawffnet-expanded"><a name="L23"></a><tt class="py-lineno"> 23</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L24"></a><tt class="py-lineno"> 24</tt>  <tt class="py-line"><tt class="py-docstring">    Takes a ffnet class instance and draws the network. </tt> </tt>
+<a name="L25"></a><tt class="py-lineno"> 25</tt>  <tt class="py-line"><tt class="py-docstring">    Networkx layouts and maplotlib buttons are used to control layout. </tt> </tt>
+<a name="L26"></a><tt class="py-lineno"> 26</tt>  <tt class="py-line"><tt class="py-docstring">    </tt> </tt>
+<a name="L27"></a><tt class="py-lineno"> 27</tt>  <tt class="py-line"><tt class="py-docstring">    Note:</tt> </tt>
+<a name="L28"></a><tt class="py-lineno"> 28</tt>  <tt class="py-line"><tt class="py-docstring">    This is very draft solution and it may not work for you.</tt> </tt>
+<a name="L29"></a><tt class="py-lineno"> 29</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L30"></a><tt class="py-lineno"> 30</tt>  <tt class="py-line">     </tt>
+<a name="L31"></a><tt class="py-lineno"> 31</tt>  <tt class="py-line">    <tt class="py-comment">#Takes copies of network graphs</tt> </tt>
+<a name="L32"></a><tt class="py-lineno"> 32</tt>  <tt class="py-line">    <tt class="py-name">G</tt> <tt class="py-op">=</tt> <tt class="py-name">net</tt><tt class="py-op">.</tt><tt class="py-name">graph</tt><tt class="py-op">.</tt><tt class="py-name">copy</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L33"></a><tt class="py-lineno"> 33</tt>  <tt class="py-line">    <tt class="py-keyword">if</tt> <tt class="py-keyword">not</tt> <tt class="py-name">biases</tt><tt class="py-op">:</tt>  </tt>
+<a name="L34"></a><tt class="py-lineno"> 34</tt>  <tt class="py-line">        <tt class="py-keyword">try</tt><tt class="py-op">:</tt> <tt class="py-name">G</tt><tt class="py-op">.</tt><tt class="py-name">delete_node</tt><tt class="py-op">(</tt><tt class="py-number">0</tt><tt class="py-op">)</tt> </tt>
+<a name="L35"></a><tt class="py-lineno"> 35</tt>  <tt class="py-line">        <tt class="py-keyword">except</tt><tt class="py-op">:</tt> <tt class="py-name">G</tt><tt class="py-op">.</tt><tt class="py-name">remove_node</tt><tt class="py-op">(</tt><tt class="py-number">0</tt><tt class="py-op">)</tt> </tt>
+<a name="L36"></a><tt class="py-lineno"> 36</tt>  <tt class="py-line">    <tt class="py-name">BG</tt> <tt class="py-op">=</tt> <tt class="py-name">net</tt><tt class="py-op">.</tt><tt class="py-name">bgraph</tt><tt class="py-op">.</tt><tt class="py-name">copy</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L37"></a><tt class="py-lineno"> 37</tt>  <tt class="py-line">     </tt>
+<a name="L38"></a><tt class="py-lineno"> 38</tt>  <tt class="py-line">     </tt>
+<a name="L39"></a><tt class="py-lineno"> 39</tt>  <tt class="py-line">    <tt class="py-name">ax</tt> <tt class="py-op">=</tt> <tt class="py-name">subplot</tt><tt class="py-op">(</tt><tt class="py-number">111</tt><tt class="py-op">)</tt> </tt>
+<a name="L40"></a><tt class="py-lineno"> 40</tt>  <tt class="py-line">    <tt class="py-name">subplots_adjust</tt><tt class="py-op">(</tt><tt class="py-name">left</tt><tt class="py-op">=</tt><tt class="py-number">0.25</tt><tt class="py-op">)</tt> </tt>
+<a name="L41"></a><tt class="py-lineno"> 41</tt>  <tt class="py-line">    <tt class="py-name">setp</tt><tt class="py-op">(</tt><tt class="py-name">ax</tt><tt class="py-op">,</tt> <tt class="py-name">xticks</tt><tt class="py-op">=</tt><tt class="py-op">[</tt><tt class="py-op">]</tt><tt class="py-op">,</tt> <tt class="py-name">yticks</tt><tt class="py-op">=</tt><tt class="py-op">[</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> </tt>
+<a name="L42"></a><tt class="py-lineno"> 42</tt>  <tt class="py-line">    <tt class="py-keyword">try</tt><tt class="py-op">:</tt> </tt>
+<a name="L43"></a><tt class="py-lineno"> 43</tt>  <tt class="py-line">        <tt class="py-name">layout</tt> <tt class="py-op">=</tt> <tt class="py-name">NX</tt><tt class="py-op">.</tt><tt class="py-name">graphviz_layout</tt><tt class="py-op">(</tt><tt class="py-name">G</tt><tt class="py-op">,</tt> <tt class="py-name">prog</tt><tt class="py-op">=</tt><tt class="py-string">'dot'</tt><tt class="py-op">)</tt> </tt>
+<a name="L44"></a><tt class="py-lineno"> 44</tt>  <tt class="py-line">        <tt class="py-name">active</tt> <tt class="py-op">=</tt> <tt class="py-number">0</tt> </tt>
+<a name="L45"></a><tt class="py-lineno"> 45</tt>  <tt class="py-line">    <tt class="py-keyword">except</tt><tt class="py-op">:</tt> </tt>
+<a name="L46"></a><tt class="py-lineno"> 46</tt>  <tt class="py-line">        <tt class="py-name">layout</tt> <tt class="py-op">=</tt> <tt class="py-name">NX</tt><tt class="py-op">.</tt><tt class="py-name">circular_layout</tt><tt class="py-op">(</tt><tt class="py-name">G</tt><tt class="py-op">)</tt> </tt>
+<a name="L47"></a><tt class="py-lineno"> 47</tt>  <tt class="py-line">        <tt class="py-name">active</tt> <tt class="py-op">=</tt> <tt class="py-number">5</tt> </tt>
+<a name="L48"></a><tt class="py-lineno"> 48</tt>  <tt class="py-line">    <tt class="py-name">NX</tt><tt class="py-op">.</tt><tt class="py-name">draw_networkx</tt><tt class="py-op">(</tt><tt class="py-name">G</tt><tt class="py-op">,</tt> <tt class="py-name">layout</tt><tt class="py-op">)</tt> </tt>
+<a name="L49"></a><tt class="py-lineno"> 49</tt>  <tt class="py-line">     </tt>
+<a name="L50"></a><tt class="py-lineno"> 50</tt>  <tt class="py-line">    <tt class="py-comment"># Make radio buttons for layouts</tt> </tt>
+<a name="L51"></a><tt class="py-lineno"> 51</tt>  <tt class="py-line">    <tt class="py-name">axcolor</tt> <tt class="py-op">=</tt> <tt class="py-string">'lightgoldenrodyellow'</tt> </tt>
+<a name="L52"></a><tt class="py-lineno"> 52</tt>  <tt class="py-line">     </tt>
+<a name="L53"></a><tt class="py-lineno"> 53</tt>  <tt class="py-line">    <tt class="py-name">rax</tt> <tt class="py-op">=</tt> <tt class="py-name">axes</tt><tt class="py-op">(</tt><tt class="py-op">[</tt><tt class="py-number">0.025</tt><tt class="py-op">,</tt> <tt class="py-number">0.4</tt><tt class="py-op">,</tt> <tt class="py-number">0.18</tt><tt class="py-op">,</tt> <tt class="py-number">0.35</tt><tt class="py-op">]</tt><tt class="py-op">,</tt> <tt class="py-name">axisbg</tt><tt class="py-op">=</tt><tt class="py-name">axcolor</tt><tt class="py-op">)</tt> </tt>
+<a name="L54"></a><tt class="py-lineno"> 54</tt>  <tt class="py-line">    <tt class="py-name">setp</tt><tt class="py-op">(</tt><tt class="py-name">rax</tt><tt class="py-op">,</tt> <tt class="py-name">xticks</tt><tt class="py-op">=</tt><tt class="py-op">[</tt><tt class="py-op">]</tt><tt class="py-op">,</tt> <tt class="py-name">yticks</tt><tt class="py-op">=</tt><tt class="py-op">[</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> </tt>
+<a name="L55"></a><tt class="py-lineno"> 55</tt>  <tt class="py-line">     </tt>
+<a name="L56"></a><tt class="py-lineno"> 56</tt>  <tt class="py-line">    <tt class="py-name">text</tt><tt class="py-op">(</tt><tt class="py-number">0.</tt><tt class="py-op">,</tt> <tt class="py-number">1.</tt><tt class="py-op">,</tt> <tt class="py-string">"Network layouts"</tt><tt class="py-op">)</tt> </tt>
+<a name="L57"></a><tt class="py-lineno"> 57</tt>  <tt class="py-line">    <tt class="py-name">radio_layout</tt> <tt class="py-op">=</tt> <tt class="py-name">RadioButtons</tt><tt class="py-op">(</tt><tt class="py-name">rax</tt><tt class="py-op">,</tt> \ </tt>
+<a name="L58"></a><tt class="py-lineno"> 58</tt>  <tt class="py-line">                    <tt class="py-op">(</tt><tt class="py-string">'dot'</tt><tt class="py-op">,</tt> <tt class="py-string">'neato'</tt><tt class="py-op">,</tt> <tt class="py-string">'fdp'</tt><tt class="py-op">,</tt> <tt class="py-string">'twopi'</tt><tt class="py-op">,</tt> <tt class="py-string">'circo'</tt><tt class="py-op">,</tt> \ </tt>
+<a name="L59"></a><tt class="py-lineno"> 59</tt>  <tt class="py-line">                    <tt class="py-string">'circular'</tt><tt class="py-op">,</tt> <tt class="py-string">'random'</tt><tt class="py-op">,</tt> <tt class="py-string">'spring'</tt><tt class="py-op">,</tt> <tt class="py-string">'shell'</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> \ </tt>
+<a name="L60"></a><tt class="py-lineno"> 60</tt>  <tt class="py-line">                    <tt class="py-name">active</tt><tt class="py-op">=</tt><tt class="py-name">active</tt><tt class="py-op">)</tt> </tt>
+<a name="L61"></a><tt class="py-lineno"> 61</tt>  <tt class="py-line">    <tt class="py-name">radio_layout</tt><tt class="py-op">.</tt><tt class="py-name">layout</tt> <tt class="py-op">=</tt> <tt class="py-name">layout</tt> </tt>
+<a name="L62"></a><tt class="py-lineno"> 62</tt>  <tt class="py-line">    <tt class="py-keyword">def</tt> <tt class="py-def-name">layoutfunc</tt><tt class="py-op">(</tt><tt class="py-param">label</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L63"></a><tt class="py-lineno"> 63</tt>  <tt class="py-line">        <tt class="py-name">ax</tt><tt class="py-op">.</tt><tt class="py-name">clear</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L64"></a><tt class="py-lineno"> 64</tt>  <tt class="py-line">        <tt class="py-name">setp</tt><tt class="py-op">(</tt><tt class="py-name">ax</tt><tt class="py-op">,</tt> <tt class="py-name">xticks</tt><tt class="py-op">=</tt><tt class="py-op">[</tt><tt class="py-op">]</tt><tt class="py-op">,</tt> <tt class="py-name">yticks</tt><tt class="py-op">=</tt><tt class="py-op">[</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> </tt>
+<a name="L65"></a><tt class="py-lineno"> 65</tt>  <tt class="py-line">        <tt class="py-keyword">try</tt><tt class="py-op">:</tt> </tt>
+<a name="L66"></a><tt class="py-lineno"> 66</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-name">label</tt> <tt class="py-op">==</tt> <tt class="py-string">'dot'</tt><tt class="py-op">:</tt> <tt class="py-name">layout</tt> <tt class="py-op">=</tt> <tt class="py-name">NX</tt><tt class="py-op">.</tt><tt class="py-name">graphviz_layout</tt><tt class="py-op">(</tt><tt class="py-name">G</tt><tt class="py-op">,</tt> <tt class="py-name">prog</tt><tt class="py-op">=</tt><tt class="py-string">'dot'</tt><tt class="py-op">)</tt> </tt>
+<a name="L67"></a><tt class="py-lineno"> 67</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-name">label</tt> <tt class="py-op">==</tt> <tt class="py-string">'neato'</tt><tt class="py-op">:</tt> <tt class="py-name">layout</tt> <tt class="py-op">=</tt> <tt class="py-name">NX</tt><tt class="py-op">.</tt><tt class="py-name">graphviz_layout</tt><tt class="py-op">(</tt><tt class="py-name">G</tt><tt class="py-op">,</tt> <tt class="py-name">prog</tt><tt class="py-op">=</tt><tt class="py-string">'neato'</tt><tt class="py-op">)</tt> </tt>
+<a name="L68"></a><tt class="py-lineno"> 68</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-name">label</tt> <tt class="py-op">==</tt> <tt class="py-string">'fdp'</tt><tt class="py-op">:</tt> <tt class="py-name">layout</tt> <tt class="py-op">=</tt> <tt class="py-name">NX</tt><tt class="py-op">.</tt><tt class="py-name">graphviz_layout</tt><tt class="py-op">(</tt><tt class="py-name">G</tt><tt class="py-op">,</tt> <tt class="py-name">prog</tt><tt class="py-op">=</tt><tt class="py-string">'fdp'</tt><tt class="py-op">)</tt> </tt>
+<a name="L69"></a><tt class="py-lineno"> 69</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-name">label</tt> <tt class="py-op">==</tt> <tt class="py-string">'twopi'</tt><tt class="py-op">:</tt> <tt class="py-name">layout</tt> <tt class="py-op">=</tt> <tt class="py-name">NX</tt><tt class="py-op">.</tt><tt class="py-name">graphviz_layout</tt><tt class="py-op">(</tt><tt class="py-name">G</tt><tt class="py-op">,</tt> <tt class="py-name">prog</tt><tt class="py-op">=</tt><tt class="py-string">'twopi'</tt><tt class="py-op">)</tt> </tt>
+<a name="L70"></a><tt class="py-lineno"> 70</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-name">label</tt> <tt class="py-op">==</tt> <tt class="py-string">'circo'</tt><tt class="py-op">:</tt> <tt class="py-name">layout</tt> <tt class="py-op">=</tt> <tt class="py-name">NX</tt><tt class="py-op">.</tt><tt class="py-name">graphviz_layout</tt><tt class="py-op">(</tt><tt class="py-name">G</tt><tt class="py-op">,</tt> <tt class="py-name">prog</tt><tt class="py-op">=</tt><tt class="py-string">'circo'</tt><tt class="py-op">)</tt> </tt>
+<a name="L71"></a><tt class="py-lineno"> 71</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-name">label</tt> <tt class="py-op">==</tt> <tt class="py-string">'circular'</tt><tt class="py-op">:</tt> <tt class="py-name">layout</tt> <tt class="py-op">=</tt> <tt class="py-name">NX</tt><tt class="py-op">.</tt><tt class="py-name">circular_layout</tt><tt class="py-op">(</tt><tt class="py-name">G</tt><tt class="py-op">)</tt> </tt>
+<a name="L72"></a><tt class="py-lineno"> 72</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-name">label</tt> <tt class="py-op">==</tt> <tt class="py-string">'random'</tt><tt class="py-op">:</tt> <tt class="py-name">layout</tt> <tt class="py-op">=</tt> <tt class="py-name">NX</tt><tt class="py-op">.</tt><tt class="py-name">random_layout</tt><tt class="py-op">(</tt><tt class="py-name">G</tt><tt class="py-op">)</tt> </tt>
+<a name="L73"></a><tt class="py-lineno"> 73</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-name">label</tt> <tt class="py-op">==</tt> <tt class="py-string">'spring'</tt><tt class="py-op">:</tt> <tt class="py-name">layout</tt> <tt class="py-op">=</tt> <tt class="py-name">NX</tt><tt class="py-op">.</tt><tt class="py-name">spring_layout</tt><tt class="py-op">(</tt><tt class="py-name">G</tt><tt class="py-op">,</tt> <tt class="py-name">iterations</tt><tt class="py-op">=</tt><tt class="py-number">15</tt><tt class="py-op">)</tt> </tt>
+<a name="L74"></a><tt class="py-lineno"> 74</tt>  <tt class="py-line">            <tt class="py-comment"># if label == 'spectral': layout = NX.spectral_layout(G, iterations=50)</tt> </tt>
+<a name="L75"></a><tt class="py-lineno"> 75</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-name">label</tt> <tt class="py-op">==</tt> <tt class="py-string">'shell'</tt><tt class="py-op">:</tt> <tt class="py-name">layout</tt> <tt class="py-op">=</tt> <tt class="py-name">NX</tt><tt class="py-op">.</tt><tt class="py-name">shell_layout</tt><tt class="py-op">(</tt><tt class="py-name">G</tt><tt class="py-op">)</tt> </tt>
+<a name="L76"></a><tt class="py-lineno"> 76</tt>  <tt class="py-line">     </tt>
+<a name="L77"></a><tt class="py-lineno"> 77</tt>  <tt class="py-line">            <tt class="py-name">radio_layout</tt><tt class="py-op">.</tt><tt class="py-name">layout</tt> <tt class="py-op">=</tt> <tt class="py-name">layout</tt> </tt>
+<a name="L78"></a><tt class="py-lineno"> 78</tt>  <tt class="py-line">            <tt class="py-name">NX</tt><tt class="py-op">.</tt><tt class="py-name">draw_networkx</tt><tt class="py-op">(</tt><tt class="py-name">G</tt><tt class="py-op">,</tt> <tt class="py-name">layout</tt><tt class="py-op">)</tt> </tt>
+<a name="L79"></a><tt class="py-lineno"> 79</tt>  <tt class="py-line">            <tt class="py-name">draw</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L80"></a><tt class="py-lineno"> 80</tt>  <tt class="py-line">        <tt class="py-keyword">except</tt><tt class="py-op">:</tt> </tt>
+<a name="L81"></a><tt class="py-lineno"> 81</tt>  <tt class="py-line">            <tt class="py-name">setp</tt><tt class="py-op">(</tt><tt class="py-name">ax</tt><tt class="py-op">,</tt> <tt class="py-name">xlim</tt> <tt class="py-op">=</tt> <tt class="py-op">(</tt><tt class="py-number">0</tt><tt class="py-op">,</tt><tt class="py-number">1</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-name">ylim</tt> <tt class="py-op">=</tt> <tt class="py-op">(</tt><tt class="py-number">0</tt><tt class="py-op">,</tt><tt class="py-number">1</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L82"></a><tt class="py-lineno"> 82</tt>  <tt class="py-line">            <tt class="py-name">text</tt><tt class="py-op">(</tt><tt class="py-number">0.5</tt><tt class="py-op">,</tt> <tt class="py-number">0.5</tt><tt class="py-op">,</tt> <tt class="py-string">"Layout is not avilable.\n(Not working graphviz?) \n (Not installed pygraphviz?)"</tt><tt class="py-op">,</tt> \ </tt>
+<a name="L83"></a><tt class="py-lineno"> 83</tt>  <tt class="py-line">                <tt class="py-name">fontsize</tt><tt class="py-op">=</tt><tt class="py-number">14</tt><tt class="py-op">,</tt> <tt class="py-name">color</tt><tt class="py-op">=</tt><tt class="py-string">'r'</tt><tt class="py-op">,</tt> <tt class="py-name">horizontalalignment</tt><tt class="py-op">=</tt><tt class="py-string">'center'</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L84"></a><tt class="py-lineno"> 84</tt>  <tt class="py-line">    <tt class="py-name">radio_layout</tt><tt class="py-op">.</tt><tt class="py-name">on_clicked</tt><tt class="py-op">(</tt><tt class="py-name">layoutfunc</tt><tt class="py-op">)</tt> </tt>
+<a name="L85"></a><tt class="py-lineno"> 85</tt>  <tt class="py-line">     </tt>
+<a name="L86"></a><tt class="py-lineno"> 86</tt>  <tt class="py-line">    <tt class="py-comment"># Make a button for showing adjoint network (backpropagation network)</tt> </tt>
+<a name="L87"></a><tt class="py-lineno"> 87</tt>  <tt class="py-line">    <tt class="py-name">bgraphax</tt> <tt class="py-op">=</tt> <tt class="py-name">axes</tt><tt class="py-op">(</tt><tt class="py-op">[</tt><tt class="py-number">0.025</tt><tt class="py-op">,</tt> <tt class="py-number">0.3</tt><tt class="py-op">,</tt> <tt class="py-number">0.18</tt><tt class="py-op">,</tt> <tt class="py-number">0.04</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> </tt>
+<a name="L88"></a><tt class="py-lineno"> 88</tt>  <tt class="py-line">    <tt class="py-name">button1</tt> <tt class="py-op">=</tt> <tt class="py-name">Button</tt><tt class="py-op">(</tt><tt class="py-name">bgraphax</tt><tt class="py-op">,</tt> <tt class="py-string">'Backprop graph'</tt><tt class="py-op">,</tt> <tt class="py-name">color</tt><tt class="py-op">=</tt><tt class="py-name">axcolor</tt><tt class="py-op">,</tt> <tt class="py-name">hovercolor</tt><tt class="py-op">=</tt><tt class="py-string">'0.975'</tt><tt class="py-op">)</tt> </tt>
+<a name="L89"></a><tt class="py-lineno"> 89</tt>  <tt class="py-line">    <tt class="py-keyword">def</tt> <tt class="py-def-name">showbgraph</tt><tt class="py-op">(</tt><tt class="py-param">event</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L90"></a><tt class="py-lineno"> 90</tt>  <tt class="py-line">        <tt class="py-name">ax</tt><tt class="py-op">.</tt><tt class="py-name">clear</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L91"></a><tt class="py-lineno"> 91</tt>  <tt class="py-line">        <tt class="py-name">setp</tt><tt class="py-op">(</tt><tt class="py-name">ax</tt><tt class="py-op">,</tt> <tt class="py-name">xticks</tt><tt class="py-op">=</tt><tt class="py-op">[</tt><tt class="py-op">]</tt><tt class="py-op">,</tt> <tt class="py-name">yticks</tt><tt class="py-op">=</tt><tt class="py-op">[</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> </tt>
+<a name="L92"></a><tt class="py-lineno"> 92</tt>  <tt class="py-line">        <tt class="py-name">layout</tt> <tt class="py-op">=</tt> <tt class="py-name">radio_layout</tt><tt class="py-op">.</tt><tt class="py-name">layout</tt> </tt>
+<a name="L93"></a><tt class="py-lineno"> 93</tt>  <tt class="py-line">        <tt class="py-name">NX</tt><tt class="py-op">.</tt><tt class="py-name">draw_networkx</tt><tt class="py-op">(</tt><tt class="py-name">G</tt><tt class="py-op">,</tt> <tt class="py-name">layout</tt><tt class="py-op">,</tt> <tt class="py-name">alpha</tt><tt class="py-op">=</tt><tt class="py-number">0.1</tt><tt class="py-op">,</tt> <tt class="py-name">labels</tt><tt class="py-op">=</tt><tt class="py-op">{</tt><tt class="py-op">}</tt><tt class="py-op">)</tt> </tt>
+<a name="L94"></a><tt class="py-lineno"> 94</tt>  <tt class="py-line">        <tt class="py-name">NX</tt><tt class="py-op">.</tt><tt class="py-name">draw_networkx</tt><tt class="py-op">(</tt><tt class="py-name">BG</tt><tt class="py-op">,</tt> <tt class="py-name">layout</tt><tt class="py-op">,</tt> <tt class="py-name">node_color</tt><tt class="py-op">=</tt><tt class="py-string">'y'</tt><tt class="py-op">)</tt> </tt>
+<a name="L95"></a><tt class="py-lineno"> 95</tt>  <tt class="py-line">        <tt class="py-name">draw</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L96"></a><tt class="py-lineno"> 96</tt>  <tt class="py-line">    <tt class="py-name">button1</tt><tt class="py-op">.</tt><tt class="py-name">on_clicked</tt><tt class="py-op">(</tt><tt class="py-name">showbgraph</tt><tt class="py-op">)</tt> </tt>
+<a name="L97"></a><tt class="py-lineno"> 97</tt>  <tt class="py-line">     </tt>
+<a name="L98"></a><tt class="py-lineno"> 98</tt>  <tt class="py-line">    <tt class="py-comment"># Make a button for showing derivative networks</tt> </tt>
+<a name="L99"></a><tt class="py-lineno"> 99</tt>  <tt class="py-line">    <tt class="py-name">dgraphax</tt> <tt class="py-op">=</tt> <tt class="py-name">axes</tt><tt class="py-op">(</tt><tt class="py-op">[</tt><tt class="py-number">0.025</tt><tt class="py-op">,</tt> <tt class="py-number">0.2</tt><tt class="py-op">,</tt> <tt class="py-number">0.18</tt><tt class="py-op">,</tt> <tt class="py-number">0.04</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> </tt>
+<a name="L100"></a><tt class="py-lineno">100</tt>  <tt class="py-line">    <tt class="py-name">button2</tt> <tt class="py-op">=</tt> <tt class="py-name">Button</tt><tt class="py-op">(</tt><tt class="py-name">dgraphax</tt><tt class="py-op">,</tt> <tt class="py-string">'Diff graphs'</tt><tt class="py-op">,</tt> <tt class="py-name">color</tt><tt class="py-op">=</tt><tt class="py-name">axcolor</tt><tt class="py-op">,</tt> <tt class="py-name">hovercolor</tt><tt class="py-op">=</tt><tt class="py-string">'0.975'</tt><tt class="py-op">)</tt> </tt>
+<a name="L101"></a><tt class="py-lineno">101</tt>  <tt class="py-line">    <tt class="py-keyword">def</tt> <tt class="py-def-name">showdgraphs</tt><tt class="py-op">(</tt><tt class="py-param">event</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L102"></a><tt class="py-lineno">102</tt>  <tt class="py-line">        <tt class="py-keyword">def</tt> <tt class="py-def-name">dsubgraph_nodes</tt><tt class="py-op">(</tt><tt class="py-param">inp</tt><tt class="py-op">,</tt> <tt class="py-param">out</tt><tt class="py-op">,</tt> <tt class="py-param">nbunch</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L103"></a><tt class="py-lineno">103</tt>  <tt class="py-line">            <tt class="py-name">pred</tt> <tt class="py-op">=</tt> <tt class="py-name">NX</tt><tt class="py-op">.</tt><tt class="py-name">predecessor</tt><tt class="py-op">(</tt><tt class="py-name">G</tt><tt class="py-op">,</tt> <tt class="py-name">inp</tt><tt class="py-op">,</tt> <tt class="py-name">out</tt><tt class="py-op">)</tt> </tt>
+<a name="L104"></a><tt class="py-lineno">104</tt>  <tt class="py-line">            <tt class="py-name">nbunch</tt> <tt class="py-op">+=</tt> <tt class="py-name">pred</tt> </tt>
+<a name="L105"></a><tt class="py-lineno">105</tt>  <tt class="py-line">            <tt class="py-keyword">for</tt> <tt class="py-name">node</tt> <tt class="py-keyword">in</tt> <tt class="py-name">pred</tt><tt class="py-op">:</tt> </tt>
+<a name="L106"></a><tt class="py-lineno">106</tt>  <tt class="py-line">                <tt class="py-name">dsubgraph_nodes</tt><tt class="py-op">(</tt><tt class="py-name">inp</tt><tt class="py-op">,</tt> <tt class="py-name">node</tt><tt class="py-op">,</tt> <tt class="py-name">nbunch</tt><tt class="py-op">)</tt> </tt>
+<a name="L107"></a><tt class="py-lineno">107</tt>  <tt class="py-line">            <tt class="py-keyword">return</tt> <tt class="py-name">nbunch</tt> </tt>
+</div><a name="L108"></a><tt class="py-lineno">108</tt>  <tt class="py-line">        <tt class="py-name">layout</tt> <tt class="py-op">=</tt> <tt class="py-name">radio_layout</tt><tt class="py-op">.</tt><tt class="py-name">layout</tt> </tt>
+<a name="L109"></a><tt class="py-lineno">109</tt>  <tt class="py-line">        <tt class="py-keyword">import</tt> <tt class="py-name">time</tt> </tt>
+<a name="L110"></a><tt class="py-lineno">110</tt>  <tt class="py-line">        <tt class="py-keyword">for</tt> <tt class="py-name">innode</tt> <tt class="py-keyword">in</tt> <tt class="py-name">net</tt><tt class="py-op">.</tt><tt class="py-name">inno</tt><tt class="py-op">:</tt> </tt>
+<a name="L111"></a><tt class="py-lineno">111</tt>  <tt class="py-line">            <tt class="py-keyword">for</tt> <tt class="py-name">outnode</tt> <tt class="py-keyword">in</tt> <tt class="py-name">net</tt><tt class="py-op">.</tt><tt class="py-name">outno</tt><tt class="py-op">:</tt>                </tt>
+<a name="L112"></a><tt class="py-lineno">112</tt>  <tt class="py-line">                <tt class="py-name">nbunch</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-name">outnode</tt><tt class="py-op">]</tt> </tt>
+<a name="L113"></a><tt class="py-lineno">113</tt>  <tt class="py-line">                <tt class="py-name">nbunch</tt> <tt class="py-op">=</tt> <tt class="py-name">dsubgraph_nodes</tt><tt class="py-op">(</tt><tt class="py-name">innode</tt><tt class="py-op">,</tt> <tt class="py-name">outnode</tt><tt class="py-op">,</tt> <tt class="py-name">nbunch</tt><tt class="py-op">)</tt> </tt>
+<a name="L114"></a><tt class="py-lineno">114</tt>  <tt class="py-line">                <tt class="py-name">g</tt> <tt class="py-op">=</tt> <tt class="py-name">G</tt><tt class="py-op">.</tt><tt class="py-name">subgraph</tt><tt class="py-op">(</tt><tt class="py-name">nbunch</tt><tt class="py-op">)</tt> </tt>
+<a name="L115"></a><tt class="py-lineno">115</tt>  <tt class="py-line">                <tt class="py-name">ax</tt><tt class="py-op">.</tt><tt class="py-name">clear</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L116"></a><tt class="py-lineno">116</tt>  <tt class="py-line">                <tt class="py-name">setp</tt><tt class="py-op">(</tt><tt class="py-name">ax</tt><tt class="py-op">,</tt> <tt class="py-name">xticks</tt><tt class="py-op">=</tt><tt class="py-op">[</tt><tt class="py-op">]</tt><tt class="py-op">,</tt> <tt class="py-name">yticks</tt><tt class="py-op">=</tt><tt class="py-op">[</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> </tt>
+<a name="L117"></a><tt class="py-lineno">117</tt>  <tt class="py-line">                <tt class="py-name">NX</tt><tt class="py-op">.</tt><tt class="py-name">draw_networkx</tt><tt class="py-op">(</tt><tt class="py-name">G</tt><tt class="py-op">,</tt> <tt class="py-name">layout</tt><tt class="py-op">,</tt> <tt class="py-name">alpha</tt><tt class="py-op">=</tt><tt class="py-number">0.1</tt><tt class="py-op">,</tt> <tt class="py-name">labels</tt><tt class="py-op">=</tt><tt class="py-op">{</tt><tt class="py-op">}</tt><tt class="py-op">)</tt> </tt>
+<a name="L118"></a><tt class="py-lineno">118</tt>  <tt class="py-line">                <tt class="py-name">NX</tt><tt class="py-op">.</tt><tt class="py-name">draw_networkx</tt><tt class="py-op">(</tt><tt class="py-name">g</tt><tt class="py-op">,</tt> <tt class="py-name">layout</tt><tt class="py-op">,</tt> <tt class="py-name">node_color</tt><tt class="py-op">=</tt><tt class="py-string">'c'</tt><tt class="py-op">)</tt> </tt>
+<a name="L119"></a><tt class="py-lineno">119</tt>  <tt class="py-line">                <tt class="py-name">draw</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L120"></a><tt class="py-lineno">120</tt>  <tt class="py-line">                <tt class="py-name">time</tt><tt class="py-op">.</tt><tt class="py-name">sleep</tt><tt class="py-op">(</tt><tt class="py-number">3</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L121"></a><tt class="py-lineno">121</tt>  <tt class="py-line">    <tt class="py-name">button2</tt><tt class="py-op">.</tt><tt class="py-name">on_clicked</tt><tt class="py-op">(</tt><tt class="py-name">showdgraphs</tt><tt class="py-op">)</tt> </tt>
+<a name="L122"></a><tt class="py-lineno">122</tt>  <tt class="py-line">     </tt>
+<a name="L123"></a><tt class="py-lineno">123</tt>  <tt class="py-line">    <tt class="py-name">axes</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L124"></a><tt class="py-lineno">124</tt>  <tt class="py-line">     </tt>
+<a name="L125"></a><tt class="py-lineno">125</tt>  <tt class="py-line"><tt class="py-comment"># Test the thetwork</tt> </tt>
+<a name="L126"></a><tt class="py-lineno">126</tt>  <tt class="py-line"><tt class="py-keyword">if</tt> <tt class="py-name">__name__</tt> <tt class="py-op">==</tt> <tt class="py-string">"__main__"</tt><tt class="py-op">:</tt> </tt>
+<a name="L127"></a><tt class="py-lineno">127</tt>  <tt class="py-line">    <tt class="py-keyword">from</tt> <tt id="link-0" class="py-name" targets="Package ffnet=ffnet-module.html,Module ffnet.ffnet=ffnet.ffnet-module.html,Class ffnet.ffnet.ffnet=ffnet.ffnet.ffnet-class.html"><a title="ffnet
+ffnet.ffnet
+ffnet.ffnet.ffnet" class="py-name" href="#" onclick="return doclink('link-0', 'ffnet', 'link-0');">ffnet</a></tt> <tt class="py-keyword">import</tt> <tt id="link-1" class="py-name"><a title="ffnet
+ffnet.ffnet
+ffnet.ffnet.ffnet" class="py-name" href="#" onclick="return doclink('link-1', 'ffnet', 'link-0');">ffnet</a></tt><tt class="py-op">,</tt> <tt class="py-name">mlgraph</tt><tt class="py-op">,</tt> <tt class="py-name">tmlgraph</tt> </tt>
+<a name="L128"></a><tt class="py-lineno">128</tt>  <tt class="py-line">     </tt>
+<a name="L129"></a><tt class="py-lineno">129</tt>  <tt class="py-line">    <tt class="py-comment">##conec = mlgraph((3,5,5,3), biases = False)</tt> </tt>
+<a name="L130"></a><tt class="py-lineno">130</tt>  <tt class="py-line">    <tt class="py-keyword">from</tt> <tt id="link-2" class="py-name"><a title="ffnet
+ffnet.ffnet
+ffnet.ffnet.ffnet" class="py-name" href="#" onclick="return doclink('link-2', 'ffnet', 'link-0');">ffnet</a></tt> <tt class="py-keyword">import</tt> <tt class="py-name">imlgraph</tt> </tt>
+<a name="L131"></a><tt class="py-lineno">131</tt>  <tt class="py-line">    <tt class="py-name">conec</tt> <tt class="py-op">=</tt> <tt class="py-name">imlgraph</tt><tt class="py-op">(</tt><tt class="py-op">(</tt><tt class="py-number">3</tt><tt class="py-op">,</tt><tt class="py-op">[</tt><tt class="py-op">(</tt><tt class="py-number">3</tt><tt class="py-op">,</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-op">(</tt><tt class="py-number">6</tt><tt class="py-op">,</tt><tt class="py-number">3</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-op">(</tt><tt class="py-number">3</tt><tt class="py-op">,</tt><tt class="py-op">)</tt><tt class="py-op">]</tt><tt class="py-op">,</tt><tt class="py-number">3</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L132"></a><tt class="py-lineno">132</tt>  <tt class="py-line">    <tt class="py-name">net</tt> <tt class="py-op">=</tt> <tt id="link-3" class="py-name"><a title="ffnet
+ffnet.ffnet
+ffnet.ffnet.ffnet" class="py-name" href="#" onclick="return doclink('link-3', 'ffnet', 'link-0');">ffnet</a></tt><tt class="py-op">(</tt><tt class="py-name">conec</tt><tt class="py-op">)</tt> </tt>
+<a name="L133"></a><tt class="py-lineno">133</tt>  <tt class="py-line">     </tt>
+<a name="L134"></a><tt class="py-lineno">134</tt>  <tt class="py-line">    <tt id="link-4" class="py-name" targets="Module ffnet.tools.drawffnet=ffnet.tools.drawffnet-module.html,Function ffnet.tools.drawffnet.drawffnet()=ffnet.tools.drawffnet-module.html#drawffnet"><a title="ffnet.tools.drawffnet
+ffnet.tools.drawffnet.drawffnet" class="py-name" href="#" onclick="return doclink('link-4', 'drawffnet', 'link-4');">drawffnet</a></tt><tt class="py-op">(</tt><tt class="py-name">net</tt><tt class="py-op">)</tt> </tt>
+<a name="L135"></a><tt class="py-lineno">135</tt>  <tt class="py-line">    <tt class="py-name">show</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L136"></a><tt class="py-lineno">136</tt>  <tt class="py-line"> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="ffnet-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="http://ffnet.sourceforge.net">ffnet</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Wed Oct 28 02:30:22 2009
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="Generator" content="Kate, the KDE Advanced Text Editor" />
+<title>stock.py</title>
+</head>
+<body>
+<pre style='color:#181615;background-color:#ffffff;'>
+<i><span style='color:#898887;'>#####################################################################</span></i><b><span style='color:#bf0303;background:#f7e6e6;'>###</span></b>
+<i><span style='color:#898887;'>##  Copyright (C) 2006 by Marek Wojciechowski</span></i>
+<i><span style='color:#898887;'>##  &lt;mwojc@p.lodz.pl&gt;</span></i>
+<i><span style='color:#898887;'>##</span></i>
+<i><span style='color:#898887;'>##  Distributed under the terms of the GNU General Public License (GPL)</span></i>
+<i><span style='color:#898887;'>##  http://www.gnu.org/copyleft/gpl.html</span></i>
+<i><span style='color:#898887;'>#####################################################################</span></i><b><span style='color:#bf0303;background:#f7e6e6;'>###</span></b>
+
+<i><span style='color:#898887;'>### stock problem example for ffnet </span></i><b><span style='color:#bf0303;background:#f7e6e6;'>###</span></b>
+
+<i><span style='color:#898887;'># Data and description for this example is borrowed from:</span></i>
+<i><span style='color:#898887;'># http://www.scientific-consultants.com/nnbd.html</span></i>
+<i><span style='color:#898887;'>#</span></i>
+<i><span style='color:#898887;'># </span></i>
+<i><span style='color:#898887;'># Training data consists of Black-Scholes option prices </span></i>
+<i><span style='color:#898887;'># for volatility levels running from 20 percent to 200 percent, </span></i>
+<i><span style='color:#898887;'># for time remaining running from 5 to 15 days, and for strike price </span></i>
+<i><span style='color:#898887;'># running from 70 dollars to 130 dollars. The stock price was set to </span></i>
+<i><span style='color:#898887;'># 100 dollars and the interest rate to 0 percent when generating </span></i>
+<i><span style='color:#898887;'># the data.</span></i>
+<i><span style='color:#898887;'>#</span></i>
+<i><span style='color:#898887;'># The data is &quot;difficult&quot; in that (for a neural network to </span></i>
+<i><span style='color:#898887;'># practically emulate Black-Scholes) a very tight fit is required.</span></i>
+<i><span style='color:#898887;'># The R-squared should be at least 0.999999 or better, and the largest</span></i>
+<i><span style='color:#898887;'># absolute error must be less than 0.05 dollars (the price increment </span></i>
+<i><span style='color:#898887;'># for most options) or, better yet, less than 0.01 dollars.</span></i>
+<i><span style='color:#898887;'>#</span></i>
+<i><span style='color:#898887;'>#</span></i>
+<i><span style='color:#898887;'># So let's try.</span></i>
+<i><span style='color:#898887;'># Attention: training might be a long process since we train a big network.</span></i>
+
+<span style='color:#ff80e0;'>from</span> ffnet <span style='color:#ff80e0;'>import</span> ffnet, mlgraph, readdata
+<span style='color:#ff80e0;'>from</span> numpy <span style='color:#ff80e0;'>import</span> array
+
+<i><span style='color:#898887;'># Generate standard layered network architecture and create network</span></i>
+conec <b>=</b> mlgraph((<span style='color:#b08000;'>3</span>,<span style='color:#b08000;'>22</span>,<span style='color:#b08000;'>12</span>,<span style='color:#b08000;'>1</span>))
+net <b>=</b> ffnet(conec)
+
+<i><span style='color:#898887;'># Read training data omitting first column and first line</span></i>
+<b>print</b> <span style='color:#bf0303;'>&quot;READING DATA...&quot;</span>
+data <b>=</b> readdata( <span style='color:#bf0303;'>'data/black-scholes.dat'</span>,
+                 usecols  <b>=</b> (<span style='color:#b08000;'>1</span>, <span style='color:#b08000;'>2</span>, <span style='color:#b08000;'>3</span>, <span style='color:#b08000;'>4</span>),
+                 skiprows <b>=</b>  <span style='color:#b08000;'>1</span>)
+<span style='color:#0057ae;'>input</span> <b>=</b>  data[:, :<span style='color:#b08000;'>3</span>] <i><span style='color:#898887;'>#first 3 columns</span></i>
+target <b>=</b> data[:, <b>-</b><span style='color:#b08000;'>1</span>] <i><span style='color:#898887;'>#last column</span></i>
+
+<b>print</b> <span style='color:#bf0303;'>&quot;TRAINING NETWORK...&quot;</span>
+<span style='color:#ff80e0;'>import</span> sys<b>;</b> sys.stdout.flush() <i><span style='color:#898887;'>#Just to ensure dislpaing the above messages here</span></i>
+net.train_tnc(<span style='color:#0057ae;'>input</span>, target, maxfun <b>=</b> <span style='color:#b08000;'>5000</span>, messages<b>=</b><span style='color:#b08000;'>1</span>)
+
+<i><span style='color:#898887;'># Test network</span></i>
+<b>print</b>
+<b>print</b> <span style='color:#bf0303;'>&quot;TESTING NETWORK...&quot;</span>
+output, regression <b>=</b> net.test(<span style='color:#0057ae;'>input</span>, target, iprint <b>=</b> <span style='color:#b08000;'>0</span>)
+Rsquared <b>=</b> regression[<span style='color:#b08000;'>0</span>][<span style='color:#b08000;'>2</span>]
+maxerr <b>=</b> <span style='color:#0057ae;'>abs</span>( array(output).reshape( <span style='color:#0057ae;'>len</span>(output) ) <b>-</b> array(target) ).<span style='color:#0057ae;'>max</span>()
+<b>print</b> <span style='color:#bf0303;'>&quot;R-squared:           </span><span style='color:#0057ae;'>%s</span><span style='color:#bf0303;'>  (should be &gt;= 0.999999)&quot;</span> <b>%</b><span style='color:#0057ae;'>str</span>(Rsquared)
+<b>print</b> <span style='color:#bf0303;'>&quot;max. absolute error: </span><span style='color:#0057ae;'>%s</span><span style='color:#bf0303;'>  (should be &lt;= 0.05)&quot;</span> <b>%</b><span style='color:#0057ae;'>str</span>(maxerr)
+<b>print</b>
+<b>print</b> <span style='color:#bf0303;'>&quot;Is ffnet ready for a stock?&quot;</span>
+
+<i><span style='color:#898887;'>##################################</span></i><b><span style='color:#bf0303;background:#f7e6e6;'>###</span></b>
+<i><span style='color:#898887;'># Make plot if matplotlib is avialble</span></i>
+<b>try</b>:
+    <span style='color:#ff80e0;'>from</span> pylab <span style='color:#ff80e0;'>import</span> <b>*</b>
+    plot( target, <span style='color:#bf0303;'>'b--'</span> )
+    plot( output, <span style='color:#bf0303;'>'k-'</span> )
+    legend((<span style='color:#bf0303;'>'target'</span>, <span style='color:#bf0303;'>'output'</span>))
+    xlabel(<span style='color:#bf0303;'>'pattern'</span>)<b>;</b> ylabel(<span style='color:#bf0303;'>'price'</span>)
+    title(<span style='color:#bf0303;'>'Outputs vs. target of trained network.'</span>)
+    grid(<span style='color:#006e28;'>True</span>)
+    show()
+<b>except</b> <b><span style='color:#054d00;'>ImportError</span></b>, e: 
+    <b>print</b> <span style='color:#bf0303;'>&quot;Cannot make plots. For plotting install matplotlib.</span><span style='color:#ff80e0;'>\n</span><span style='color:#0057ae;'>%s</span><span style='color:#bf0303;'>&quot;</span> <b>%</b> e
+</pre>
+</body>
+</html>
