@@ -15,6 +15,10 @@ Feed-forward neural network for python (ffnet)
 News
 ----
 
+*27/12/2011*
+
+You can look now at the growing list of publications_ which cite ffnet.
+
 *09/08/2011*
 
 ffnet version 0.7 has been released and is available for download at https://sourceforge.net/projects/ffnet.
@@ -120,9 +124,9 @@ Reporting bugs
 
 Bug tracker, forum and a mailing list are avilable at https://sourceforge.net/projects/ffnet 
 
------
-Notes
------
+------------
+Citing ffnet
+------------
 
 ffnet was created *in the hope that it will be useful*. If you find it really is
 and you are going to publish some ffnet generated results, please cite it:
@@ -134,6 +138,8 @@ and you are going to publish some ffnet generated results, please cite it:
     Technical University of Lodz (Poland),
     Department of Civil Engineering, Architecture and Environmental Engineering,
     http://ffnet.sourceforge.net/, ffnet-0.7, August 2011
+
+You can also look at the growing list of `publications <ffnet-publications.html>`_ which cite ffnet.
 
 ..
   .. image:: http://sflogo.sourceforge.net/sflogo.php?group_id=126615&type=8
