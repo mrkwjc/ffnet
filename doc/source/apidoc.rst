@@ -1,17 +1,29 @@
-.. _docs:
+.. default-role:: py:obj
+
+.. currentmodule:: ffnet
 
 -----------------
 API documentation
 -----------------
 
-.. toctree::
-    :maxdepth: 2
+Architecture generators
+-----------------------
+.. autofunction:: ffnet.mlgraph
+.. autofunction:: ffnet.tmlgraph
+.. autofunction:: ffnet.imlgraph
 
-    autodoc/summary
-    autodoc/ffnet
-    autodoc/archs
-    autodoc/training
-    autodoc/utils
-    autodoc/pikaia
+Main ffnet class
+----------------
+.. autoclass:: ffnet.ffnet
+    :members:
 
+Utility functions
+-----------------
+.. autofunction:: ffnet.savenet
+.. autofunction:: ffnet.loadnet
+.. autofunction:: ffnet.exportnet
+.. autofunction:: ffnet.readdata
 
+Pikaia optimizer
+-----------------------------
+.. autofunction:: pikaia.pikaia
