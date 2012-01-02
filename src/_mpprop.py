@@ -11,8 +11,7 @@ def initializer(key, net, input, target):
     key, net, input, target have to be serialized to reach this place
     this means that:
     a) initialization process might be time consuming
-    b) each process receives its own copy of data so the whole training might
-       be memory hungry.
+    b) each process receives its own copy of data so the whole training might be memory hungry.
     These drawbacks can only be ommited if net, input, target
     will live in shared memory
     """
