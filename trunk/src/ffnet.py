@@ -7,7 +7,9 @@
 ########################################################################
 
 '''
-Module containing ffnet class and utility functions.
+---------------------------------
+ffnet class and utility functions
+---------------------------------
 '''
 
 from _version import version
@@ -18,9 +20,43 @@ from pikaia import pikaia
 import sys
 
 def mlgraph(arch, biases = True):
-    '''
-    Creates standard multilayer network with full connectivity list.
-    '''
+    """
+    Creates standard multilayer network architecture.
+
+    :Parameters:
+        arch : tuple
+            Tuple of integers - numbers of nodes in subsequent layers.
+        biases : bool, optional
+            Indicates if bias (node numbered 0) should be added to hidden
+            and output neurons. Default is *True*.
+
+    :Returns:
+        conec : list
+            List of tuples -- network connections.
+
+    :Examples:
+        Basic calls:
+
+        >>> from ffnet import mlgraph
+        >>> mlgraph((2,2,1))
+        [(1, 3), (2, 3), (0, 3), (1, 4), (2, 4), (0, 4), (3, 5), (4, 5), (0, 5)]
+        >>> mlgraph((2,2,1), biases = False)
+        [(1, 3), (2, 3), (1, 4), (2, 4), (3, 5), (4, 5)]
+        
+        Generating plots:
+            
+        .. plot::
+            :include-source:
+
+            from ffnet import mlgraph, ffnet
+            import networkx as NX
+            import pylab
+
+            conec = mlgraph((3,6,3,2), biases=False)
+            net = ffnet(conec)
+            NX.draw_graphviz(net.graph, prog='dot')
+            pylab.show()
+    """
     nofl = len(arch)
     conec = []
     if nofl: trg = arch[0]
@@ -36,19 +72,89 @@ def mlgraph(arch, biases = True):
     return conec
 
 def imlgraph(arch, biases = True):
-    '''
-    Creates special layered network where outputs are
-    independent from each other.
-    Exemplary architecture definition:
-    arch = (3, [(4,), (), (6, 3)], 3).
-    With such an arch, imlgraph builds three independent
-    multilayer graphs: 3-4-1, 3-1, 3-6-3-1
-    and merges them into one graph with common input nodes.
-    
-    Simplified version of the above architecture syntax is:
-    arch = (3, 3, 3)  #exactly as in the mlgraph
-    Three nets: 3-3-1, 3-3-1, 3-3-1 are merged in this case.
-    '''
+    """
+    Creates multilayer architecture with independent outputs.
+
+    This function uses `mlgraph` to build independent multilayer 
+    architectures for each output neuron. Then it merges them into one 
+    graph with common input nodes.
+
+    :Parameters:
+        arch : tuple
+            Tuple of length 3. The first element is number of network inputs,
+            last one is number of outputs and the middle one is interpreted
+            as the hidden layers definition (it can be an *integer* or 
+            a *list* -- see examples)
+        biases : bool, optional
+            Indicates if bias (node numbered 0) should be added to hidden
+            and output neurons. Default is *True*.
+
+    :Returns:
+        conec : list
+            List of tuples -- network connections.
+
+    :Raises:
+        TypeError
+            If *arch* cannot be properly interpreted.
+
+    :Examples:
+        The following *arch* definitions are possible:
+        
+        >>> from ffnet import imlgraph
+        >>> arch = (2, 2, 2)
+        >>> imlgraph(arch, biases=False)
+            [(1, 3),
+            (2, 3),
+            (1, 4),
+            (2, 4),
+            (3, 5),
+            (4, 5),
+            (1, 6),
+            (2, 6),
+            (1, 7),
+            (2, 7),
+            (6, 8),
+            (7, 8)]
+            
+        I this case two multilayer networks (for two outputs)
+        of the architectures (2,2,1), (2,2,1) are merged into one graph.
+        
+        >>> arch = (2, [(2,), (2,2)], 2)
+        >>> imlgraph(arch, biases=False)
+            [(1, 3),
+            (2, 3),
+            (1, 4),
+            (2, 4),
+            (3, 5),
+            (4, 5),
+            (1, 6),
+            (2, 6),
+            (1, 7),
+            (2, 7),
+            (6, 8),
+            (7, 8),
+            (6, 9),
+            (7, 9),
+            (8, 10),
+            (9, 10)]
+
+        I this case networks of the architectures (2,2,1) and (2,2,2,1)
+        are merged.
+
+        Exemplary plot:
+        
+        .. plot::
+            :include-source:
+
+            from ffnet import imlgraph, ffnet
+            import networkx as NX
+            import pylab
+
+            conec = imlgraph((3, [(3,), (6, 3), (3,)], 3), biases=False)
+            net = ffnet(conec)
+            NX.draw_graphviz(net.graph, prog='dot')
+            pylab.show()
+    """
     #Checks of the architecture
     if len(arch) < 3:
         raise TypeError("Wrong architecture definition (at least 3 layers needed).")
@@ -83,11 +189,56 @@ def imlgraph(arch, biases = True):
     return conec
 
 def tmlgraph(arch, biases = True):
-    '''
-    Creates multilayer network full connectivity list,
-    but now layers have connections with all preceding layers
-    (not only "the nearest" one).
-    '''
+    """
+    Creates multilayer network full connectivity list.
+    
+    Similar to `mlgraph`, but now layers are fully connected with all 
+    preceding layers.
+
+    :Parameters:
+        arch : tuple
+            Tuple of integers - numbers of nodes in subsequent layers.
+        biases : bool, optional
+            Indicates if bias (node numbered 0) should be added to hidden
+            and output neurons. Default is *True*.
+
+    :Returns:
+        conec : list
+            List of tuples -- network connections.
+
+    :Examples:
+        Basic calls:
+        
+        >>> from ffnet import tmlgraph
+        >>> tmlgraph((2,2,1))
+            [(0, 3),
+            (1, 3),
+            (2, 3),
+            (0, 4),
+            (1, 4),
+            (2, 4),
+            (0, 5),
+            (1, 5),
+            (2, 5),
+            (3, 5),
+            (4, 5)]
+        >>> tmlgraph((2,2,1), biases = False)
+        [(1, 3), (2, 3), (1, 4), (2, 4), (1, 5), (2, 5), (3, 5), (4, 5)]
+        
+        Generating plots:
+        
+        .. plot::
+            :include-source:
+
+            from ffnet import tmlgraph, ffnet
+            import networkx as NX
+            import pylab
+
+            conec = tmlgraph((3, 8, 3), biases=False)
+            net = ffnet(conec)
+            NX.draw_graphviz(net.graph, prog='dot')
+            pylab.show()
+    """
     nofl = len(arch)
     conec = []; srclist = []
     if biases: srclist = [0]
@@ -227,15 +378,17 @@ def _dconec(conec, inno):
 
 class ffnet:
     """
-    Feed-forward neural network main class.
+    Feed-forward neural network main class
     
     NETWORK CREATION:
     Creation of the network consist in delivering list of neuron 
-    connections:
+    connections::
+    
         conec = [[1, 3], [2, 3], [0, 3] 
                  [1, 4], [2, 4], [0, 4] 
                  [3, 5], [4, 5], [0, 5]]
         net = ffnet(conec)
+    
     0 (zero) in conec is a special unit representing bias. If there is
     no connection from 0, bias is not considered in the node.
     Only feed-forward directed graphs are allowed. Class makes check
@@ -244,7 +397,7 @@ class ffnet:
 
     Although generation of conec is left to the user, there are several
     functions provided to facilitate this task. See description of 
-    the following functions: mlgraph, imlgraph, tmlgraph.
+    the following functions: `mlgraph`, `imlgraph`, `tmlgraph`.
     More architectures may be provided in the future.
     
     Weights are automatically initialized at the network creation. They can
@@ -254,8 +407,10 @@ class ffnet:
     There are several training methods included, currently:
     train_momentum, train_rprop, train_genetic, train_cg, 
     train_bfgs, train_tnc.
-    The simplest usage is, for example:
+    The simplest usage is, for example::
+    
         net.train_tnc(input, target)
+    
     where 'input' and 'target' is data to be learned. Class performs data
     normalization by itself and records encoding/decoding information 
     to be used during network recalling.
@@ -265,15 +420,22 @@ class ffnet:
     method description.
     
     RECALLING NETWORK:
-    Usage of the trained network is as simple as function call:
+    Usage of the trained network is as simple as function call::
+    
         ans = net(inp)
-    or, alternatively:
+    
+    or, alternatively::
+    
         ans = net.call(inp)
+    
     where 'inp' - list of network inputs and 'ans' - list of network outputs
     There is also possibility to retrieve partial derivatives of 
-    output vs. input at given input point:
+    output vs. input at given input point::
+    
         deriv = n.derivative(inp)
-    'deriv' is an array of the form:
+    
+    'deriv' is an array of the form::
+    
         | o1/i1, o1/i2, ..., o1/in |
         | o2/i1, o2/i2, ..., o2/in |
         | ...                      |
@@ -283,10 +445,13 @@ class ffnet:
     There are three helper functions provided with this class:
     savenet, loadnet and exportnet.
     Basic usage:
+    
         savenet(net, filename)   --> pickles network
         net = loadnet(filename)  --> loads pickled network
         exportnet(net, filename) --> exports network to fortran source
+    
     """
+    
     def __init__(self, conec, lazy_derivative = True):
         graph, conec, inno, hidno, outno = _ffconec(conec)
         self.graph = graph        
@@ -354,11 +519,13 @@ class ffnet:
         Returns partial derivatives of the network's 
         output vs its input at given input point 
         (for one input sample or 2D array of input samples)
-        in the following array:
+        in the following array::
+        
             | o1/i1, o1/i2, ..., o1/in |
             | o2/i1, o2/i2, ..., o2/in |
             | ...                      |
             | om/i1, om/i2, ..., om/in |
+        
         """
         if self.dconecno is None:  #create dconecno (only od demand)
             self._set_dconec()
@@ -520,13 +687,12 @@ class ffnet:
         Rprop training algorithm.
         
         Allowed parameters:
+        
         a               - training step increasing parameter (default is 1.2)
         b               - training step decreasing parameter (default is 0.5)
         mimin           - minimum training step (default is 0.000001)
         mimax           - maximum training step (default is 50.)
-        xmi             - vector containing initial training steps for weights;
-                          if 'xmi' is a scalar then its value is set for all
-                          weights (default is 0.1)
+        xmi             - vector containing initial training steps for weights; if 'xmi' is a scalar then its value is set for all weights (default is 0.1)
         maxiter         - the maximum number of iterations (default is 10000)
         disp            - print convergence message if non-zero (default is 0)
         
@@ -554,42 +720,43 @@ class ffnet:
         """
         Global weights optimization with genetic algorithm.
     
-        Allowed parameters:
-        lower        - lower bound of weights values (default is -25.)
-        upper        - upper bound of weights values (default is 25.)
-        individuals  - number of individuals in a population (default
-                       is 20)
-        generations  - number of generations over which solution is
-                       to evolve (default is 500)
-        crossover    - crossover probability; must be  <= 1.0 (default
-                       is 0.85). If crossover takes place, either one
-                       or two splicing points are used, with equal
-                       probabilities
-        mutation     - 1/2/3/4/5 (default is 2)
-                       1=one-point mutation, fixed rate
-                       2=one-point, adjustable rate based on fitness
-                       3=one-point, adjustable rate based on distance
-                       4=one-point+creep, fixed rate
-                       5=one-point+creep, adjustable rate based on fitness
-                       6=one-point+creep, adjustable rate based on distance
-        initrate     - initial mutation rate; should be small (default
-                       is 0.005) (Note: the mutation rate is the proba-
-                       bility that any one gene locus will mutate in
-                       any one generation.)
-        minrate      - minimum mutation rate; must be >= 0.0 (default
-                       is 0.0005)
-        maxrate      - maximum mutation rate; must be <= 1.0 (default
-                       is 0.25)
-        fitnessdiff  - relative fitness differential; range from 0
-                       (none) to 1 (maximum).  (default is 1.)
-        reproduction - reproduction plan; 1/2/3=Full generational
-                       replacement/Steady-state-replace-random/Steady-
-                       state-replace-worst (default is 3)
-        elitism      - elitism flag; 0/1=off/on (default is 0)
-                       (Applies only to reproduction plans 1 and 2)
-        verbosity    - printed output 0/1/2=None/Minimal/Verbose
-                       (default is 0)
-    
+        ..
+            Allowed parameters:
+            lower        - lower bound of weights values (default is -25.)
+            upper        - upper bound of weights values (default is 25.)
+            individuals  - number of individuals in a population (default
+                        is 20)
+            generations  - number of generations over which solution is
+                        to evolve (default is 500)
+            crossover    - crossover probability; must be  <= 1.0 (default
+                        is 0.85). If crossover takes place, either one
+                        or two splicing points are used, with equal
+                        probabilities
+            mutation     - 1/2/3/4/5 (default is 2)
+                        1=one-point mutation, fixed rate
+                        2=one-point, adjustable rate based on fitness
+                        3=one-point, adjustable rate based on distance
+                        4=one-point+creep, fixed rate
+                        5=one-point+creep, adjustable rate based on fitness
+                        6=one-point+creep, adjustable rate based on distance
+            initrate     - initial mutation rate; should be small (default
+                        is 0.005) (Note: the mutation rate is the proba-
+                        bility that any one gene locus will mutate in
+                        any one generation.)
+            minrate      - minimum mutation rate; must be >= 0.0 (default
+                        is 0.0005)
+            maxrate      - maximum mutation rate; must be <= 1.0 (default
+                        is 0.25)
+            fitnessdiff  - relative fitness differential; range from 0
+                        (none) to 1 (maximum).  (default is 1.)
+            reproduction - reproduction plan; 1/2/3=Full generational
+                        replacement/Steady-state-replace-random/Steady-
+                        state-replace-worst (default is 3)
+            elitism      - elitism flag; 0/1=off/on (default is 0)
+                        (Applies only to reproduction plans 1 and 2)
+            verbosity    - printed output 0/1/2=None/Minimal/Verbose
+                        (default is 0)
+        
         Note: this optimization routine is a python wrapper for fortran pikaia code.
     
         For more info see pikaia homepage and documentation:
@@ -614,13 +781,13 @@ class ffnet:
         """
         Train network with conjugate gradient algorithm.
         scipy.optimize.fmin_cg keyword arguments are accepted, except:
+        
             args
             fprime 
         
         NOTE: This procedure does produce no output by default.
         
     Documentation of scipy.optimize.fmin_cg:
-    ----------------------------------------
     """
         if 'maxiter' not in kwargs: kwargs['maxiter'] = 10000
         input, target = self._setnorm(input, target)
@@ -631,20 +798,21 @@ class ffnet:
         self.weights = optimize.fmin_cg(func, self.weights, fprime=fprime, \
                                         args=extra_args, **kwargs)
         self.trained = 'cg'
-    train_cg.__doc__ += optimize.fmin_cg.__doc__ # paste __doc__
+    #train_cg.__doc__ += optimize.fmin_cg.__doc__ # paste __doc__
 
     def train_bfgs(self, input, target, **kwargs):
         """
         Train network with constrained version of BFGS algorithm.
         scipy.optimize.fmin_l_bfgs_b keyword arguments are accepted, except:
+        
             args
             fprime 
+        
         Bounds are set for all weights as (-100., 100.) by default.
         
         NOTE: This procedure does produce no output by default.
         
     Documentation of scipy.optimize.fmin_l_bfgs_b:
-    ------------------------------------------
     """
         if sys.platform.startswith('aix'): return
         
@@ -657,20 +825,21 @@ class ffnet:
         self.weights = optimize.fmin_l_bfgs_b(func, self.weights, fprime=fprime, \
                                               args=extra_args, **kwargs)[0]
         self.trained = 'bfgs'
-    train_bfgs.__doc__ += optimize.fmin_l_bfgs_b.__doc__ # paste __doc__
+    #train_bfgs.__doc__ += optimize.fmin_l_bfgs_b.__doc__ # paste __doc__
 
     def train_tnc(self, input, target, nproc = 1, **kwargs):
         """
         Train network with constrained truncated Newton algorithm (TNC).
         scipy.optimize.fmin_tnc keyword arguments are accepted, except:
+        
             args
             fprime 
+            
         Bounds are set for all weights as (-100., 100.) by default.
         
         NOTE: This procedure does produce no output by default.
         
     Documentation of scipy.optimize.fmin_tnc:
-    -----------------------------------------
     """        
         input, target = self._setnorm(input, target)
         if 'messages' not in kwargs: kwargs['messages'] = 0
@@ -691,7 +860,7 @@ class ffnet:
                                          args=extra_args, **kwargs)
         self.weights = array( res[0] )
         self.trained = 'tnc'
-    train_tnc.__doc__ += optimize.fmin_tnc.__doc__ # paste __doc__
+    #train_tnc.__doc__ += optimize.fmin_tnc.__doc__ # paste __doc__
     
     def _train_tnc_mp(self, input, target, nproc = None, **kwargs):        
         # register training data at mpprop module level
@@ -747,14 +916,16 @@ class ffnet:
         
         (slope, intercept, r-value, p-value, stderr-of-slope, stderr-of-estimate).
         
-        Optional parameters:
-        iprint   - verbosity level:
+        Optional parameters::
+        
+                   iprint   - verbosity level:
                    0 - print nothing
                    1 - print regression parameters for each output node
                    2 - print additionaly general network info and all targets vs. outputs
-                       (default is 1)
-        filename - string with path to the file; if given, output is redirected 
+                   (default is 1)
+                   filename - string with path to the file; if given, output is redirected 
                    to this file (default is None)
+        
         """
         # Check if we dump stdout to the file
         if filename:
@@ -876,10 +1047,9 @@ def readdata(filename, **kwargs):
     all keyword arguments.
     
     Documentation of numpy.loadtxt:
-    -------------------------------
     """
     from numpy import loadtxt
     data = loadtxt(filename, **kwargs)
     return data
 import numpy
-readdata.__doc__ += numpy.loadtxt.__doc__ # paste __doc__
+#readdata.__doc__ += numpy.loadtxt.__doc__ # paste __doc__
