@@ -2,9 +2,9 @@
 
 .. currentmodule:: ffnet
 
------------------
-API documentation
------------------
+--------
+API docs
+--------
 
 Architecture generators
 -----------------------
@@ -25,5 +25,5 @@ Utility functions
 .. autofunction:: ffnet.readdata
 
 Pikaia optimizer
------------------------------
+----------------
 .. autofunction:: pikaia.pikaia
