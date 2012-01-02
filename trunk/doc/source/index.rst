@@ -9,11 +9,12 @@ Feed-forward neural network for python (ffnet)
 Welcome to the ffnet documentation pages!
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
 
     news
     overview
     install
+    using
     apidoc
     examples
     bugs
