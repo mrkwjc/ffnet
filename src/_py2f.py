@@ -8,6 +8,7 @@
 
 """
 Functions to create fortran code.
+
 Needed for exporting trained network to fortran source.
 """
 
@@ -31,7 +32,7 @@ def fcomment(string = ' ', lstrip = False):
 def addfline(string=' '):  # not very smart solution (should be in flines?)
     if string == '': string == ' '
     return ' '*5 + '& ' + string + '\n'
-    
+
 def f2pyline(string=' '):  # not very smart solution (should be in flines?)
     if string == '': string == ' '
     return 'cf2py ' + string + '\n'
@@ -51,9 +52,9 @@ def farray(arr, fname):
     elif arr.dtype == dtype('float32'): ftyp = 'REAL '
     elif arr.dtype == dtype('float64'): ftyp = 'DOUBLE PRECISION '
     else: raise TypeError("Unsupported array type: %s" (arr.dtype,))
-    
+
     declaration = flines ( ftyp + fname + fshp )
-    
+
     indexes = [ [ i ] for i in range(shp[0]) ]
     findexes = [ [ i + 1 ] for i in range(shp[0]) ]
     try:
@@ -68,17 +69,17 @@ def farray(arr, fname):
             indexes = newindexes[:]
             findexes = newfindexes[:]
     except: pass
-    indexes = [ tuple(i) for i in indexes ] 
-    if len(shp) == 1: 
+    indexes = [ tuple(i) for i in indexes ]
+    if len(shp) == 1:
         findexes = [ '(%i)' %idx[0] for idx in findexes ]
     else:
         findexes = [ str(tuple(idx)) for idx in findexes ]
-    
+
     definition = ''
     for i in xrange( len(indexes) ):
         fval = fval2string(arr[indexes[i]], ftyp)
         definition += flines ( fname + findexes[i] + ' = ' + fval )
-        
+
     return declaration, definition
 
 def fnumber(number, fname):
@@ -88,24 +89,24 @@ def fnumber(number, fname):
     else: raise TypeError("Unsupported variable type")
 
     fval = fval2string(number, ftyp)
-    
+
     declaration = flines ( ftyp + fname )
     definition = flines ( fname + ' = ' + fval )
-    
+
     return declaration, definition
-    
+
 def fstring(string, fname):
     typ = type(string).__name__
-    if typ == 'str': 
+    if typ == 'str':
         length = len(string)
         ftyp = 'CHARACTER*%i ' %(length)
     else: raise TypeError("Provide a string")
-        
+
     declaration = flines ( ftyp + fname )
     definition = flines ( fname + ' = ' + "'" + string + "'" )
-    
+
     return declaration, definition
-    
+
 def fexport(variable, fname):
     if type(variable).__name__ == 'ndarray':
         return farray(variable, fname)
@@ -121,7 +122,7 @@ def ffnetrecall(net, fname):
     """
     # Network routine definition
     netroutine = flines ( 'SUBROUTINE ' + fname + '(input, output)' )
-    
+
     # Short description
     descr =  net.call.__doc__
     descr += "Arguments:\n"
@@ -144,11 +145,11 @@ def ffnetrecall(net, fname):
     declarations += flines ( 'DOUBLE PRECISION units(%i)' %u )
     declarations += flines ( 'DOUBLE PRECISION input(%i)' %i )
     declarations += flines ( 'DOUBLE PRECISION output(%i)' %o )
-    
+
     # call network propagation routine
     callnet = flines ( 'CALL normcall( weights, conec, %i, units, %i, ' %(n, u) )
     callnet += addfline ( 'inno, %i, outno, %i, eni, deo, input, output )'  %(i, o) )
-    
+
     routine = fcomment( '-'*66 ) + \
               netroutine  + \
               fcomment( '-'*66 ) + \
@@ -159,11 +160,11 @@ def ffnetrecall(net, fname):
               f2pyline( 'intent(out) output' ) + fcomment() + \
               definitions + \
               callnet + fcomment() + \
-              flines( 'END' )  
+              flines( 'END' )
               #flines( 'EXTERNAL normcall' )
 
     return routine
-    
+
 def ffnetdiff(net, fname):
     """
     Takes ffnet network instance and returns string representing
@@ -171,7 +172,7 @@ def ffnetdiff(net, fname):
     """
     # Network routine definition
     netroutine = flines ( 'SUBROUTINE ' + fname + '(input, deriv)' )
-    
+
     # Short description
     descr =  net.derivative.__doc__
     descr += "Arguments:\n"
@@ -179,7 +180,7 @@ def ffnetdiff(net, fname):
     descr += "    deriv - 2-d array of the shape (%i, %i)\n" \
                   %(len(net.outno), len(net.inno))
     descr = fcomment(descr, lstrip = True)
-    
+
     # Network variables export
     declarations = ''
     definitions = ''
@@ -197,12 +198,12 @@ def ffnetdiff(net, fname):
     declarations += flines ( 'DOUBLE PRECISION units(%i)' %u )
     declarations += flines ( 'DOUBLE PRECISION input(%i)' %i )
     declarations += flines ( 'DOUBLE PRECISION deriv(%i, %i)' %(o, i) )
-    
+
     # call network propagation routine
     callnet = flines ( 'CALL normdiff( weights, conec, %i, dconecno, %i, ' %(n, dn) )
     callnet += addfline ( 'dconecmk, units, %i, inno, %i, outno, %i, '  %(u, i, o) )
     callnet += addfline ( 'eni, ded, input, deriv)' )
-    
+
     routine = fcomment( '-'*66 ) + \
               netroutine  + \
               fcomment( '-'*66 ) + \
@@ -235,11 +236,11 @@ http://ffnet.sourceforge.net
 
 Copyright (C) 2006 by Marek Wojciechowski
 <mwojc@p.lodz.pl>
- 
+
 Distributed under the terms of the GNU General Public License:
 http://www.gnu.org/copyleft/gpl.html
 ##################################################################
- 
+
 NETWORK SPECIFICATION
 %s
 
@@ -250,8 +251,8 @@ OUTPUT LIMITS
 NOTE: You need 'ffnet.f' file distributed with ffnet-%s
       sources to get the below routines to work.
 """ %(version, net.__repr__(), inlimits, outlimits, version)
-    
+
     header = fcomment ( header )
-    
+
     return header
 

@@ -6,11 +6,11 @@
 ##  http://www.gnu.org/copyleft/gpl.html
 ########################################################################
 
-'''
----------------------------------
-ffnet class and utility functions
----------------------------------
-'''
+"""
+--------------------------------------
+Main ffnet class and utility functions
+--------------------------------------
+"""
 
 from _version import version
 from scipy import zeros, ones, random, optimize, sqrt, ndarray, array
@@ -42,9 +42,9 @@ def mlgraph(arch, biases = True):
         [(1, 3), (2, 3), (0, 3), (1, 4), (2, 4), (0, 4), (3, 5), (4, 5), (0, 5)]
         >>> mlgraph((2,2,1), biases = False)
         [(1, 3), (2, 3), (1, 4), (2, 4), (3, 5), (4, 5)]
-        
-        Generating plots:
-            
+
+        Exemplary plot:
+
         .. plot::
             :include-source:
 
@@ -75,15 +75,15 @@ def imlgraph(arch, biases = True):
     """
     Creates multilayer architecture with independent outputs.
 
-    This function uses `mlgraph` to build independent multilayer 
-    architectures for each output neuron. Then it merges them into one 
+    This function uses `mlgraph` to build independent multilayer
+    architectures for each output neuron. Then it merges them into one
     graph with common input nodes.
 
     :Parameters:
         arch : tuple
             Tuple of length 3. The first element is number of network inputs,
             last one is number of outputs and the middle one is interpreted
-            as the hidden layers definition (it can be an *integer* or 
+            as the hidden layers definition (it can be an *integer* or
             a *list* -- see examples)
         biases : bool, optional
             Indicates if bias (node numbered 0) should be added to hidden
@@ -99,7 +99,7 @@ def imlgraph(arch, biases = True):
 
     :Examples:
         The following *arch* definitions are possible:
-        
+
         >>> from ffnet import imlgraph
         >>> arch = (2, 2, 2)
         >>> imlgraph(arch, biases=False)
@@ -115,10 +115,10 @@ def imlgraph(arch, biases = True):
             (2, 7),
             (6, 8),
             (7, 8)]
-            
-        I this case two multilayer networks (for two outputs)
+
+        In this case two multilayer networks (for two outputs)
         of the architectures (2,2,1), (2,2,1) are merged into one graph.
-        
+
         >>> arch = (2, [(2,), (2,2)], 2)
         >>> imlgraph(arch, biases=False)
             [(1, 3),
@@ -142,7 +142,7 @@ def imlgraph(arch, biases = True):
         are merged.
 
         Exemplary plot:
-        
+
         .. plot::
             :include-source:
 
@@ -165,7 +165,7 @@ def imlgraph(arch, biases = True):
         if len(arch[1]) != arch[2]:
             raise TypeError("Length of arch[1] should be equal to arch[2].")
     else: raise TypeError("Wrong architecture definition.")
-    
+
     #Merging function
     def merge(conec, conec_tmp, nofi):
         from scipy import array, where
@@ -177,7 +177,7 @@ def imlgraph(arch, biases = True):
             return conec + conec_tmp
         except ValueError:
             return conec_tmp
-        
+
     nofi = arch[0]
     inps = arch[:1]
     outs = (1,)
@@ -191,8 +191,8 @@ def imlgraph(arch, biases = True):
 def tmlgraph(arch, biases = True):
     """
     Creates multilayer network full connectivity list.
-    
-    Similar to `mlgraph`, but now layers are fully connected with all 
+
+    Similar to `mlgraph`, but now layers are fully connected with all
     preceding layers.
 
     :Parameters:
@@ -208,7 +208,7 @@ def tmlgraph(arch, biases = True):
 
     :Examples:
         Basic calls:
-        
+
         >>> from ffnet import tmlgraph
         >>> tmlgraph((2,2,1))
             [(0, 3),
@@ -224,9 +224,9 @@ def tmlgraph(arch, biases = True):
             (4, 5)]
         >>> tmlgraph((2,2,1), biases = False)
         [(1, 3), (2, 3), (1, 4), (2, 4), (1, 5), (2, 5), (3, 5), (4, 5)]
-        
-        Generating plots:
-        
+
+        Exemplary plot:
+
         .. plot::
             :include-source:
 
@@ -272,7 +272,7 @@ def _linear(a, b, c, d):
     Returns coefficients of linear map from range (a,b) to (c,d)
     '''
     #if b == a: raise ValueError("Mapping not possible due to equal limits")
-    if b == a: 
+    if b == a:
         c1 = 0.0
         c2 = ( c + d ) / 2.
     else:
@@ -283,6 +283,7 @@ def _linear(a, b, c, d):
 def _norms(inarray, lower = 0., upper = 1.):
     '''
     Gets normalization information from an array, for use in ffnet class.
+
     (lower, upper) is a range of normalization.
     inarray is 2-dimensional, normalization parameters are computed
     for each column...
@@ -296,11 +297,12 @@ def _norms(inarray, lower = 0., upper = 1.):
         en += [_linear(minarr, maxarr, lower, upper)]
         de += [_linear(lower, upper, minarr, maxarr)]
     return array(limits), array(en), array(de)
-    
+
 def _normarray(inarray, coeff):
-    ''' 
-    Normalize 2-dimensional array linearly column by column 
-    with provided coefficiens.
+    '''
+    Normalize 2-dimensional array linearly column by column.
+
+    coeff -- linear map coefficiens.
     '''
     #if coeff is not None:
     inarray = array(inarray).transpose()
@@ -313,9 +315,12 @@ def _normarray(inarray, coeff):
 
 def _ffconec(conec):
     """
+    Generates forward propagation informations from conec.
+
     Checks if conec is acyclic, sorts it if necessary and returns tuple:
-    (conec, inno, hidno, outno) where:
-    conec - sorted input connectivity
+    (graph, conec, inno, hidno, outno) where:
+    graph - NX.DiGraph()
+    conec - topologically sorted conec
     inno/hidno/outno  - lists of input/hidden/ouput units
     """
     if len(conec) == 0: raise ValueError("Empty connectivity list")
@@ -331,13 +336,15 @@ def _ffconec(conec):
         else:
             conec += ins   #Maybe + [(0,node)] i.e. bias
             if not outs: outno += [node]
-            else: 
+            else:
                 if node != 0: hidno += [node] #bias handling again
     return graph, conec, inno, hidno, outno
 
 def _bconec(conec, inno):
     """
-    Returns positions of edges of reversed graph in conec (for backprop). 
+    Generates back propagation informations from conec.
+
+    Returns positions of edges of reversed graph in conec (for backprop).
     Conec is assumed to be acyclic.
     """
     bgraph = NX.DiGraph()
@@ -354,9 +361,11 @@ def _bconec(conec, inno):
             idx = conec.index(edge) + 1
             bconecno.append(idx)
     return bgraph, bconecno
-    
+
 def _dconec(conec, inno):
     """
+    Generates derivative propagation informations from conec.
+
     Return positions of edges (in conec) of graphs for
     derivative calculation, all packed in one list (dconecno). Additionaly
     beginings of each graph in this list is returned (dconecmk)
@@ -365,7 +374,7 @@ def _dconec(conec, inno):
     for idx, i in enumerate(inno):
         dgraph = NX.DiGraph()
         dgraph.add_edges_from(conec)
-        dgraph = _dependency(dgraph, i) 
+        dgraph = _dependency(dgraph, i)
         dsnodes = NX.topological_sort(dgraph)
         for dnode in dsnodes:
             for dedge in dgraph.in_edges(dnode):
@@ -378,92 +387,55 @@ def _dconec(conec, inno):
 
 class ffnet:
     """
-    Feed-forward neural network main class
-    
-    NETWORK CREATION:
-    Creation of the network consist in delivering list of neuron 
-    connections::
-    
-        conec = [[1, 3], [2, 3], [0, 3] 
-                 [1, 4], [2, 4], [0, 4] 
-                 [3, 5], [4, 5], [0, 5]]
-        net = ffnet(conec)
-    
-    0 (zero) in conec is a special unit representing bias. If there is
-    no connection from 0, bias is not considered in the node.
-    Only feed-forward directed graphs are allowed. Class makes check
-    for cycles in the provided graph and raises TypeError if any.
-    All nodes (exept input ones) have sigmoid activation function.
+    Feed-forward neural network main class.
 
-    Although generation of conec is left to the user, there are several
-    functions provided to facilitate this task. See description of 
-    the following functions: `mlgraph`, `imlgraph`, `tmlgraph`.
-    More architectures may be provided in the future.
-    
-    Weights are automatically initialized at the network creation. They can
-    be reinitialized later with 'randomweights' method.
-    
-    TRAINING NETWORK:
-    There are several training methods included, currently:
-    train_momentum, train_rprop, train_genetic, train_cg, 
-    train_bfgs, train_tnc.
-    The simplest usage is, for example::
-    
-        net.train_tnc(input, target)
-    
-    where 'input' and 'target' is data to be learned. Class performs data
-    normalization by itself and records encoding/decoding information 
-    to be used during network recalling.
-    Class makes basic checks of consistency of data.
-    
-    For information about training prameters see appropriate 
-    method description.
-    
-    RECALLING NETWORK:
-    Usage of the trained network is as simple as function call::
-    
-        ans = net(inp)
-    
-    or, alternatively::
-    
-        ans = net.call(inp)
-    
-    where 'inp' - list of network inputs and 'ans' - list of network outputs
-    There is also possibility to retrieve partial derivatives of 
-    output vs. input at given input point::
-    
-        deriv = n.derivative(inp)
-    
-    'deriv' is an array of the form::
-    
-        | o1/i1, o1/i2, ..., o1/in |
-        | o2/i1, o2/i2, ..., o2/in |
-        | ...                      |
-        | om/i1, om/i2, ..., om/in |
-    
-    LOADING/SAVING/EXPORTING NETWORK
-    There are three helper functions provided with this class:
-    savenet, loadnet and exportnet.
-    Basic usage:
-    
-        savenet(net, filename)   --> pickles network
-        net = loadnet(filename)  --> loads pickled network
-        exportnet(net, filename) --> exports network to fortran source
-    
+    :Parameters:
+        conec : list of tuples
+            List of network connections
+        lazy_derivative : bool
+            If *True* all data necessary for derivatives calculation
+            (see `ffnet.derivative` method) are generated only on demand.
+
+    :Returns:
+        net
+             Feed forward network object
+
+    :Raises:
+        TypeError
+           If *conec* is not directed acyclic graph
+
+    :Instance attributes:
+        conec : array
+            Topologically sorted network connections
+        weights : array
+            Weights in order of topologically sorted connections
+        renormalize : bool
+            If *True* normalization ranges will be recreated from
+            training data at next training call.
+
+            Default is *True*
+
+    :Examples:
+        >>> from ffnet import mlgraph, ffnet
+        >>> conec = mlgraph((2,2,1))
+        >>> net = ffnet(conec)
+
+    :See also:
+        `mlgraph`, `tmlgraph`, `imlgraph`
+
     """
-    
     def __init__(self, conec, lazy_derivative = True):
         graph, conec, inno, hidno, outno = _ffconec(conec)
-        self.graph = graph        
+        self.graph = graph
         self.conec = array(conec)
         self.inno = array(inno)
         self.hidno = array(hidno)
-        self.outno = array(outno)        
-        
+        self.outno = array(outno)
+
         bgraph, bconecno = _bconec(conec, self.inno)
         self.bgraph = bgraph
         self.bconecno = array(bconecno)
-        
+
         # Ommit creating data for derivatives here (which is expensive for large nets)
         if lazy_derivative:
             self.dgraphs = None
@@ -478,13 +450,13 @@ class ffnet:
         self.randomweights()
         # set initial normalization parameters
         self._setnorm()
-        
+
     def __repr__(self):
         info = "Feed-forward neural network: \n" + \
                "inputs:  %4i \n" %(len(self.inno)) + \
                "hiddens: %4i \n" %(len(self.hidno)) + \
                "outputs: %4i \n" %(len(self.outno)) + \
-               "connections and biases: %4i" %(len(self.conec)) 
+               "connections and biases: %4i" %(len(self.conec))
         return info
 
     def __call__(self, inp):
@@ -497,11 +469,22 @@ class ffnet:
         self.dgraphs = dgraphs
         self.dconecno = array(dconecno)
         self.dconecmk = array(dconecmk)
-        
+
     def call(self, inp):
         """
-        Returns network answer (numpy array) to input sequence 
-        (for one input sample or 2D array of input samples)
+        Calculates network answer to given input.
+
+        :Parameters:
+            inp : array
+                2D array of input patterns (or 1D for single pattern)
+
+        :Returns:
+            ans : array
+                1D or 2D array of calculated network outputs
+
+        :Raises:
+            TypeError
+                If *inp* is invalid
         """
         if not isinstance(inp, ndarray): inp = array(inp, 'd')
         if inp.ndim == 1:
@@ -516,25 +499,41 @@ class ffnet:
 
     def derivative(self, inp):
         """
-        Returns partial derivatives of the network's 
-        output vs its input at given input point 
-        (for one input sample or 2D array of input samples)
-        in the following array::
-        
+        Returns partial derivatives of the network's output vs its input.
+
+        For each input pattern an array of the form::
+
             | o1/i1, o1/i2, ..., o1/in |
             | o2/i1, o2/i2, ..., o2/in |
             | ...                      |
             | om/i1, om/i2, ..., om/in |
-        
+
+        is returned.
+
+        :Parameters:
+            inp : array
+                2D array of input patterns (or 1D for single pattern)
+
+        :Returns:
+            ans : array
+                1D or 2D array of calculated network outputs
+
+        :Examples:
+            >>> from ffnet import mlgraph, ffnet
+            >>> conec = mlgraph((3,3,2))
+            >>> net = ffnet(conec); net.weights[:] = 1.
+            >>> net.derivative([0., 0., 0.])
+            array([[ 0.02233658,  0.02233658,  0.02233658],
+                   [ 0.02233658,  0.02233658,  0.02233658]])
         """
         if self.dconecno is None:  #create dconecno (only od demand)
             self._set_dconec()
-           
+
         if not isinstance(inp, ndarray): inp = array(inp, 'd')
         if inp.ndim == 1:
             deriv = netprop.normdiff(self.weights, self.conec, self.dconecno, self.dconecmk, \
                             self.units, self.inno, self.outno, self.eni, self.ded, inp)
-            return deriv 
+            return deriv
         if inp.ndim == 2:
             deriv = netprop.normdiff2(self.weights, self.conec, self.dconecno, self.dconecmk, \
                             self.units, self.inno, self.outno, self.eni, self.ded, inp)
@@ -543,31 +542,67 @@ class ffnet:
 
     def sqerror(self, input, target):
         """
-        Returns 0.5*(sum of squared errors at output)
-        for input and target arrays being first normalized.
-        Might be slow in frequent use, because data normalization is
-        performed at each call.
+        Calculates sum of squared errors at network output.
+
+        Error is calculated for **normalized** input and target arrays.
+
+        :Parameters:
+            input : 2-D array
+                Array of input patterns
+            target : 2-D array
+                Array of network targets
+
+        :Returns:
+            err : float
+                0.5*(sum of squared errors at network outputs)
+
+        .. note::
+            This function might be slow in frequent use, because data
+            normalization is performed at each call. Usually there's no need
+            to use this function, unless you need to adopt your own training
+            strategy.
         """
         input, target = self._setnorm(input, target)
         err  = netprop.sqerror(self.weights, self.conec, self.units, \
                                self.inno, self.outno, input, target)
         return err
-    
+
     def sqgrad(self, input, target):
         """
-        Returns gradient of sqerror vs. network weights.
-        Input and target arrays are first normalized.
-        Might be slow in frequent use, because data normalization is
-        performed at each call.
+        Returns gradient of network error vs. network weights.
+
+        Error is calculated for **normalized** input and target arrays.
+
+        :Parameters:
+            input : 2-D array
+                Array of input patterns
+            target : 2-D array
+                Array of network targets
+
+        :Returns:
+            grad : 1-D array
+                Array of the same length as *net.weights* containing
+                gradient values.
+
+        .. note::
+            This function might be slow in frequent use, because data
+            normalization is performed at each call. Usually there's no need
+            to use this function, unless you need to adopt your own training
+            strategy.
         """
-        input, target = self._setnorm(input, target) 
+        input, target = self._setnorm(input, target)
         g  = netprop.grad(self.weights, self.conec, self.bconecno, self.units, \
                           self.inno, self.outno, input, target)
         return g
-    
+
     def randomweights(self):
         """
-        Randomize weights due to Bottou proposition.
+        Randomize network weights due to Bottou proposition.
+
+        If *n* is a number of node's incoming connections, weights of these
+        connections are chosen randomly from range
+        *(-2.38/sqrt(n), -2.38/sqrt(n))*
+
         """
         nofw = len(self.conec)
         weights = zeros(nofw, 'd')
@@ -584,23 +619,23 @@ class ffnet:
         Tests input and target data.
         """
         # Test conversion
-        try: 
+        try:
             if not isinstance(input, ndarray): input = array(input, 'd')
             #input = array(input, 'd')
         except: raise ValueError("Input cannot be converted to numpy array")
-        try: 
+        try:
             if not isinstance(target, ndarray): target = array(target, 'd')
             #target = array(target, 'd')
         except: raise ValueError("Target cannot be converted to numpy array")
-        
+
         #if input.dtype.char != 'd': input = array(input, 'd')
-        
+
         #Convert 1-d arrays to 2-d (this allows to put 1-d arrays
         #for training if we have one input and/or one output
         if len(self.inno) == 1 and len(input.shape) == 1:
             input = input.reshape( (input.shape[0], 1) )
         if len(self.outno) == 1 and len(target.shape) == 1:
-            target = target.reshape( (target.shape[0], 1) )        
+            target = target.reshape( (target.shape[0], 1) )
 
         #Test some sizes
         numip = input.shape[0]; numop = target.shape[0]
@@ -615,12 +650,13 @@ class ffnet:
         if numov != numo:
             raise ValueError \
             ("Inconsistent target data, target units: %i, target values: %i" %(numo, numov))
-        
+
         return input, target
 
     def _setnorm(self, input = None, target = None):
         """
         Retrieves normalization info from training data and normalizes data.
+
         This method sets self.renormalize attribute to control normalization.
         """
         numi = len(self.inno); numo = len(self.outno)
@@ -633,7 +669,7 @@ class ffnet:
             self.renormalize = True  # this is set by __init__
         else:
             input, target = self._testdata(input, target)
-            
+
             # Warn if any input or target node takes a one single value
             # I'm still not sure where to put this check....
             for i, col in enumerate(input.transpose()):
@@ -643,9 +679,9 @@ class ffnet:
             for i, col in enumerate(target.transpose()):
                 if max(col) == min(col):
                     print "Warning: %ith target node takes always a single value of %f." %(i+1, max(col))
-            
+
             #limits are informative only, eni,dei/eno,deo are input/output coding-decoding
-            if self.renormalize: 
+            if self.renormalize:
                 self.inlimits, self.eni, self.dei = _norms(input, lower=0.15, upper=0.85)
                 self.outlimits, self.eno, self.deo = _norms(target, lower=0.15, upper=0.85)
                 self.ded = zeros((numo,numi), 'd')
@@ -653,19 +689,27 @@ class ffnet:
                     for i in xrange(numi):
                         self.ded[o,i] = self.eni[i,0] * self.deo[o,0]
                 self.renormalize = False
-                
+
             return _normarray(input, self.eni), _normarray(target, self.eno)
 
     def train_momentum(self, input, target, eta = 0.2, momentum = 0.8, \
                         maxiter = 10000, disp = 0):
         """
         Simple backpropagation training with momentum.
-    
-        Allowed parameters:
-        eta             - descent scaling parameter (default is 0.2)
-        momentum        - momentum coefficient (default is 0.8)
-        maxiter         - the maximum number of iterations (default is 10000)
-        disp            - print convergence message if non-zero (default is 0)
+
+        :Parameters:
+            input : 2-D array
+                Array of input patterns
+            target : 2-D array
+                Array of network targets
+            eta : float, optional
+                Learning rate
+            momentum : float, optional
+                Momentum coefficient
+            maxiter : integer, optional
+                Maximum number of iterations
+            disp : bool
+                If True convergence method is displayed
         """
         input, target = self._setnorm(input, target)
         if disp:
@@ -685,24 +729,37 @@ class ffnet:
                     xmi = 0.1, maxiter = 10000, disp = 0):
         """
         Rprop training algorithm.
-        
-        Allowed parameters:
-        
-        a               - training step increasing parameter (default is 1.2)
-        b               - training step decreasing parameter (default is 0.5)
-        mimin           - minimum training step (default is 0.000001)
-        mimax           - maximum training step (default is 50.)
-        xmi             - vector containing initial training steps for weights; if 'xmi' is a scalar then its value is set for all weights (default is 0.1)
-        maxiter         - the maximum number of iterations (default is 10000)
-        disp            - print convergence message if non-zero (default is 0)
-        
-        Method updates network weights and returns 'xmi' vector 
-        (after 'maxiter' iterations).
+
+        :Parameters:
+            input : 2-D array
+                Array of input patterns
+            target : 2-D array
+                Array of network targets
+            a : float, optional
+                Training step increasing parameter
+            b : float, optional
+                Training step decreasing parameter
+            mimin : float, optional
+                Minimum training step
+            mimax : float, optional
+                Maximum training step
+            xmi : array (or float), optional
+                Array containing initial training steps for weights.
+                If *xmi* is a scalar then its value is set for all weights
+            maxiter : integer, optional
+                Maximum number of iterations
+            disp : bool
+                If True convergence method is displayed. Default is *False*
+
+        :Returns:
+            xmi : array
+                Computed array of training steps to be used in eventual further
+                training calls.
         """
         input, target = self._setnorm(input, target)
         if type(xmi).__name__ in ['float', 'int']:
             xmi = [ xmi ]*len(self.conec)
-        
+
         if disp:
             err  = netprop.sqerror(self.weights, self.conec, self.units, \
                                    self.inno, self.outno, input, target)
@@ -719,48 +776,27 @@ class ffnet:
     def train_genetic(self, input, target, **kwargs):
         """
         Global weights optimization with genetic algorithm.
-    
-        ..
-            Allowed parameters:
-            lower        - lower bound of weights values (default is -25.)
-            upper        - upper bound of weights values (default is 25.)
-            individuals  - number of individuals in a population (default
-                        is 20)
-            generations  - number of generations over which solution is
-                        to evolve (default is 500)
-            crossover    - crossover probability; must be  <= 1.0 (default
-                        is 0.85). If crossover takes place, either one
-                        or two splicing points are used, with equal
-                        probabilities
-            mutation     - 1/2/3/4/5 (default is 2)
-                        1=one-point mutation, fixed rate
-                        2=one-point, adjustable rate based on fitness
-                        3=one-point, adjustable rate based on distance
-                        4=one-point+creep, fixed rate
-                        5=one-point+creep, adjustable rate based on fitness
-                        6=one-point+creep, adjustable rate based on distance
-            initrate     - initial mutation rate; should be small (default
-                        is 0.005) (Note: the mutation rate is the proba-
-                        bility that any one gene locus will mutate in
-                        any one generation.)
-            minrate      - minimum mutation rate; must be >= 0.0 (default
-                        is 0.0005)
-            maxrate      - maximum mutation rate; must be <= 1.0 (default
-                        is 0.25)
-            fitnessdiff  - relative fitness differential; range from 0
-                        (none) to 1 (maximum).  (default is 1.)
-            reproduction - reproduction plan; 1/2/3=Full generational
-                        replacement/Steady-state-replace-random/Steady-
-                        state-replace-worst (default is 3)
-            elitism      - elitism flag; 0/1=off/on (default is 0)
-                        (Applies only to reproduction plans 1 and 2)
-            verbosity    - printed output 0/1/2=None/Minimal/Verbose
-                        (default is 0)
-        
-        Note: this optimization routine is a python wrapper for fortran pikaia code.
-    
-        For more info see pikaia homepage and documentation:
-        http://www.hao.ucar.edu/modeling/pikaia/pikaia.php
+
+        :Parameters:
+            input : 2-D array
+                Array of input patterns
+            target : 2-D array
+                Array of network targets
+            lower : float, optional
+                Lower bound of weights values (default is -25.)
+            upper : float, optional
+                Upper bound of weights values (default is 25.)
+            individuals : integer, optional
+                Number of individuals in a population (default is 20)
+            generations : integer, optional
+                Number of generations over which solution is
+                to evolve (default is 500)
+            verbosity : {0, 1, 2}, optional
+                Printed output 0/1/2=None/Minimal/Verbose (default is 0)
+
+        .. seealso::
+            See description of `pikaia.pikaia` optimization function for other
+            parameters.
         """
         input, target = self._setnorm(input, target)
         lower = -25.
@@ -776,19 +812,25 @@ class ffnet:
         self.weights = pikaia(func, n, extra_args, **kwargs)
         self.weights = netprop.vmapa(self.weights, 0., 1., lower, upper)
         self.trained = 'genetic'
-    
+
     def train_cg(self, input, target, **kwargs):
         """
         Train network with conjugate gradient algorithm.
-        scipy.optimize.fmin_cg keyword arguments are accepted, except:
-        
-            args
-            fprime 
-        
-        NOTE: This procedure does produce no output by default.
-        
-    Documentation of scipy.optimize.fmin_cg:
-    """
+
+        :Parameters:
+            input : 2-D array
+                Array of input patterns
+            target : 2-D array
+                Array of network targets
+            maxiter : integer, optional
+                Maximum number of iterations (default is 10000)
+            disp : bool
+                If True convergence method is displayed (default)
+
+        .. seealso::
+            `scipy.optimize.fmin_cg` optimizer is used in this method. Look
+            at its documentation for possible other useful parameters.
+        """
         if 'maxiter' not in kwargs: kwargs['maxiter'] = 10000
         input, target = self._setnorm(input, target)
         func = netprop.func
@@ -798,24 +840,33 @@ class ffnet:
         self.weights = optimize.fmin_cg(func, self.weights, fprime=fprime, \
                                         args=extra_args, **kwargs)
         self.trained = 'cg'
-    #train_cg.__doc__ += optimize.fmin_cg.__doc__ # paste __doc__
 
     def train_bfgs(self, input, target, **kwargs):
         """
         Train network with constrained version of BFGS algorithm.
-        scipy.optimize.fmin_l_bfgs_b keyword arguments are accepted, except:
-        
-            args
-            fprime 
-        
-        Bounds are set for all weights as (-100., 100.) by default.
-        
-        NOTE: This procedure does produce no output by default.
-        
-    Documentation of scipy.optimize.fmin_l_bfgs_b:
-    """
+
+        :Parameters:
+            input : 2-D array
+                Array of input patterns
+            target : 2-D array
+                Array of network targets
+            maxfun : int
+                Maximum number of function evaluations (default is 15000)
+            bounds : list, optional
+                *(min, max)* pairs for each connection weight, defining
+                the bounds on that weight. Use None for one of *min* or
+                *max* when there is no bound in that direction.
+                By default all bounds ar set to (-100, 100)
+            disp : int, optional
+                If 0, then no output (default). If positive number then
+                convergence messages are dispalyed.
+
+        .. seealso::
+            `scipy.optimize.fmin_l_bfgs_b` optimizer is used in this method. Look
+            at its documentation for possible other useful parameters.
+        """
         if sys.platform.startswith('aix'): return
-        
+
         input, target = self._setnorm(input, target)
         if 'bounds' not in kwargs: kwargs['bounds'] = ((-100., 100.),)*len(self.conec)
         func = netprop.func
@@ -825,50 +876,70 @@ class ffnet:
         self.weights = optimize.fmin_l_bfgs_b(func, self.weights, fprime=fprime, \
                                               args=extra_args, **kwargs)[0]
         self.trained = 'bfgs'
-    #train_bfgs.__doc__ += optimize.fmin_l_bfgs_b.__doc__ # paste __doc__
 
     def train_tnc(self, input, target, nproc = 1, **kwargs):
         """
-        Train network with constrained truncated Newton algorithm (TNC).
-        scipy.optimize.fmin_tnc keyword arguments are accepted, except:
-        
-            args
-            fprime 
-            
-        Bounds are set for all weights as (-100., 100.) by default.
-        
-        NOTE: This procedure does produce no output by default.
-        
-    Documentation of scipy.optimize.fmin_tnc:
-    """        
+        :Parameters:
+            input : 2-D array
+                Array of input patterns
+            target : 2-D array
+                Array of network targets
+            nproc : int or 'ncpu', optional
+                Number of processes spawned for training. If nproc='ncpu'
+                nproc will be set to number of avilable processors
+            maxfun : int
+                Maximum number of function evaluation. If None, maxfun is
+                set to max(100, 10*len(weights)). Defaults to None.
+            bounds : list, optional
+                *(min, max)* pairs for each connection weight, defining
+                the bounds on that weight. Use None for one of *min* or
+                *max* when there is no bound in that direction.
+                By default all bounds ar set to (-100, 100)
+            messages : int, optional
+                If 0, then no output (default). If positive number then
+                convergence messages are dispalyed.
+
+        .. note::
+            On Windows using *ncpu > 1* might be memory hungry, because
+            each process have to load its own instance of network and
+            training data. This is not the case on Linux platforms.
+
+        .. seealso::
+            `scipy.optimize.fmin_tnc` optimizer is used in this method. Look
+            at its documentation for possible other useful parameters.
+        """
         input, target = self._setnorm(input, target)
         if 'messages' not in kwargs: kwargs['messages'] = 0
         if 'bounds' not in kwargs: kwargs['bounds'] = ((-100., 100.),)*len(self.conec)
-       
+
         # multiprocessing version if nproc > 1
         if (isinstance(nproc, int) and nproc > 1) or nproc in (None, 'ncpu'):
             if nproc == 'ncpu': nproc = None
             self._train_tnc_mp(input, target, nproc = nproc, **kwargs)
             return
-            
+
         # single process version
         func = netprop.func
-        fprime = netprop.grad       
+        fprime = netprop.grad
         extra_args = (self.conec, self.bconecno, self.units, \
                            self.inno, self.outno, input, target)
         res = optimize.fmin_tnc(func, self.weights, fprime=fprime, \
                                          args=extra_args, **kwargs)
         self.weights = array( res[0] )
         self.trained = 'tnc'
-    #train_tnc.__doc__ += optimize.fmin_tnc.__doc__ # paste __doc__
-    
-    def _train_tnc_mp(self, input, target, nproc = None, **kwargs):        
-        # register training data at mpprop module level
+
+    def _train_tnc_mp(self, input, target, nproc = None, **kwargs):
+        """
+        Parallel training with TNC algorithm
+
+        Standard multiprocessing package is used here.
+        """
+        #register training data at mpprop module level
         # this have to be done *BEFORE* creating pool
         import _mpprop as mpprop
         try: key = max(mpprop.nets) + 1
         except ValueError: key = 0  # uniqe identifier for this training
-        mpprop.nets[key] = self 
+        mpprop.nets[key] = self
         mpprop.inputs[key] = input
         mpprop.targets[key] = target
 
@@ -887,19 +958,19 @@ class ffnet:
             pool = Pool(nproc)
         # generate splitters for training data
         splitters = mpprop.splitdata(len(input), nproc)
-        
+
         # train
         func = mpprop.mpfunc
         fprime = mpprop.mpgrad
-        
+
         #if 'messages' not in kwargs: kwargs['messages'] = 0
         #if 'bounds' not in kwargs: kwargs['bounds'] = ((-100., 100.),)*len(self.conec)
         res = optimize.fmin_tnc(func, self.weights, fprime = fprime, \
                                 args = (pool, splitters, key), **kwargs)
         self.weights = res[0]
-        
+
         # remove references from mpprop
-        del mpprop.nets[key] 
+        del mpprop.nets[key]
         del mpprop.inputs[key]
         del mpprop.targets[key]
         pool.terminate()
@@ -907,25 +978,80 @@ class ffnet:
 
     def test(self, input, target, iprint = 1, filename = None):
         """
-        Calculates output and parameters of regression line of targets vs. outputs.
-        
-        Returns: (output, regress)
-        
-        where regress contains regression line parameters for each output node. These
-        parameters are: 
-        
-        (slope, intercept, r-value, p-value, stderr-of-slope, stderr-of-estimate).
-        
-        Optional parameters::
-        
-                   iprint   - verbosity level:
-                   0 - print nothing
-                   1 - print regression parameters for each output node
-                   2 - print additionaly general network info and all targets vs. outputs
-                   (default is 1)
-                   filename - string with path to the file; if given, output is redirected 
-                   to this file (default is None)
-        
+        Calculates output and parameters of regression.
+
+        :Parameters:
+            input : 2-D array
+                Array of input patterns
+            target : 2-D array
+                Array of network targets
+            iprint : {0, 1, 2}, optional
+                Verbosity level: 0 -- print nothing, 1 -- print regression
+                parameters for each output node (default), 2 -- print
+                additionaly general network info and all targets vs. outputs
+            filename : str
+                Path to the file where printed messages are redirected
+                Default is None
+
+        :Returns:
+            out : tuple
+                *(output, regress)* tuple where: *output* is an array of network
+                answers on input patterns and *regress* contains regression
+                parameters for each output node. These parameters are: *slope,
+                intercept, r-value, p-value, stderr-of-slope, stderr-of-estimate*.
+
+        :Examples:
+            >>> from ffnet import mlgraph, ffnet
+            >>> from numpy.random import rand
+            >>> conec = mlgraph((3,3,2))
+            >>> net = ffnet(conec)
+            >>> input = rand(50,3); target = rand(50,2)
+            >>> output, regress = net.test(input, target)
+            Testing results for 50 testing cases:
+            OUTPUT 1 (node nr 8):
+            Regression line parameters:
+            slope         = -0.000649
+            intercept     =  0.741282
+            r-value       = -0.021853
+            p-value       =  0.880267
+            slope stderr  =  0.004287
+            estim. stderr =  0.009146
+            .
+            OUTPUT 2 (node nr 7):
+            Regression line parameters:
+            slope         =  0.005536
+            intercept     =  0.198818
+            r-value       =  0.285037
+            p-value       =  0.044816
+            slope stderr  =  0.002687
+            estim. stderr =  0.005853
+
+            Exemplary plot:
+
+            .. plot::
+                :include-source:
+
+                from ffnet import mlgraph, ffnet
+                from numpy.random import rand
+                from numpy import linspace
+                import pylab
+
+                # Create and train net on random data
+                conec = mlgraph((3,10,2))
+                net = ffnet(conec)
+                input = rand(50,3); target = rand(50,2)
+                net.train_tnc(input, target, maxfun = 400)
+                output, regress = net.test(input, target, iprint = 0)
+
+                # Plot results for first output
+                pylab.plot(target.T[0], output.T[0], 'o',
+                                        label='targets vs. outputs')
+                slope = regress[0][0]; intercept = regress[0][1]
+                x = linspace(0,1)
+                y = slope * x + intercept
+                pylab.plot(x, y, linewidth = 2, label = 'regression line')
+                pylab.legend()
+                pylab.show()
         """
         # Check if we dump stdout to the file
         if filename:
@@ -951,20 +1077,20 @@ class ffnet:
         for o in xrange(numo):
             if iprint:
                 print "OUTPUT %i (node nr %i):" %(o+1, self.outno[o])
-            if iprint == 2:    
+            if iprint == 2:
                 print "Targets vs. outputs:"
                 for p in xrange(nump):
                     print "%4i % 13.6f % 13.6f" %(p+1, target[o,p], output[o,p])
             x = target[o]; y = output[o]
             r = linregress(x, y)
-            # linregress calculates stderr of the slope instead of the estimate, even 
+            # linregress calculates stderr of the slope instead of the estimate, even
             # though the docs say something else. we calculate the thing here manually
             sstd = r[-1]
             estd = sstd * sqrt( ( ( x-x.mean() )**2 ).sum() )
             r += (estd,)
             if iprint:
                 print "Regression line parameters:"
-                print "slope         = % f" % r[0] 
+                print "slope         = % f" % r[0]
                 print "intercept     = % f" % r[1]
                 print "r-value       = % f" % r[2]
                 print "p-value       = % f" % r[3]
@@ -973,32 +1099,45 @@ class ffnet:
             regress.append(r)
             if iprint: print
         # Close file and restore stdout
-        if filename: 
+        if filename:
             file.close()
             sys.stdout = saveout
-            
+
         return output.transpose(), regress
 
 def savenet(net, filename):
     """
-    Saves network to a file using cPickle module.
+    Dumps network to a file using cPickle.
+
+    :Parameters:
+        net : ffnet
+            Intance of the network
+        filename : str
+            Path to the file where network is dumped
     """
     import cPickle
     file = open(filename, 'w')
     cPickle.dump(net, file)
     file.close()
     return
-    
+
 def loadnet(filename):
     """
-    Loads network pickled previously with 'savenet'. 
-    """    
+    Loads network pickled previously with `savenet`.
+
+    :Parameters:
+        filename : str
+            Path to the file with saved network
+    """
     import cPickle
     file = open(filename, 'r')
     net = cPickle.load(file)
     return net
 
 def _exportfortran(net, filename, name, derivative = True):
+    """
+    Exports network to Fortran source
+    """
     import _py2f as py2f
     f = open( filename, 'w' )
     f.write( py2f.fheader( net, version = version ) )
@@ -1009,22 +1148,27 @@ def _exportfortran(net, filename, name, derivative = True):
         f.write( py2f.fcomment() )
         f.write( py2f.ffnetdiff(net, 'd' + name) )
     f.close()
-    
+
 def exportnet(net, filename, name = 'ffnet', lang = None, derivative = True):
     """
     Exports network to a compiled language source code.
-    Currently only fortran is supported.
 
-    There are two routines exported. First one, for
-    recalling the network, is named as indicated by keyword argument
-    'name'. The second one, for calculating partial derivatives, have
-    the same name with 'd' prefix. 'ffnet' and 'dffnet' are exported
-    by default.
-    
-    NOTE: You need 'ffnet.f' file distributed with ffnet
-          sources to get the exported routines to work.
+    :Parameters:
+        filename : str
+            Path to the file where network is exported
+        name : str
+            Name of the exported function
+        lang : str
+            Language to which network is to be exported.
+            Currently only Fortran is supported
+        derivative : bool
+            If *True* a function for derivative calculation is also
+            exported. It is named as *name* with prefix 'd'
+
+    .. note::
+        You need 'ffnet.f' file distributed with ffnet
+        sources to get the exported Fortran routines to work.
     """
-
     # Determine language if not specified
     if not lang:
         import os.path
@@ -1043,13 +1187,14 @@ def exportnet(net, filename, name = 'ffnet', lang = None, derivative = True):
 
 def readdata(filename, **kwargs):
     """
-    Reads arrays from ASCII files. Just calls numpy.loadtxt passing
-    all keyword arguments.
-    
-    Documentation of numpy.loadtxt:
+    Reads arrays from ASCII files.
+
+    .. note::
+        This function just calls `numpy.loadtxt` passing
+        to it all keyword arguments. Refer to this function
+        for possible options.
     """
     from numpy import loadtxt
     data = loadtxt(filename, **kwargs)
     return data
-import numpy
-#readdata.__doc__ += numpy.loadtxt.__doc__ # paste __doc__
+

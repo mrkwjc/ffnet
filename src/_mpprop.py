@@ -1,6 +1,9 @@
+"""
+Parallel training functions
+"""
 from fortran import _ffnet as netprop
 
-# Global containers to store and share data between processes 
+# Global containers to store and share data between processes
 nets = {}
 inputs = {}
 targets = {}
@@ -8,6 +11,7 @@ targets = {}
 def initializer(key, net, input, target):
     """
     This initializer will be used on WINDOWS ONLY (because of no fork())
+
     key, net, input, target have to be serialized to reach this place
     this means that:
     a) initialization process might be time consuming
@@ -23,6 +27,7 @@ def initializer(key, net, input, target):
 def splitdata(N, nproc):
     """
     Creates splitters for dataset of length *N* for *nproc* processes.
+
     Splits to *nproc* equal data chunks.
     """
     n = N / nproc
@@ -32,7 +37,7 @@ def splitdata(N, nproc):
     idx2 = idx + [N]
     return zip(idx1, idx2)
 
-func = netprop.func 
+func = netprop.func
 def procfunc(x, splitter, key):
     """
     Per process function netprop.func function
@@ -68,4 +73,4 @@ def mpgrad(x, pool, splitters, key):
     res = []
     for splitter in splitters:
         res += [pool.apply_async(procgrad, (x, splitter, key))]
-    return sum([r.get() for r in res]) 
+    return sum([r.get() for r in res])
