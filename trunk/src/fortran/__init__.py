@@ -1,5 +1,7 @@
 '''
-Fortran extensions.
+------------------
+Fortran extensions
+------------------
 '''
 
-import _ffnet, _pikaia 
+import _ffnet, _pikaia
