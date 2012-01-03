@@ -1,28 +1,20 @@
-########################################################################
-##  Copyright (C) 2006 by Marek Wojciechowski
-##  <mwojc@p.lodz.pl>
-##
-##  Distributed under the terms of the GNU General Public License (GPL)
-##  http://www.gnu.org/copyleft/gpl.html
-########################################################################
-
 ### stock problem example for ffnet ###
 
 # Data and description for this example is borrowed from:
 # http://www.scientific-consultants.com/nnbd.html
 #
-# 
-# Training data consists of Black-Scholes option prices 
-# for volatility levels running from 20 percent to 200 percent, 
-# for time remaining running from 5 to 15 days, and for strike price 
-# running from 70 dollars to 130 dollars. The stock price was set to 
-# 100 dollars and the interest rate to 0 percent when generating 
+#
+# Training data consists of Black-Scholes option prices
+# for volatility levels running from 20 percent to 200 percent,
+# for time remaining running from 5 to 15 days, and for strike price
+# running from 70 dollars to 130 dollars. The stock price was set to
+# 100 dollars and the interest rate to 0 percent when generating
 # the data.
 #
-# The data is "difficult" in that (for a neural network to 
+# The data is "difficult" in that (for a neural network to
 # practically emulate Black-Scholes) a very tight fit is required.
 # The R-squared should be at least 0.999999 or better, and the largest
-# absolute error must be less than 0.05 dollars (the price increment 
+# absolute error must be less than 0.05 dollars (the price increment
 # for most options) or, better yet, less than 0.01 dollars.
 #
 #
@@ -70,5 +62,5 @@ try:
     title('Outputs vs. target of trained network.')
     grid(True)
     show()
-except ImportError, e: 
+except ImportError, e:
     print "Cannot make plots. For plotting install matplotlib.\n%s" % e

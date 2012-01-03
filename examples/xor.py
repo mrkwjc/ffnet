@@ -1,11 +1,3 @@
-########################################################################
-##  Copyright (C) 2006 by Marek Wojciechowski
-##  <mwojc@p.lodz.pl>
-##
-##  Distributed under the terms of the GNU General Public License (GPL)
-##  http://www.gnu.org/copyleft/gpl.html
-########################################################################
-
 ### XOR problem example for ffnet ###
 
 from ffnet import ffnet, mlgraph
@@ -44,5 +36,5 @@ print "Exporting trained network to the fortran source..."
 exportnet(net, "xor.f")
 print "Done..."
 print "Look at the generated xor.f file."
-print "Note: you must compile xor.f along with the ffnet.f" 
+print "Note: you must compile xor.f along with the ffnet.f"
 print "file which can be found in ffnet sources."
