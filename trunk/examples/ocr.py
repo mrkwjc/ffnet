@@ -1,16 +1,8 @@
-########################################################################
-##  Copyright (C) 2006 by Marek Wojciechowski
-##  <mwojc@p.lodz.pl>
-##
-##  Distributed under the terms of the GNU General Public License (GPL)
-##  http://www.gnu.org/copyleft/gpl.html
-########################################################################
-
 ### Digits recognition example for ffnet ###
 
-# Training file (data/ocr.dat) contains 68 patterns - first 58 
-# are used for training and last 10 are used for testing. 
-# Each pattern contains 64 inputs which define 8x8 bitmap of 
+# Training file (data/ocr.dat) contains 68 patterns - first 58
+# are used for training and last 10 are used for testing.
+# Each pattern contains 64 inputs which define 8x8 bitmap of
 # the digit and last 10 numbers are the targets (10 targets for 10 digits).
 # Layered network architecture is used here: (64, 10, 10, 10).
 
@@ -40,12 +32,12 @@ output, regression = net.test(input[58:], target[58:], iprint = 2)
 try:
     from pylab import *
     from random import randint
-    
+
     digitpat = randint(58, 67) #Choose testing pattern to plot
-    
+
     subplot(211)
     imshow(input[digitpat].reshape(8,8), interpolation = 'nearest')
-    
+
     subplot(212)
     N = 10  # number of digits / network outputs
     ind = arange(N)   # the x locations for the groups
@@ -57,14 +49,7 @@ try:
     title("Trained network (64-10-10-10) guesses a digit above...")
     xlabel("Digit")
     ylabel("Network outputs")
-   
+
     show()
-except ImportError, e: 
+except ImportError, e:
     print "Cannot make plots. For plotting install matplotlib.\n%s" % e
-    
-print \
-"""
-Note:
-Normalization of input/output data is handled automatically in ffnet.
-Just use your raw data both at trainig and recalling phase. 
-"""
