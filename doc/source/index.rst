@@ -8,6 +8,8 @@ Feed-forward neural network for python (ffnet)
 
 Welcome to the ffnet documentation pages!
 
+**ffnet is a fast and easy-to-use feed-forward neural network training solution for python.**
+
 .. toctree::
     :maxdepth: 1
 

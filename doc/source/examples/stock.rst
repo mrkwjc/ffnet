@@ -8,7 +8,7 @@ Black-Scholes option pricing
 .. literalinclude:: ../../../examples/stock.py
     :language: python
 
-Successfull training should result in very good fitness: 
+Successfull training should result in very good fitness:
 
 .. image:: figures/fitness.png
-    :scale: 60%
+    :scale: 50%
