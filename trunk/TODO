@@ -1,5 +1,8 @@
-o  Add support for frozen weights.
-o  Add other activation functions (also user defined ones).
-o  Refactor fortran code in the light of the above new capabilities.
-o  Random network architecture generation (probably based on mlgraph)
-o  Consider adding train method (without indicating algorithm) to ffnet class
+*  Add support for frozen weights.
+*  Add other activation functions (also user defined ones).
+*  Refactor fortran code in the light of the above new capabilities.
+*  Random network architecture generation (probably based on mlgraph)
+*  Consider adding train method (without indicating algorithm) to ffnet class
+
+* Add possibility to add/remove nodes/weights
+* Support for Python 3!
