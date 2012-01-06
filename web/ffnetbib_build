@@ -1,1 +1,0 @@
-bibtex2html -s plain -noheader -nofooter -nobibsource ./ffnet-publications.bib
