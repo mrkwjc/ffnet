@@ -1,121 +1,20 @@
 This is ffnet-0.7 README file.
+
 Distributed under the terms of the GNU General Public License (GPL)
 http://www.gnu.org/copyleft/gpl.html
 
-Copyright (C) 2011 by Marek Wojciechowski
-<mwojc@p.lodz.pl>
+Copyright (C) 2011 by Marek Wojciechowski <mwojc@p.lodz.pl>
 
 
-Overview
---------
-ffnet is a fast and easy-to-use feed-forward neural network 
-training solution for python. For usage examples
-go to http://ffnet.sourceforge.net or browse source distribution of 
-the software.
+**ffnet is fast and easy-to-use feed-forward neural network solution for python**
+
+For instalation instructions and documentation go to http://ffnet.sourceforge.net.
 
 
-Requirements
-------------
-ffnet needs at least:
-* python-2.6 (or 2.4, 2.5 + multiprocessing package)
-* numpy-1.4
-* scipy-0.8
-* networkx-1.3
+Release Notes
+=============
 
-For plots (which appear in examples) you'll need also the
-matplotlib package (http://matplotlib.sourceforge.net/). 
-
-If you're going to compile ffnet from sources you'll need also 
-python header files and C and Fortran 77 compiler.
-Installation of those depends on your operating system.
-
-
-Download
---------
-Go to http://ffnet.sourceforge.net to download latest release version
-of ffnet. You can also download development version from ffnet
-subversion repository (you need subversion installed on your system):
-
-svn co https://ffnet.svn.sourceforge.net/svnroot/ffnet/trunk ffnet
-
-In order to grab the latest development snapshot via your web browser go to
-http://ffnet.svn.sourceforge.net/viewvc/ffnet/trunk/
-and download the tarball.
-
-Be aware that development versions are not guaranteed to be fully functional.
-
-
-Installation
-------------
-For building from sources you can try:
-
-    easy_install ffnet
-
-If this doesn't work for you (for example you don't have setuptools installed)
-you can try the options below:
-
-1. Building from source on Linux/Unix.
-Unpack ffnet to the directory of your choice, enter this
-directory and run as root:
-
-    python setup.py install
-
-ffnet uses numpy.distutils and f2py tool to compile Fortran parts of
-the program. The above will work if you are running Linux/Unix system 
-with gcc and g77 (gfortran). If you need to use another compiler run:
-
-    f2py -c --help-fcompiler
-
-to see a list of supported compilers.
-For example, installing with Intel Fortran Compiler on 32-bit machine
-looks like:
-
-    python setup.py install --fcompiler=intel
-
-2. Binary packages for Linux/Unix
-You are welcome to produce binary packages for your Linux distribution.
-
-3. Building from source on Windows (32-bit).
-If you have mingw compilers installed, run:
-
-    python setup.py build --compiler=mingw32
-    python setup.py install --skip-build
-
-4. Binary installers for Windows:
-You are welcome to produce binary packages for Windows.
-
-
-Testing
--------
-Installation can be tested with:
-
-    from ffnet._tests import runtest
-    runtest()
-
-Execute also ffnet examples. They all should work.
-
-
-Basic usage
------------
->>> from ffnet import ffnet, mlgraph, savenet, loadnet, exportnet
->>> conec = mlgraph( (2,2,1) )
->>> net = ffnet(conec)
->>> input = [ [0.,0.], [0.,1.], [1.,0.], [1.,1.] ]
->>> target  = [ [1.], [0.], [0.], [1.] ]
->>> net.train_tnc(input, target, maxfun = 1000)
->>> net.test(input, target, iprint = 2)
->>> savenet(net, "xor.net")
->>> exportnet(net, "xor.f")
->>> net = loadnet("xor.net")
->>> answer = net( [ 0., 0. ] )
->>> partial_derivatives = net.derivative( [ 0., 0. ] )
-
-
-Notes
+0.7.1
 -----
-Windows users might be interested in installing Enthought Python Distribution:
-http://www.enthought.com/products/getepd.php
-which reaches all ffnet requirements and is free for non-commercial use.
-
-It is also very convenient to use ffnet interactively with
-ipython, an enhanced python shell. See http://ipython.scipy.org/moin.
+This release contains mainly documentation improvements and changes in examples.
+Look also at the new sphinx-based website: http://ffnet.sourceforge.net.
