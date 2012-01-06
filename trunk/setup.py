@@ -12,7 +12,7 @@ ext2 = Extension(name = 'ffnet.fortran._pikaia',
 if __name__ == "__main__":
     from numpy.distutils.core import setup
     setup(name              = 'ffnet',
-          version           = '0.7',
+          version           = '0.7.1',
           description       = 'Feed-forward neural network solution for python',
           long_description  = '"ffnet" is a fast and easy-to-use feed-forward neural network training solution for python. Many nice features are implemented: arbitrary network connectivity, automatic data normalization, very efficient training tools, support for multicore systems, network export to fortran code...',
           author            = 'Marek Wojciechowski',

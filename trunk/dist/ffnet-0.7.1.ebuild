@@ -24,8 +24,7 @@ DEPEND="
 	dev-python/numpy
 	sci-libs/scipy
 	virtual/fortran
-	matplotlib? ( dev-python/matplotlib )
-	graphviz? ( dev-python/pygraphviz )"
+	matplotlib? ( dev-python/matplotlib )"
 RDEPEND="${DEPEND}"
 
 pkg_setup() {
