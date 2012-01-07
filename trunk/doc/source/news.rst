@@ -2,6 +2,11 @@
 **News**
 --------
 
+*07/01/2012*
+    ffnet version 0.7.1 jas been released. This release contains mainly documentation improvements and changes in examples. Look also at the new sphinx-based website: http://ffnet.sourceforge.net.
+
+----
+
 *27/12/2011*
     You can look now at the growing list of :download:`publications <pubs/ffnet-publications.html>` which cite ffnet.
 
