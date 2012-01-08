@@ -599,9 +599,9 @@ class ffnet:
         """
         Randomize network weights due to Bottou proposition.
 
-        If *n* is a number of node's incoming connections, weights of these
+        If *n* is a number of incoming connections to the node, weights of these
         connections are chosen randomly from range
-        *(-2.38/sqrt(n), -2.38/sqrt(n))*
+        *(-2.38/sqrt(n), 2.38/sqrt(n))*
 
         """
         nofw = len(self.conec)
