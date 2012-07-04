@@ -125,21 +125,21 @@ class Testnorms(unittest.TestCase):
         self.assertEqual(n[1].tolist(), [[0.7, 0.15], [0.7, 0.15]])
         self.assertAlmostEqual(n[2][0,0], 1.42857143, 8)
         self.assertAlmostEqual(n[2][0,1], -0.21428571, 8)
-        
+
 class Testnormarray(unittest.TestCase):
     def testEmpty(self):
         inarray = [[], []]
         n = _normarray(inarray, [])
         for i in xrange(len(n)):
             self.assertEqual(n[i].tolist(), [])
-    
+
     def testOneColumn(self):
         inarray = [[0.], [1.], [1.], [0.]]
         coeff = [[0.7, 0.15]]
         n = _normarray(inarray, coeff)
         for i in xrange(4):
             self.assertAlmostEqual(n[i,0], coeff[0][0]*inarray[i][0] + coeff[0][1], 8)
-            
+
 class Testffconec(unittest.TestCase):
     def testEmpty(self):
         conec = []
@@ -161,7 +161,7 @@ class Testffconec(unittest.TestCase):
         self.assertEqual(n[2], [1, 2])
         self.assertEqual(n[3], [3, 4])
         self.assertEqual(n[4], [5])
-        
+
 class Testbconec(unittest.TestCase):
     def testNoCycles(self):
         conec = [(1, 3), (2, 3), (0, 3), \
@@ -170,7 +170,7 @@ class Testbconec(unittest.TestCase):
         inno = [1,2]
         n = _bconec(conec, inno)
         self.assertEqual(n[1], [8,7])
-        
+
 class Testdconec(unittest.TestCase):
     def testNoCycles(self):
         conec = [(1, 3), (2, 3), (0, 3), \
@@ -180,7 +180,7 @@ class Testdconec(unittest.TestCase):
         n = _dconec(conec, inno)
         self.assertEqual(n[1], [1, 4, 7, 8, 2, 5, 7, 8])
         self.assertEqual(n[2], [0, 4, 8])
-        
+
 class Testdconec2(unittest.TestCase):
     def testNoCycles(self):
         conec = [(1, 3), (2, 3), (0, 3), \
@@ -190,26 +190,26 @@ class Testdconec2(unittest.TestCase):
         n = _dconec(conec, inno)
         self.assertEqual(n[1], [1, 4, 6, 7, 2, 6])
         self.assertEqual(n[2], [0, 4, 6])
-        
+
 class TestFfnetSigmoid(unittest.TestCase):
     def setUp(self):
         self.conec = [(0, 3), (1, 3), (2, 3), \
                       (0, 4), (1, 4), (2, 4), (3, 4)]
-        
+
         self.net = ffnet(self.conec); self.net([1.,1.]) #try if net works
         self.net.weights = array([1.]*7)
-        
+
         self.tnet = ffnet(self.conec)
         self.tnet.weights = array([ 0.65527021, -1.12400619, 0.02066321, \
-                                   0.13930684, -0.40153965, 0.11965115, -1.00622429 ])       
+                                   0.13930684, -0.40153965, 0.11965115, -1.00622429 ])
         self.input = [[0.,0.], [0.,1.], [1.,0.], [1.,1.]]
         self.target  = [[1.], [0.], [0.], [1.]]
-        
+
     def testCall(self):
         self.assertEqual(self.net([0., 0.]), self.net.call([0., 0.]))
         self.assertAlmostEqual(self.net([0., 0.])[0], 0.8495477739862124, 8)
         self.assertAlmostEqual(self.net([[0., 0.], [0., 0.]])[1, 0], 0.8495477739862124, 8)
-        
+
     def testDerivative(self):
         self.assertAlmostEqual(self.net.derivative([0., 0.])[0][0], 0.1529465741023702, 8)
         self.assertAlmostEqual(self.net.derivative([0., 0.])[0][1], 0.1529465741023702, 8)
@@ -223,7 +223,8 @@ class TestFfnetSigmoid(unittest.TestCase):
                  (4, 6), (3, 6), (5, 6) ]
         net = ffnet(conec)
         y1n, y2n = net.derivative([1, 1])[0]
-        from scipy import derivative
+        try: from scipy import derivative
+        except: from scipy.misc import derivative
         def func1(x):
             return net([x, 1])[0]
         def func2(x):
@@ -233,7 +234,7 @@ class TestFfnetSigmoid(unittest.TestCase):
         self.assertAlmostEqual(y1n, y1, 7)
         self.assertAlmostEqual(y2n, y2, 7)
 
-    
+
     def testSqerror(self):
         err = self.tnet.sqerror(self.input, self.target)
         out = [ (self.tnet(self.input[i])[0] - self.target[i][0])**2 \
@@ -248,23 +249,23 @@ class TestFfnetSigmoid(unittest.TestCase):
 
         self.tnet.train_momentum(self.input, self.target, eta=1., momentum=0., maxiter=1)
         w2 = self.tnet.weights
-        
+
         for i in xrange(len(w1)):
             self.assertAlmostEqual(w1[i], w2[i], 8)
-            
+
 
     def testTrainGenetic(self):
         print "Test of genetic algorithm optimization"
         self.tnet.train_genetic(self.input, self.target, lower = -50., upper = 50., \
                                 individuals = 20, generations = 1000)
         self.tnet.test(self.input, self.target)
-    
-    def testTrainMomentum(self): 
+
+    def testTrainMomentum(self):
         print "Test of backpropagation momentum algorithm"
         self.tnet.train_momentum(self.input, self.target, maxiter=10000)
         self.tnet.test(self.input, self.target)
 
-    def testTrainRprop(self): 
+    def testTrainRprop(self):
         print "Test of rprop algorithm"
         self.tnet.randomweights()
         xmi = self.tnet.train_rprop(self.input, self.target, \
@@ -276,13 +277,13 @@ class TestFfnetSigmoid(unittest.TestCase):
         print "Test of conjugate gradient algorithm"
         self.tnet.train_cg(self.input, self.target, maxiter=1000, disp=1)
         self.tnet.test(self.input, self.target)
-        
+
     def testTrainBfgs(self):
         print "Test of BFGS algorithm"
         print "Skipped because of problems on some scipy compilations."
         #self.tnet.train_bfgs(self.input, self.target, maxfun = 1000)
         #self.tnet.test(self.input, self.target)
-        
+
     def testTrainTnc(self):
         print "Test of TNC algorithm"
         self.tnet.train_tnc(array(self.input), array(self.target), maxfun = 1000)
@@ -292,7 +293,7 @@ class TestFfnetSigmoid(unittest.TestCase):
         print "Test of TNC parallel algorithm"
         self.tnet.train_tnc(array(self.input), array(self.target), nproc = 2, maxfun = 1000)
         self.tnet.test(self.input, self.target)
-        
+
     def testRenormalize(self):
         self.tnet._setnorm(self.input, self.target)
         a = self.tnet([1., 1.])
@@ -301,7 +302,7 @@ class TestFfnetSigmoid(unittest.TestCase):
         self.tnet._setnorm(input2, target2)
         b = self.tnet([1., 1.])
         self.assertAlmostEqual(a, b, 15)
-        
+
         self.tnet.renormalize = True
         self.tnet._setnorm(input2, target2)
         c = self.tnet([1., 1.])
@@ -312,18 +313,18 @@ class TestFfnetSigmoid(unittest.TestCase):
         input = [1, 2., 5]
         target = [2, 3, 5.]
         net.train_tnc(input, target, maxfun = 10)
-        
-        
+
+
 class TestSaveLoadExport(unittest.TestCase):
     def setUp(self):
         conec = imlgraph( (5,5,5) )
         self.net = ffnet(conec)
-        
+
     def tearDown(self):
         import os
         try: os.remove('tmpffnet.f')
         except: pass
-        try: 
+        try:
             os.remove('tmpffnet.so')
             os.remove('tmpffnet2.so')
         except: pass
@@ -339,11 +340,11 @@ class TestSaveLoadExport(unittest.TestCase):
         res2 = net( [ 1, 2, 3, 4, 5. ] )
         for i in xrange(5):
             self.assertAlmostEqual(res1[i], res2[i], 8)
-        
+
     def testExportWithDerivative(self):
         print os.getcwd()
         exportnet(self.net, 'tmpffnet.f')
-        ## THE BELOW IS PLATFORM AND ffnet.f FILE DEPENDENT 
+        ## THE BELOW IS PLATFORM AND ffnet.f FILE DEPENDENT
         ## SHOULD BE COMMENTED FOR RELEASES ???
         from numpy import f2py, array
         f = open( 'tmpffnet.f', 'r' ); source = f.read(); f.close()
@@ -366,7 +367,7 @@ class TestSaveLoadExport(unittest.TestCase):
 
     def testExportNoDerivative(self):
         exportnet(self.net, 'tmpffnet.f', derivative = False)
-        ## THE BELOW IS PLATFORM AND ffnet.f FILE DEPENDENT 
+        ## THE BELOW IS PLATFORM AND ffnet.f FILE DEPENDENT
         ## SHOULD BE COMMENTED FOR RELEASES ???
         from numpy import f2py
         f = open( 'tmpffnet.f', 'r' ); source = f.read(); f.close()
@@ -386,7 +387,7 @@ class TestSaveLoadExport(unittest.TestCase):
 class TestDataReader(unittest.TestCase):
     #def setUp(self):
         #self.filename = ffnetpath + 'examples/data/ocr.dat'
-    
+
     def testReadData(self):
         try: data = readdata( ffnetpath + 'examples/data/ocr.dat' )
         except: data = readdata( ffnetpath + '../examples/data/ocr.dat')
@@ -400,22 +401,21 @@ class TestExport2Fortran(unittest.TestCase):  #not finished, just started
         from numpy import array
         self.A = array([[1,2,3], [4,5,6]])
         self.B = array([[1,2,3], [4,5,6.]])
-        
+
     def tearDown(self):
         pass
-    
+
     def testArray(self):
-        s1 = farray(self.A, 'test')      
+        s1 = farray(self.A, 'test')
         s2 = farray(self.B, 'test')
 
 def runtest():
    ''' Runs all tests from this module '''
    import sys
    suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])
-   unittest.TextTestRunner(verbosity=2).run(suite)        
-    
+   unittest.TextTestRunner(verbosity=2).run(suite)
+
 
 # run tests
 if __name__ == '__main__':
     unittest.main(verbosity = 2)
-    
