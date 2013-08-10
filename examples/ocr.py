@@ -49,7 +49,6 @@ try:
     title("Trained network (64-10-10-10) guesses a digit above...")
     xlabel("Digit")
     ylabel("Network outputs")
-
     show()
 except ImportError, e:
     print "Cannot make plots. For plotting install matplotlib.\n%s" % e
