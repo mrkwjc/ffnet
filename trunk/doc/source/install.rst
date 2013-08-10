@@ -33,7 +33,7 @@ Go to sourceforge `download page <http://sourceforge.net/projects/ffnet/files/ff
 
 You can also checkout development version of the code from the project subversion repository:
 
-    ``svn co https://ffnet.svn.sourceforge.net/svnroot/ffnet/trunk ffnet``
+    ``svn co https://svn.code.sf.net/p/ffnet/code/trunk ffnet``
 
 or from this direct `link <http://ffnet.svn.sourceforge.net/viewvc/ffnet/trunk.tar.gz>`_.
 
