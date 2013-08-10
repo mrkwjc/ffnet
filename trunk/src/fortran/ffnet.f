@@ -18,7 +18,7 @@ c************************************************************************
       subroutine prop(x, conec, n, units, u)
 c************************************************************************
 c
-c.....Gets conec and units with input already set 
+c.....Gets conec and units with input already set
 c.....and calculates all activations.
 c.....Identity input and sigmoid activation function for other units
 c.....is assumed
@@ -31,7 +31,7 @@ c.....helper variables
       integer src, trg, ctrg, xn
 c.....f2py statements
 cf2py intent(in, out) units
-      
+
 c.....propagate signals with sigmoid activation function
       if (n.gt.0) then
           ctrg = conec(1,2)
@@ -61,9 +61,9 @@ c.....propagate signals with sigmoid activation function
 
       return
       end
-      
+
 c************************************************************************
-      subroutine sqerror(x, conec, n, units, u, inno, i, outno, o, 
+      subroutine sqerror(x, conec, n, units, u, inno, i, outno, o,
      &                   Input, Targ, p, sqerr)
 c************************************************************************
 c
@@ -90,24 +90,24 @@ c.........propagate signals
 c.........sum squared errors
           do k=1,o
              sqerr = sqerr + (units(outno(k)) - Targ(pat,k))**2
-          enddo  
+          enddo
       ENDDO
       sqerr = 0.5d0*sqerr
-      
+
       return
-      end    
-      
+      end
+
 c************************************************************************
-      subroutine grad(x, conec, n, bconecno, bn, units, u, inno, i,  
+      subroutine grad(x, conec, n, bconecno, bn, units, u, inno, i,
      &                outno, o, Input, Targ, p, xprime)
 c************************************************************************
 c
-c.....Takes conec, bconecno, Input and Target patterns and returns 
+c.....Takes conec, bconecno, Input and Target patterns and returns
 c.....gradient calculated with error backpropagation
 c
       implicit none
 c.....variables
-      integer n, bn, u, i, o, p 
+      integer n, bn, u, i, o, p
       integer conec(n,2), bconecno(bn), inno(i), outno(o)
       double precision x(n), units(u), Input(p,i), Targ(p,o)
       double precision xprime(n), diff(o), bunits(u)
@@ -127,12 +127,12 @@ c.........propagate input signals
           do k=1,i
               units(inno(k)) = Input(pat,k)
           enddo
-          call prop(x, conec, n, units, u)        
+          call prop(x, conec, n, units, u)
 c.........set diffs at network output as back network inputs
           do k=1,o
-	         diff(k) = units(outno(k)) - Targ(pat,k)
-	         deriv = units(outno(k)) * (1. - units(outno(k))) !ugly
-	         bunits(outno(k)) = diff(k) * deriv
+             diff(k) = units(outno(k)) - Targ(pat,k)
+             deriv = units(outno(k)) * (1. - units(outno(k))) !ugly
+             bunits(outno(k)) = diff(k) * deriv
           enddo
 c.........backpropagate errors
           if (bn.gt.0) then
@@ -141,15 +141,15 @@ c.........backpropagate errors
               do k=1,bn
                   src = conec(bconecno(k),2)
                   trg = conec(bconecno(k),1)
-	              cx = x(bconecno(k))
+                  cx = x(bconecno(k))
                   if (trg.ne.ctrg) then  !if next unit
-	                  deriv = units(ctrg) * (1. - units(ctrg)) !ugly 
-				      bunits(ctrg) = bunits(ctrg) * deriv
+                      deriv = units(ctrg) * (1. - units(ctrg)) !ugly
+                      bunits(ctrg) = bunits(ctrg) * deriv
                       ctrg = trg
                       bunits(ctrg) = bunits(src) * cx
-	              else
-	                  bunits(ctrg) = bunits(ctrg) + bunits(src) * cx
-	              endif
+                  else
+                      bunits(ctrg) = bunits(ctrg) + bunits(src) * cx
+                  endif
               enddo
               deriv = units(ctrg) * (1 - units(ctrg))
               bunits(ctrg) = bunits(ctrg) * deriv  !for last unit
@@ -165,12 +165,12 @@ c.........add gradient elements to overall xprime
               endif
           enddo
       ENDDO
-      
+
       return
-      end    
+      end
 
 c************************************************************************
-      subroutine recall(x, conec, n, units, u, inno, i, outno, o, 
+      subroutine recall(x, conec, n, units, u, inno, i, outno, o,
      &                  input, output)
 c************************************************************************
 c
@@ -194,8 +194,8 @@ c.....propagate signals
 c.....get output
       do k=1,o
          output(k) = units(outno(k))
-      enddo  
-      
+      enddo
+
       return
       end
 
@@ -225,7 +225,7 @@ c.....first set inputs for usual and derivative network units
           dunits(inno(k)) = 0d0
       enddo
 c.....calculate derivatives of activation functions --> units became
-c.....units derivatives (ugly, usable only for sigmoid function 
+c.....units derivatives (ugly, usable only for sigmoid function
 c.....and identity input)
       call prop(x, conec, n, units, u)
       do k=1,u
@@ -242,7 +242,7 @@ c.....loop over inputs
       do di=1,i
 c.........set current input unit derivative as network input
 	      dunits(inno(di)) = units(inno(di))
-c.........propagate signals through derivative network (dunits became 
+c.........propagate signals through derivative network (dunits became
 c.........net units and units derivatives are now scaling factors)
           if (dn.gt.0) then
               ctrg = conec(dconecno(dconecmk(di)+1),2)
@@ -267,7 +267,7 @@ c.........save network outputs (do/di)
               dunits(outno(k)) = 0d0
           enddo
 c.........restore current input
-          dunits(inno(di)) = 0d0 
+          dunits(inno(di)) = 0d0
       enddo
 
       RETURN
@@ -276,36 +276,36 @@ c
 cc
 ccc
 cccc
-ccccc EXTENSIONS OF BASIC ROUTINES 
+ccccc EXTENSIONS OF BASIC ROUTINES
 cccc
 ccc
 cc
 c
 c************************************************************************
-      subroutine func(x, conec, n, bconecno, bn, units, u, inno, i,  
+      subroutine func(x, conec, n, bconecno, bn, units, u, inno, i,
      &                outno, o, Input, Targ, p, sqerr)
 c************************************************************************
 c
 c.....Just calls sqerror, but now the agruments list
-c.....is compatibile with grad. This compatibility is needed by scipy 
+c.....is compatibile with grad. This compatibility is needed by scipy
 c.....optimizers.
 c
       implicit none
 c.....variables
-      integer n, bn, u, i, o, p 
+      integer n, bn, u, i, o, p
       integer conec(n,2), bconecno(bn), inno(i), outno(o)
       double precision x(n), units(u), Input(p,i), Targ(p,o), sqerr
 c.....f2py statements
 cf2py intent(out) sqerr
 
-      call sqerror(x, conec, n, units, u, inno, i, outno, o, 
+      call sqerror(x, conec, n, units, u, inno, i, outno, o,
      &             Input, Targ, p, sqerr)
-     
+
       return
       end
 
 c************************************************************************
-      subroutine pikaiaff(x, ffn, conec, n, units, u, inno, i, outno, o, 
+      subroutine pikaiaff(x, ffn, conec, n, units, u, inno, i, outno, o,
      &                    Input, Targ, p, bound1, bound2, isqerr)
 c************************************************************************
 c
@@ -321,15 +321,15 @@ c.....variables
       double precision bound1, bound2, isqerr
 c.....f2py statements
 cf2py intent(out) isqerr
-      
+
 c.....first map x vector values from 0,1 to bound1,bound2
       call vmapa(x, n, 0d0, 1d0, bound1, bound2, x2)
 c.....now propagate patterns and obtain error
-      call sqerror(x2, conec, n, units, u, inno, i, outno, o, 
+      call sqerror(x2, conec, n, units, u, inno, i, outno, o,
      &             Input, Targ, p, isqerr)
 c.....inverse error
       isqerr = 1. / isqerr
-      
+
       RETURN
       end
 
@@ -357,7 +357,7 @@ c.....propagate signals
       call prop(x, conec, n, units, u)
 c.....get output
       call getout(units, u, outno, o, deo, output)
-      
+
       return
       end
 c
@@ -391,7 +391,7 @@ c.....first set inputs for usual and derivative network units
 c.....propagate through network
       call prop(x, conec, n, units, u)
 c.....calculate derivatives of activation functions --> units became
-c.....units derivatives (ugly, usable only for sigmoid function 
+c.....units derivatives (ugly, usable only for sigmoid function
 c.....and identity input)
       do k=1,u
 	      units(k) = units(k) * (1d0 - units(k))
@@ -408,7 +408,7 @@ c.....loop over inputs
       do di=1,i
 c.........set current input unit derivative as network input
 	      dunits(inno(di)) = units(inno(di))
-c.........propagate signals through derivative network (dunits became 
+c.........propagate signals through derivative network (dunits became
 c.........net units and units derivatives are now scaling factors)
           if (dn.gt.0) then
               ctrg = conec(dconecno(dconecmk(di)+1),2)
@@ -433,7 +433,7 @@ c.........save network outputs (do/di)
               dunits(outno(k)) = 0d0
           enddo
 c.........restore current input
-          dunits(inno(di)) = 0d0 
+          dunits(inno(di)) = 0d0
       enddo
 
       RETURN
@@ -468,12 +468,12 @@ c.....iterate over input set
               output(j,k) = tmpout(k)
           enddo
       enddo
-      
+
       return
       end
 c
 c************************************************************************
-      subroutine normdiff2(x, conec, n, dconecno, dn, dconecmk, units,u, 
+      subroutine normdiff2(x, conec, n, dconecno, dn, dconecmk, units,u,
      &                     inno, i, outno, o, eni, ded, input, p, deriv)
 c************************************************************************
 c
@@ -504,7 +504,7 @@ c.....iterate over input set
               enddo
           enddo
       enddo
-      
+
       return
       end
 c
@@ -517,7 +517,7 @@ ccc
 cc
 c
 c************************************************************************
-      subroutine momentum(x, conec, n, bconecno, bn, units, u, inno, i,  
+      subroutine momentum(x, conec, n, bconecno, bn, units, u, inno, i,
      &                   outno, o, Input, Targ, p, eta, moment, maxiter)
 c************************************************************************
 c
@@ -533,7 +533,7 @@ c.....helper variables
       integer j, k
 c.....f2py statements
 cf2py intent(in, out) x
-      
+
 c.....initialize variables
       do j=1,n
           update0(j) = 0d0
@@ -541,7 +541,7 @@ c.....initialize variables
       k=0
 c.....update maxiter times
       do while (k.lt.maxiter)
-          call grad(x, conec, n, bconecno, bn, units, u, inno, i,  
+          call grad(x, conec, n, bconecno, bn, units, u, inno, i,
      &              outno, o, Input, Targ, p, xprime)
 	      do j=1,n
               update = -eta*xprime(j)
@@ -550,13 +550,13 @@ c.....update maxiter times
           enddo
           k=k+1
       enddo
-	  
+
       return
       end
-      
+
 c************************************************************************
-      subroutine rprop(x, conec, n, bconecno, bn, units, u, inno, i,  
-     &                 outno, o, Input, Targ, p, 
+      subroutine rprop(x, conec, n, bconecno, bn, units, u, inno, i,
+     &                 outno, o, Input, Targ, p,
      &                 a, b, mimin, mimax, xmi, maxiter)
 c************************************************************************
 c
@@ -573,7 +573,7 @@ c.....helper variables
       integer j, k
 c.....f2py statements
 cf2py intent(in, out) x, xmi
-      
+
 c.....initialize variables
       do j=1,n
           xprime0(j) = 0d0
@@ -581,7 +581,7 @@ c.....initialize variables
       k=0
 c.....update maxiter times
       do while (k.lt.maxiter)
-          call grad(x, conec, n, bconecno, bn, units, u, inno, i,  
+          call grad(x, conec, n, bconecno, bn, units, u, inno, i,
      &              outno, o, Input, Targ, p, xprime)
 	      do j=1,n
 c.............find mi coefficient
@@ -598,7 +598,7 @@ c.............update weights and record gradient components
           enddo
           k=k+1
       enddo
-	  
+
       return
       end
 c
@@ -664,9 +664,9 @@ c
 c.....variables
       double precision a, b, c, d, f, mapa
 c.....helper variables
-      double precision t    
-      
-c.....map vector (no check of bounds...)      
+      double precision t
+
+c.....map vector (no check of bounds...)
       t = ( d - c ) / ( b - a )
       mapa = c + ( f - a ) * t
 
@@ -683,8 +683,8 @@ c
       implicit none
 c.....variables
       double precision a, b, c, d, f, dmapa
-      
-c.....map vector (no check of bounds...)      
+
+c.....map vector (no check of bounds...)
       dmapa = ( d - c ) / ( b - a )
 
       RETURN
@@ -704,11 +704,11 @@ c.....helper variables
       integer k
       double precision t
 c.....f2py statements
-cf2py intent(out) vout      
-      
-c.....map vector (no check of bounds...)      
+cf2py intent(out) vout
+
+c.....map vector (no check of bounds...)
       t = ( d - c ) / ( b - a )
-      do k=1,n   
+      do k=1,n
           vout(k) = c + ( vin(k) - a ) * t
       enddo
 
@@ -729,9 +729,9 @@ c.....helper variables
       integer j,k
       double precision t
 c.....f2py statements
-cf2py intent(out) mmout      
-      
-c.....map matrix (no check of bounds...)      
+cf2py intent(out) mmout
+
+c.....map matrix (no check of bounds...)
       t = ( d - c ) / ( b - a )
       do j=1,m
 	      do k=1,n
@@ -741,5 +741,4 @@ c.....map matrix (no check of bounds...)
 
       RETURN
       end
-	  
-      
+
