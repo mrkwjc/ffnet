@@ -4,4 +4,4 @@ Fortran extensions
 ------------------
 '''
 
-import _ffnet, _pikaia
+from . import _ffnet, _pikaia

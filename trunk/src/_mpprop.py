@@ -30,7 +30,7 @@ def splitdata(N, nproc):
 
     Splits to *nproc* equal data chunks.
     """
-    n = N / nproc
+    n = N // nproc
     i = (nproc - N % nproc) * n
     idx = range(n, i, n) + range(i, N, n+1)
     idx1 = [0] + idx
