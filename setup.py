@@ -2,6 +2,11 @@
 # -*- coding: utf-8 -*-
 
 from numpy.distutils.core import Extension
+try:
+   from distutils.command.build_py import build_py_2to3 \
+        as build_py
+except ImportError:
+   from distutils.command.build_py import build_py
 
 ext1 = Extension(name = 'ffnet.fortran._ffnet',
                  sources = ['src/fortran/ffnet.f'])
@@ -37,5 +42,6 @@ if __name__ == "__main__":
                                                          'examples/mptrain.py']),
                                ('ffnet/examples/data',  ['examples/data/ocr.dat',
                                                          'examples/data/black-scholes.dat']),
-                               ('ffnet/fortran',        ['src/fortran/ffnet.f', 'src/fortran/pikaia.f'])]
+                               ('ffnet/fortran',        ['src/fortran/ffnet.f', 'src/fortran/pikaia.f'])],
+          cmdclass = {'build_py': build_py}
           )

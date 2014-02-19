@@ -306,7 +306,7 @@ class TestFfnetSigmoid(unittest.TestCase):
         self.tnet.renormalize = True
         self.tnet._setnorm(input2, target2)
         c = self.tnet([1., 1.])
-        self.assertNotAlmostEqual(a, c, 15)
+        self.assertNotAlmostEqual(float(a), float(c), 15)
 
     def testTestdata(self):
         net = ffnet( mlgraph((1, 5, 1)) )

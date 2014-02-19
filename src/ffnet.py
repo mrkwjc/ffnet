@@ -1116,7 +1116,7 @@ def savenet(net, filename):
             Path to the file where network is dumped
     """
     import cPickle
-    file = open(filename, 'w')
+    file = open(filename, 'wb')
     cPickle.dump(net, file)
     file.close()
     return
@@ -1130,7 +1130,7 @@ def loadnet(filename):
             Path to the file with saved network
     """
     import cPickle
-    file = open(filename, 'r')
+    file = open(filename, 'rb')
     net = cPickle.load(file)
     return net
 
