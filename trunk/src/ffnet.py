@@ -1116,7 +1116,14 @@ def savenet(net, filename):
             Path to the file where network is dumped
     """
     import cPickle
-    file = open(filename, 'wb')
+    if cPickle.format_version >= '3.0':
+        #Py3k. Cannot pickle numpy array in 3 and have it readable by 2,
+        #so don't even try for compatibility. Force binary mode.
+        warnings.warn(
+            'Network files written with Python 3 not readable on Python 2')
+        file = open(filename, 'wb')
+    else:
+        file = open(filename, 'w')
     cPickle.dump(net, file)
     file.close()
     return
@@ -1130,8 +1137,13 @@ def loadnet(filename):
             Path to the file with saved network
     """
     import cPickle
-    file = open(filename, 'rb')
-    net = cPickle.load(file)
+    if cPickle.format_version >= '3.0':
+        #Py3k, need to read in binary format to unpickle
+        file = open(filename, 'rb')
+        net = cPickle.load(file, encoding='latin-1')
+    else:
+        file = open(filename, 'r')
+        net = cPickle.load(file)
     return net
 
 def _exportfortran(net, filename, name, derivative = True):
