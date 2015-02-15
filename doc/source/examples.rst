@@ -12,5 +12,3 @@ Examples
     examples/xor
     examples/stock
     examples/mptrain
-
-

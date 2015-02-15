@@ -1,4 +1,4 @@
-This is ffnet-0.7 README file.
+This is ffnet-0.8.0 README file.
 
 Distributed under the terms of the GNU General Public License (GPL)
 http://www.gnu.org/copyleft/gpl.html
@@ -14,7 +14,6 @@ For instalation instructions and documentation go to http://ffnet.sourceforge.ne
 Release Notes
 =============
 
-0.7.1
+0.8.0
 -----
-This release contains mainly documentation improvements and changes in examples.
-Look also at the new sphinx-based website: http://ffnet.sourceforge.net.
+This version supports python 3. Only minor changes in code (and no API changes) are made in comparison to previous release, all scripts should run without problems.

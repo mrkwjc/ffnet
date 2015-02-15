@@ -3,7 +3,7 @@ Feed-forward neural network for python (ffnet)
 ==============================================
 
 :Author: :ref:`Marek Wojciechowski <mwojc>`
-:Version: `0.7.1 <http://sourceforge.net/projects/ffnet/files/ffnet/ffnet-0.7.1>`_
+:Version: `0.8.0 <http://sourceforge.net/projects/ffnet/files/ffnet/ffnet-0.7.1>`_
 :License: `GPL <http://www.gnu.org/copyleft/gpl.html>`_
 
 Welcome to the ffnet documentation pages!
@@ -22,6 +22,7 @@ Welcome to the ffnet documentation pages!
     bugs
     cite
     mwojc
+    acknowledgements
 
 ..
     Indices and tables
