@@ -1119,6 +1119,7 @@ def savenet(net, filename):
     if cPickle.format_version >= '3.0':
         #Py3k. Cannot pickle numpy array in 3 and have it readable by 2,
         #so don't even try for compatibility. Force binary mode.
+        import warnings
         warnings.warn(
             'Network files written with Python 3 not readable on Python 2')
         file = open(filename, 'wb')

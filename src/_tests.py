@@ -5,6 +5,7 @@ import unittest
 import sys; import os
 from ffnet import *
 from ffnet import _linear, _norms, _normarray, _ffconec, _bconec, _dconec
+import sys
 
 # Get ffnet module realpath
 ffnetpath = os.path.dirname(os.path.realpath(__file__)) + '/'
@@ -353,6 +354,8 @@ class TestSaveLoadExport(unittest.TestCase):
         if sys.platform == 'win32':
             eargs = '--compiler=mingw32'
         else: eargs = ''
+        if sys.version[0] == '3':
+            source = bytes(source, "utf-8")
         f2py.compile(source, modulename = 'tmpffnet', extra_args = eargs, verbose = 0)
         import tmpffnet
         resA1 = tmpffnet.ffnet( [ 1, 2, 3, 4, 5. ] )
@@ -376,6 +379,8 @@ class TestSaveLoadExport(unittest.TestCase):
         if sys.platform == 'win32':
             eargs = '--compiler=mingw32'
         else: eargs = ''
+        if sys.version[0] == '3':
+            source = bytes(source, "utf-8")
         f2py.compile(source, modulename = 'tmpffnet2', extra_args = eargs, verbose = 0)
         import tmpffnet2
         resA1 = tmpffnet2.ffnet( [ 1, 2, 3, 4, 5. ] )
