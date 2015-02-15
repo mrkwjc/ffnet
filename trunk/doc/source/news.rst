@@ -1,9 +1,12 @@
 --------
 **News**
 --------
+*15/02/2015*
+    ffnet version 0.8.0 has been released with python 3 support. Only minor changes in code (and no API changes) are made in comparison to previous release, all scripts should run without problems.
+
 
 *07/01/2012*
-    ffnet version 0.7.1 jas been released. This release contains mainly documentation improvements and changes in examples. Look also at the new sphinx-based website: http://ffnet.sourceforge.net.
+    ffnet version 0.7.1 has been released. This release contains mainly documentation improvements and changes in examples. Look also at the new sphinx-based website: http://ffnet.sourceforge.net.
 
 ----
 
