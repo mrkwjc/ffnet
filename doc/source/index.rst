@@ -16,7 +16,6 @@ Welcome to the ffnet documentation pages!
     news
     overview
     install
-    using
     apidoc
     examples
     bugs

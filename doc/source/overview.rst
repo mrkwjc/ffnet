@@ -35,4 +35,4 @@ Overview
         answer = net( [ 0., 0. ] )
         partial_derivatives = net.derivative( [ 0., 0. ] )
 
-    Read :ref:`documentation <docs>` and :ref:`examples <examples>` for more info.
+    Read API :ref:`documentation <apidoc>` and :ref:`examples <examples>` for more info.
