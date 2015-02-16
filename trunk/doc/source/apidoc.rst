@@ -1,3 +1,5 @@
+.. _apidoc:
+
 .. default-role:: py:obj
 
 .. currentmodule:: ffnet
