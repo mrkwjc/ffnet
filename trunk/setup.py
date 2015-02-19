@@ -1,21 +1,43 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import sys
+metadata = {}
+if (len(sys.argv) >= 2
+        and ('--help' in sys.argv[1:] or sys.argv[1]
+             in ('--help-commands', 'egg_info', '--version', 'clean'))):
 
-from numpy.distutils.core import Extension
-try:
-   from distutils.command.build_py import build_py_2to3 \
-        as build_py
-except ImportError:
-   from distutils.command.build_py import build_py
+    # For these actions, NumPy is not required.
+    #
+    # They are required to succeed without Numpy for example when
+    # pip is used to install Scikit when Numpy is not yet present in
+    # the system.
+    try:
+        from setuptools import setup
+    except ImportError:
+        from distutils.core import setup
+    try:
+        import numpy
+    except ImportError:
+        metadata['setup_requires'] = ['numpy>=1.4']
+else:
+    from numpy.distutils.core import setup
+    from numpy.distutils.core import Extension
+    try:
+       from distutils.command.build_py import build_py_2to3 \
+            as build_py
+    except ImportError:
+       from distutils.command.build_py import build_py
 
-ext1 = Extension(name = 'ffnet.fortran._ffnet',
-                 sources = ['src/fortran/ffnet.f'])
+    ext1 = Extension(name = 'ffnet.fortran._ffnet',
+                     sources = ['src/fortran/ffnet.f'])
 
-ext2 = Extension(name = 'ffnet.fortran._pikaia',
-                 sources = ['src/fortran/pikaia.f'])
+    ext2 = Extension(name = 'ffnet.fortran._pikaia',
+                     sources = ['src/fortran/pikaia.f'])
+
+    metadata['cmdclass'] = {'build_py': build_py}
+    metadata['ext_modules'] = [ext1, ext2]
 
 if __name__ == "__main__":
-    from numpy.distutils.core import setup
     setup(name              = 'ffnet',
           version           = '0.8.0',
           description       = 'Feed-forward neural network solution for python',
@@ -29,9 +51,9 @@ if __name__ == "__main__":
                                'ffnet.fortran': 'src/fortran',
                                'ffnet.examples': 'examples'},
           packages          = ['ffnet', 'ffnet.fortran', 'ffnet.examples'],
-          ext_modules       = [ext1, ext2],
           package_data      = {'ffnet.fortran': ['ffnet.f', 'pikaia.f'],
                                'ffnet.examples': ['data/*']
                                },
-          cmdclass = {'build_py': build_py}
+          install_requires  = ['numpy>=1.4', 'scipy>=0.8', 'networkx>=1.3'],
+          **metadata
           )
