@@ -1143,8 +1143,13 @@ def loadnet(filename):
         file = open(filename, 'rb')
         net = cPickle.load(file, encoding='latin-1')
     else:
-        file = open(filename, 'Ur')
-        net = cPickle.load(file)
+        try:
+            file = open(filename, 'rU')
+            net = cPickle.load(file)
+        except ImportError:  # when reading Windows \r\n endlines on Linux
+            import pickle  # cPickle seems to not work with universal endlines
+            file = open(filename, 'rU')
+            net = pickle.load(file)            
     return net
 
 def _exportfortran(net, filename, name, derivative = True):
