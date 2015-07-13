@@ -1143,7 +1143,7 @@ def loadnet(filename):
         file = open(filename, 'rb')
         net = cPickle.load(file, encoding='latin-1')
     else:
-        file = open(filename, 'r')
+        file = open(filename, 'Ur')
         net = cPickle.load(file)
     return net
 
