@@ -29,10 +29,10 @@ else:
        from distutils.command.build_py import build_py
 
     ext1 = Extension(name = 'ffnet.fortran._ffnet',
-                     sources = ['src/fortran/ffnet.f'])
+                     sources = ['ffnet/fortran/ffnet.f'])
 
     ext2 = Extension(name = 'ffnet.fortran._pikaia',
-                     sources = ['src/fortran/pikaia.f'])
+                     sources = ['ffnet/fortran/pikaia.f'])
 
     metadata['cmdclass'] = {'build_py': build_py}
     metadata['ext_modules'] = [ext1, ext2]
@@ -47,8 +47,8 @@ if __name__ == "__main__":
           url               = 'ffnet.sourceforge.net',
           license           = 'GPL',
           platforms         = 'Posix, Windows',
-          package_dir       = {'ffnet': 'src', 
-                               'ffnet.fortran': 'src/fortran',
+          package_dir       = {'ffnet': 'ffnet', 
+                               'ffnet.fortran': 'ffnet/fortran',
                                'ffnet.examples': 'examples'},
           packages          = ['ffnet', 'ffnet.fortran', 'ffnet.examples'],
           package_data      = {'ffnet.fortran': ['ffnet.f', 'pikaia.f'],
