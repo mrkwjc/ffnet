@@ -235,6 +235,16 @@ class ADiGraph(DiGraph):
                         raise ValueError("No such depgraph exists")
         return H
 
+    def depgraph2(self, u, v = None, reverse = False):
+        """
+        Returns subgraph which connects node u with v.
+        Returns empty graph if there is no dependency between nodes.
+        """
+        H = self.__class__()
+        for p in NX.all_simple_paths(self, u, v):
+            H.add_path(p)
+        return H
+
     def subgraph(self, nbunch):
         H = DiGraph.subgraph(self, nbunch) # first use
         G = self.__class__(H.edges())
