@@ -956,6 +956,12 @@ class ffnet:
             pool = Pool(nproc, initializer = mpprop.initializer, initargs=initargs)
         else:
             pool = Pool(nproc)
+        
+        # save references for later cleaning
+        self._mppool = pool
+        self._mpprop = mpprop
+        self._mpkey = key
+        
         # generate splitters for training data
         splitters = mpprop.splitdata(len(input), nproc)
 
@@ -969,12 +975,25 @@ class ffnet:
                                 args = (pool, splitters, key), **kwargs)
         self.weights = res[0]
 
-        # remove references from mpprop
+        # clean mpprop and pool
+        self._clean_mp()
+
+
+    def _clean_mp(self):
+        pool = self._mppool
+        mpprop = self._mpprop
+        key = self._mpkey
+        # clean mpprop
         del mpprop.nets[key]
         del mpprop.inputs[key]
         del mpprop.targets[key]
+        del self._mpprop  # we do not want to keep this
+        del self._mpkey
+        # terminate and remove pool
         pool.terminate()
         del pool
+        del self._mppool  # if not removed this class couldn't be pickled!
+
 
     def test(self, input, target, iprint = 1, filename = None):
         """
