@@ -38,7 +38,7 @@ class Trainer(HasTraits):
 class TncTrainer(Trainer):
     name = Str('tnc')
     maxfun = Int(0)
-    nproc = 4 #Int(cpu_count())
+    nproc = Int(cpu_count())
     messages = Int(1)
     stopped = Bool(True)
 
@@ -46,8 +46,9 @@ class TncTrainer(Trainer):
         if self.stopped:
             self.net.weights[:] = x
             if self.nproc > 1:
-                self.net.pool.terminate()  # This will raise AssertionError
-                del self.net.pool
+                self.net._clean_mp()  # This will raise AssertionError
+                #self.net._mppool.terminate()
+                #del self.net._mppool
             raise AssertionError
 
     def __repr__(self):
@@ -88,7 +89,7 @@ class TncTrainer(Trainer):
                        )
 
 if __name__ == "__main__":
-    from ffnet import ffnet, mlgraph
+    from ffnet_import import *
     net = ffnet(mlgraph((2,2,1)))
     inp = [[0,0], [1,1], [1,0], [0,1]]
     trg = [[1], [1], [0], [0]]

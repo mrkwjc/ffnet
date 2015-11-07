@@ -29,13 +29,13 @@ class Trainer(HasTraits):
     stop_training = Button
     output = Code
     output_selected_line = Int
-    # values={}
+    values=Dict  # Put here variables to be accesible via shell
 
     def log(self, message):
         self.output += message + '\n'
 
-    def _output_changed(self):
-        self.output_selected_line = self.output.count('\n')
+    def _output_changed(self, output):
+        self.output_selected_line = output.count('\n')
 
     def _new_fired(self):
         n = Network()
@@ -120,27 +120,20 @@ class Trainer(HasTraits):
                               Tabbed(
                                      Item('output',
                                           style  = 'readonly',
-                                          #editor = c,
                                           editor = CodeEditor(show_line_numbers = False,
                                                               selected_color    = 0xFFFFFF,
                                                               selected_line = 'output_selected_line',
-                                                              auto_scroll = True),
+                                                              auto_scroll = True,
+                                                              ),
                                           dock   = 'tab',
                                           export = 'DockWindowShell'
                                           ),
-                                    #Item( 'values',
-                                        #id     = 'values_1',
-                                        #label  = 'Shell',
-                                        #editor = ShellEditor( share = True ),
-                                        #dock   = 'tab',
-                                        #export = 'DockWindowShell'
-                                    #),
-                                    #Item( 'values',
-                                        #id     = 'values_2',
-                                        #editor = ValueEditor(),
-                                        #dock   = 'tab',
-                                        #export = 'DockWindowShell'
-                                    #),
+                                    Item( 'values',
+                                        label  = 'Shell',
+                                        editor = ShellEditor( share = True ),
+                                        dock   = 'tab',
+                                        export = 'DockWindowShell'
+                                    ),
                                     show_labels = False
                                    ),
                              ),

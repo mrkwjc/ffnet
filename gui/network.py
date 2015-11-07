@@ -4,8 +4,7 @@ from enthought.traits.ui.file_dialog import open_file, save_file
 from enthought.traits.ui.ui_editors.array_view_editor import ArrayViewEditor
 import pyface.api as pyface
 
-from ffnet import ffnet, mlgraph, tmlgraph, imlgraph
-from ffnet import savenet, loadnet, exportnet
+from ffnet_import import *
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -37,7 +36,7 @@ class Network(HasTraits):
     connectivity_type = Enum('mlgraph', 'tmlgraph', 'imlgraph')
     biases = Bool(True)
     biases_in_preview = Bool(False)
-    net = Instance(ffnet) #, (mlgraph((2, 2, 1)), True))
+    net = Any  #Instance(ffnet) #, (mlgraph((2, 2, 1)), True))
     #create_button = Action(name = 'Create', action = 'create_button_handler')
     preview = Button
 
