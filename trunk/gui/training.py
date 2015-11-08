@@ -7,7 +7,7 @@ import time
 
 class Trainer(HasTraits):
     name = Str
-    stopped = Bool(True)
+    stopped = Any #Bool(True)
 
 class TncTrainer(Trainer):
     name = Str('tnc')
@@ -16,12 +16,15 @@ class TncTrainer(Trainer):
     messages = Int(1)
 
     def callback(self, x):
-        if self.stopped:
+        #self.parent.send(self.stopped)
+        #stopped = self.child.recv()
+        if self.stopped.value:
             self.net.weights[:] = x
             if self.nproc > 1:
                 self.net._clean_mp()  # This will raise AssertionError
                 #self.net._mppool.terminate()
                 #del self.net._mppool
+            self.p.terminate()
             raise AssertionError
 
     def __repr__(self):
@@ -34,10 +37,19 @@ class TncTrainer(Trainer):
         self.nproc = min(self.nproc, len(inp))  # should be in ffnet!
         r = Redirector(fd=2)  
         r.start() # Catch output
-        self.stopped = False
         t0 = time.time()
         try:
-            net.train_tnc(inp, trg, nproc=self.nproc, maxfun=self.maxfun, disp = self.messages, callback=self.callback)
+            #net.train_tnc(inp, trg, nproc=self.nproc, maxfun=self.maxfun, disp = self.messages, callback=self.callback)
+            from multiprocessing import Process, Value
+            self.stopped = Value('i', 0)
+            p = Process(target=net.train_tnc, args=(inp, trg), kwargs={'nproc':self.nproc,
+                                                                       'maxfun': self.maxfun,
+                                                                       'disp': self.messages,
+                                                                       'callback': self.callback})
+            self.p = p
+            p.start()
+            p.join()
+            #time.sleep(0.1)  # Wait a while for ui to be updated (it may rely on train_algorithm values)
             reason = 'Training finished normally.'
         except AssertionError:
             reason = 'Training stopped by user.'
