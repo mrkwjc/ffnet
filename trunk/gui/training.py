@@ -1,46 +1,19 @@
 from enthought.traits.api import *
 from enthought.traits.ui.api import *
-from enthought.traits.ui.ui_editors.array_view_editor import ArrayViewEditor
-import numpy
-from multiprocessing import cpu_count, active_children
-import time
+from multiprocessing import cpu_count
 from redirfile import Redirector
+import time
 
-class MomentumOptions(HasTraits):
-    eta = Float
-    momentum = Float
-
-
-class TncOptions(HasTraits):
-    maxfun = Int
-    messages = Int
-
-
-class TrainOptions(HasTraits):
-    algorithm = Enum('tnc', 'momentum')
-    tnc = Instance(TncOptions, ())
-    momentum = Instance(MomentumOptions, ())
-    options = Button
-    
-    traits_view = View(HGroup(UItem('algorithm'),
-                              UItem('options')),
-                       resizable= True)
-    
-    def _options_fired(self):
-        eval('self.%s.edit_traits()' %self.algorithm)
-
-#TrainOptions().configure_traits()
 
 class Trainer(HasTraits):
     name = Str
-    stop = Bool(False)
+    stopped = Bool(True)
 
 class TncTrainer(Trainer):
     name = Str('tnc')
     maxfun = Int(0)
     nproc = Int(cpu_count())
     messages = Int(1)
-    stopped = Bool(True)
 
     def callback(self, x):
         if self.stopped:
@@ -56,7 +29,6 @@ class TncTrainer(Trainer):
 
     def train(self, net, inp, trg, logger):
         self.net = net
-        logger('Using TNC trainig algorithm...\n')
         if not self.maxfun:
             self.maxfun = max(100, 10*len(net.weights))
         self.nproc = min(self.nproc, len(inp))  # should be in ffnet!
@@ -68,7 +40,7 @@ class TncTrainer(Trainer):
             net.train_tnc(inp, trg, nproc=self.nproc, maxfun=self.maxfun, disp = self.messages, callback=self.callback)
             reason = 'Training finished normally.'
         except AssertionError:
-            reason = 'Training stopped.'
+            reason = 'Training stopped by user.'
         except:
             import traceback
             reason = traceback.format_exc()

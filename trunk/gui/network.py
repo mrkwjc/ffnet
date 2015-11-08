@@ -6,7 +6,8 @@ import pyface.api as pyface
 
 from ffnet_import import *
 
-import matplotlib.pyplot as plt
+from mplfigure import MPLFigureSimple
+import matplotlib
 import networkx as nx
 import os
 
@@ -39,6 +40,7 @@ class Network(HasTraits):
     net = Any  #Instance(ffnet) #, (mlgraph((2, 2, 1)), True))
     #create_button = Action(name = 'Create', action = 'create_button_handler')
     preview = Button
+    preview_figure = Instance(MPLFigureSimple, ())
 
     def __repr__(self):
         return self.name
@@ -100,13 +102,16 @@ class Network(HasTraits):
             nlist = sorted(self.net.graph.nodes())
             if not self.biases_in_preview:
                 graph = graph.subgraph(nlist[1:])
-            nx.draw_graphviz(graph, prog='dot', with_labels=True,
+            axes = self.preview_figure.axes
+            matplotlib.rcParams['interactive']=False
+            nx.draw_graphviz(graph, ax = axes, prog='dot', with_labels=True,
                             node_color='#A0CBE2', node_size=500,
                             edge_color='k')
-            plt.show()
+            matplotlib.rcParams['interactive']=True
+            self.preview_figure.edit_traits(kind='livemodal')
+            #self.edit_traits(view='preview_view', kind='livemodal')
 
-    # , editor=TextEditor(enter_set=True, auto_set=False)
-    view_traits = View(Item('architecture', has_focus=True),
+    traits_view = View(Item('architecture', has_focus=True),
                        Item('connectivity_type'),
                        Item('biases'),
                        Item('biases_in_preview'),
@@ -115,6 +120,8 @@ class Network(HasTraits):
                        buttons = [OKButton, CancelButton],
                        resizable=True,
                        width=0.2)
+    
+    #preview_view = View(UItem('preview_figure', style='custom'))
 
 
 # Do tests
