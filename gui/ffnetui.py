@@ -9,6 +9,7 @@ from network import Network
 from training import TncTrainer
 import thread
 import sys
+import time
 
 
 class Trainer(HasTraits):
@@ -31,6 +32,9 @@ class Trainer(HasTraits):
     output_selected_line = Int
     values=Dict  # Put here variables to be accesible via shell
 
+    def count(self):
+        self.counter += 1
+
     def log(self, message):
         self.output += message + '\n'
 
@@ -39,7 +43,7 @@ class Trainer(HasTraits):
 
     def _new_fired(self):
         n = Network()
-        n.edit_traits(kind='modal')
+        n.edit_traits(kind='livemodal')
         if n.net is not None:
             self.netlist.append(n)
             self.network = n
@@ -50,7 +54,7 @@ class Trainer(HasTraits):
             idx = self.netlist.index(self.network)
             name = self.network.name
             del self.netlist[idx]
-            self.log('Network removed (from memory): %s' %name)
+            self.log('Network removed: %s' %name)
 
     def _save_as_fired(self):
         oldname = self.network.name
@@ -85,10 +89,12 @@ class Trainer(HasTraits):
     
     def _train_fired(self):
         self.log('Training network: %s' %self.network.name)
+        self.log("Using '%s' trainig algorithm...\n" %self.train_algorithm.name)
         inp = self.input_data.load()
         trg = self.target_data.load()
         # self.train_algorithm.train(self.network.net, inp, trg, self.log)
         thread.start_new_thread(self.train_algorithm.train, (self.network.net, inp, trg, self.log))
+        time.sleep(0.02)  # Wait a while for ui to be updated (it may rely on train_algorithm values)
 
     def _stop_training_fired(self):
         self.train_algorithm.stopped = True  # will raise exception
@@ -143,6 +149,21 @@ class Trainer(HasTraits):
                        resizable = True,
                        )
 
+if __name__=="__main__":
+    from ffnet import loadnet
+    import os
+    t = Trainer()
+    # Add test network
+    n = Network()
+    path = 'testnet.net'
+    n.net = loadnet(path)
+    n.file_name = path
+    n.name = os.path.splitext(os.path.basename(path))[0]
+    t.netlist.append(n)
+    t.network = n
+    # Add test data
+    t.input_data.filename = 'black-scholes-input.dat'
+    t.target_data.filename = 'black-scholes-target.dat'
+    # Run
+    t.configure_traits()
 
-t = Trainer()
-t.configure_traits()
