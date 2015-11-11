@@ -24,7 +24,7 @@ class TncTrainer(Trainer):
     def _callback(self, x):
         if self.running.value == 0:
             self.net.weights[:] = x  #TODO: weights are not saved!
-            # If multiprocessing is used in fmin_tnc we need to terminate also these processes
+            # If multiprocessing is used in fmin_tnc we need to terminate these processes
             if self.nproc > 1:
                 self.net._clean_mp()  # this raises AssertionError
             raise AssertionError
@@ -38,6 +38,7 @@ class TncTrainer(Trainer):
         # Redirect stderr
         r = Redirector(fd=2)
         r.start()
+        #
         ## Run training
         t0 = time.time()
         self.running.value = 1
@@ -49,42 +50,28 @@ class TncTrainer(Trainer):
                                        'callback': self._callback})
         self.process.start()
         self.process.join()
-        # self.process.terminate()
+        self.process.terminate()
         running = self.running.value  # Keep for logging
         self.running.value = 0
         t1 = time.time()
         ## Training finished
-        # Get catched output and recover stderr
+        #
+        # Get catched output
         output = r.stop()
-
-        # Discover reason of termination
+        logger.info(output.strip())
+        # Discover and log reason of termination
         if not running:
-            # Training was finished by setting self.running.value = 0
-            reason = 'Training stopped by user.'
+            logger.info('Training stopped by user.')
         else:
             if not self.process.exception:
-                reason = 'Training finished normally.'
+                logger.info('Training finished normally.')
             else:
                 err, tb = self.process.exception
-                reason = 'Training finished with error:\n\n'
-                reason += tb
-        # Log results
-        #output += '\n' + reason
-        #output += '\n' + 'Execution time: %3.3f seconds\n\n' %(t1-t0)
-        #logger.info(output)  # Flush output in one logger call
-        #logger.info(reason)
-        #logger.info('Execution time: %3.3f seconds\n\n' %(t1-t0))
-        #logger.info(output)  # Flush output in one logger call
-        #logger.info(reason)
-        #logger.info('Execution time: %3.3f seconds\n\n' %(t1-t0))
-        logger(output)  # Flush output in one logger call
-        logger(reason)
-        logger('Execution time: %3.3f seconds\n' %(t1-t0))
-        #logger(output)  # Flush output in one logger call
-        #logger(reason)
-        #logger('Execution time: %3.3f seconds\n\n' %(t1-t0))
-        #time.sleep(0.1)
-        # NEEDED logging facility, the above crashes gui sometimes!
+                logger.info('Training finished with error:')
+                logger.info(tb.strip())
+        # Log time
+        logger.info('Execution time: %3.3f seconds.' %(t1-t0))
+
 
     traits_view = View(
                        Item('maxfun'),
@@ -100,8 +87,10 @@ if __name__ == "__main__":
     net = ffnet(mlgraph((2,2,1)))
     inp = [[0,0], [1,1], [1,0], [0,1]]
     trg = [[1], [1], [0], [0]]
-    def logger(msg):
-        print msg
+    import logging
+    logger = logging.Logger('test', level=logging.DEBUG)
+    handler = logging.StreamHandler()
+    logger.addHandler(handler)
 
     tnc = TncTrainer()
     tnc.train(net, inp, trg, logger)

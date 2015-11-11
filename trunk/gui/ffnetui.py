@@ -13,8 +13,7 @@ import sys
 import time
 import uuid
 
-from logger import create_logger
-import ffnet
+from logger import Logger
 from toolbar import toolbar, menubar
 
 class Trainer(HasTraits):
@@ -33,23 +32,13 @@ class Trainer(HasTraits):
     train_settings = Button
     train = Button
     stop_training = Button
-    logs = Code
-    logs_selected_line = Int
+    logs = Instance(Logger, ())
+
     values=Dict  # Put here variables to be accesible via shell
 
     def __init__(self, **traits):
         HasTraits.__init__(self, **traits)
-        name = uuid.uuid4().hex
-        self.logger = create_logger(name, self)
-        self.logger.info('Welcome! You are using ffnet-%s.' %ffnet.version)
-
-    def log(self, message):
-        #self.logs += message + '\n'
-        # self.logger.info(message)
-        GUI.invoke_later(self.logger.info, message)
-
-    #def _logs_changed(self, logs):
-        #self.logs_selected_line = logs.count('\n')
+        self.logger = self.logs.logger
 
     def _new(self):
         n = Network()
@@ -99,23 +88,14 @@ class Trainer(HasTraits):
     
     def _train_fired(self):
         self.logger.info('Training network: %s' %self.network.name)
-        self.logger.info("Using '%s' trainig algorithm...\n" %self.train_algorithm.name)
+        self.logger.info("Using '%s' trainig algorithm." %self.train_algorithm.name)
         inp = self.input_data.load()
         trg = self.target_data.load()
-        # self.train_algorithm.train(self.network.net, inp, trg, self.log)
-        thread.start_new_thread(self.train_algorithm.train, (self.network.net, inp, trg, self.log))
+        thread.start_new_thread(self.train_algorithm.train, (self.network.net, inp, trg, self.logger))
         time.sleep(0.05)  # Wait a while for ui to be updated (it may rely on train_algorithm values)
-        #from multiprocessing import Process
-        #p = Process(target=self.train_algorithm.train, args=(self.network.net, inp, trg, self.log))
-        #p.start()
-        #time.sleep(0.1)  # Wait a while for ui to be updated (it may rely on train_algorithm values)
-
 
     def _stop_training_fired(self):
-        #self.train_algorithm.stopped = True  # will raise exception
-        #self.train_algorithm.parent.send(True)
         self.train_algorithm.running.value = 0
-
 
 
     traits_view = View(VSplit(Tabbed(
@@ -133,16 +113,17 @@ class Trainer(HasTraits):
                                      show_border = True,
                                      )),
                               Tabbed(
-                                     Item('logs',
-                                          style  = 'readonly',
-                                          editor = CodeEditor(show_line_numbers = False,
-                                                              selected_color    = 0xFFFFFF,
-                                                              selected_line = 'logs_selected_line',
-                                                              auto_scroll = True,
-                                                              ),
-                                          dock   = 'tab',
-                                          export = 'DockWindowShell'
-                                          ),
+                                     Item('logs', style='custom'),
+                                     #Item('logs',
+                                          #style  = 'readonly',
+                                          #editor = CodeEditor(show_line_numbers = False,
+                                                              #selected_color    = 0xFFFFFF,
+                                                              #selected_line = 'logs_selected_line',
+                                                              #auto_scroll = True,
+                                                              #),
+                                          #dock   = 'tab',
+                                          #export = 'DockWindowShell'
+                                          #),
                                     Item( 'values',
                                         label  = 'Shell',
                                         editor = ShellEditor( share = True ),
@@ -161,9 +142,10 @@ class Trainer(HasTraits):
                        )
 
 if __name__=="__main__":
-    from ffnet import loadnet
+    from ffnet import loadnet, version
     import os
     t = Trainer()
+    t.logger.info('Welcome! You are using ffnet-%s.' %version)
     # Add test network
     n = Network()
     path = 'testnet.net'
