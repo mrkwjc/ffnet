@@ -4,13 +4,18 @@
 
 from enthought.traits.api import *
 from enthought.traits.ui.api import *
+from pyface.api import GUI
 from loadtxt import LoadTxt
 from network import Network
 from training import TncTrainer
 import thread
 import sys
 import time
+import uuid
 
+from logger import create_logger
+import ffnet
+from toolbar import toolbar, menubar
 
 class Trainer(HasTraits):
     netlist = List(values=Instance(Network))
@@ -28,35 +33,40 @@ class Trainer(HasTraits):
     train_settings = Button
     train = Button
     stop_training = Button
-    output = Code
-    output_selected_line = Int
+    logs = Code
+    logs_selected_line = Int
     values=Dict  # Put here variables to be accesible via shell
 
-    def count(self):
-        self.counter += 1
+    def __init__(self, **traits):
+        HasTraits.__init__(self, **traits)
+        name = uuid.uuid4().hex
+        self.logger = create_logger(name, self)
+        self.logger.info('Welcome! You are using ffnet-%s.' %ffnet.version)
 
     def log(self, message):
-        self.output += message + '\n'
+        #self.logs += message + '\n'
+        # self.logger.info(message)
+        GUI.invoke_later(self.logger.info, message)
 
-    def _output_changed(self, output):
-        self.output_selected_line = output.count('\n')
+    #def _logs_changed(self, logs):
+        #self.logs_selected_line = logs.count('\n')
 
-    def _new_fired(self):
+    def _new(self):
         n = Network()
         n.edit_traits(kind='livemodal')
         if n.net is not None:
             self.netlist.append(n)
             self.network = n
-            self.log('Network created: %s' %n.name)
+            self.logger.info('Network created: %s' %n.name)
 
-    def _remove_fired(self):
+    def _remove(self):
         if len(self.netlist) != 0:
             idx = self.netlist.index(self.network)
             name = self.network.name
             del self.netlist[idx]
-            self.log('Network removed: %s' %name)
+            self.logger.info('Network removed: %s' %name)
 
-    def _save_as_fired(self):
+    def _save_as(self):
         oldname = self.network.name
         success = self.network.save_as() # Open dialog
         if success:
@@ -69,47 +79,46 @@ class Trainer(HasTraits):
             # Log
             newname = self.network.name
             if newname == oldname:
-                self.log('Network saved: %s' %oldname)
+                self.logger.info('Network saved: %s' %oldname)
             else:
-                self.log('Network %s saved as: %s' %(oldname, newname))
+                self.logger.info('Network %s saved as: %s' %(oldname, newname))
 
-    def _load_fired(self):
+    def _load(self):
         n = Network()
         n.load()  # Open dialog
         if n.net is not None:
             self.netlist.append(n)
             self.network = n
-            self.log('Network loaded: %s' %n.name)
+            self.logger.info('Network loaded: %s' %n.name)
     
-    def _export_fired(self):
+    def _export(self):
         raise NotImplementedError
     
     def _train_settings_fired(self):
         self.train_algorithm.edit_traits(kind='modal')
     
     def _train_fired(self):
-        self.log('Training network: %s' %self.network.name)
-        self.log("Using '%s' trainig algorithm...\n" %self.train_algorithm.name)
+        self.logger.info('Training network: %s' %self.network.name)
+        self.logger.info("Using '%s' trainig algorithm...\n" %self.train_algorithm.name)
         inp = self.input_data.load()
         trg = self.target_data.load()
         # self.train_algorithm.train(self.network.net, inp, trg, self.log)
         thread.start_new_thread(self.train_algorithm.train, (self.network.net, inp, trg, self.log))
-        time.sleep(0.02)  # Wait a while for ui to be updated (it may rely on train_algorithm values)
+        time.sleep(0.05)  # Wait a while for ui to be updated (it may rely on train_algorithm values)
+        #from multiprocessing import Process
+        #p = Process(target=self.train_algorithm.train, args=(self.network.net, inp, trg, self.log))
+        #p.start()
+        #time.sleep(0.1)  # Wait a while for ui to be updated (it may rely on train_algorithm values)
+
 
     def _stop_training_fired(self):
-        self.train_algorithm.stopped = True  # will raise exception
+        #self.train_algorithm.stopped = True  # will raise exception
+        #self.train_algorithm.parent.send(True)
+        self.train_algorithm.running.value = 0
+
 
 
     traits_view = View(VSplit(Tabbed(
-                              VGroup(Group(UItem('network', emphasized=True, enabled_when='netlist')),
-                                     UItem('new'),
-                                     UItem('load'),
-                                     UItem('save_as', enabled_when='netlist'),
-                                     UItem('export', enabled_when = 'False'),
-                                     UItem('remove', enabled_when='netlist'),
-                                     label = 'Network',
-                                     show_border=True,
-                                     ),
                               VGroup(Group(UItem('network', emphasized=True, enabled_when='netlist')),
                                      Item('input_data', style='custom'),
                                      Item('target_data', style='custom'),
@@ -118,17 +127,17 @@ class Trainer(HasTraits):
                                             UItem('train_settings', label='Settings'),
                                             #label = 'Train algorithm'
                                             ),
-                                     UItem('train', emphasized=True, enabled_when='netlist and object.train_algorithm.stopped'),
-                                     UItem('stop_training', emphasized=True, enabled_when='netlist and not object.train_algorithm.stopped'),
+                                     UItem('train', emphasized=True, enabled_when='netlist and not object.train_algorithm.running.value'),
+                                     UItem('stop_training', emphasized=True, enabled_when='netlist and object.train_algorithm.running.value'),
                                      label = 'Training',
                                      show_border = True,
                                      )),
                               Tabbed(
-                                     Item('output',
+                                     Item('logs',
                                           style  = 'readonly',
                                           editor = CodeEditor(show_line_numbers = False,
                                                               selected_color    = 0xFFFFFF,
-                                                              selected_line = 'output_selected_line',
+                                                              selected_line = 'logs_selected_line',
                                                               auto_scroll = True,
                                                               ),
                                           dock   = 'tab',
@@ -147,6 +156,8 @@ class Trainer(HasTraits):
                        width=0.4,
                        height=0.5,
                        resizable = True,
+                       menubar = menubar,
+                       toolbar = toolbar,
                        )
 
 if __name__=="__main__":
