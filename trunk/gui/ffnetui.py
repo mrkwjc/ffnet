@@ -91,8 +91,8 @@ class Trainer(HasTraits):
         self.logger.info("Using '%s' trainig algorithm." %self.train_algorithm.name)
         inp = self.input_data.load()
         trg = self.target_data.load()
-        thread.start_new_thread(self.train_algorithm.train, (self.network.net, inp, trg, self.logger))
-        time.sleep(0.05)  # Wait a while for ui to be updated (it may rely on train_algorithm values)
+        thread.start_new_thread(self.train_algorithm.train, (self.network.net, inp, trg, self.logs))
+        time.sleep(0.1)  # Wait a while for ui to be updated (it may rely on train_algorithm values)
 
     def _stop_training_fired(self):
         self.train_algorithm.running.value = 0
