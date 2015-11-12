@@ -8,8 +8,7 @@ import time
 
 class Trainer(HasTraits):
     name = Str
-    process = Instance(Process)
-    running = Instance(mp.Value, ('i', 0))
+    running = Instance(mp.Value, ('i', 0))  # shared memory value
 
     def __repr__(self):
         return self.name
@@ -17,7 +16,7 @@ class Trainer(HasTraits):
 class TncTrainer(Trainer):
     name = Str('tnc')
     maxfun = Int(0)
-    nproc =  Int(1) #Int(mp.cpu_count())
+    nproc =  Int(mp.cpu_count())
     messages = Int(1)
 
     # Is this good place for doing this?
@@ -29,31 +28,33 @@ class TncTrainer(Trainer):
                 self.net._clean_mp()  # this raises AssertionError
             raise AssertionError
 
-    def train(self, net, inp, trg, logger):
+    def train(self, net, inp, trg, logs):
         # Setup
+        logger = logs.logger
         self.net = net
         if not self.maxfun:
             self.maxfun = max(100, 10*len(net.weights))  # should be in ffnet!
         self.nproc = min(self.nproc, len(inp))  # should be in ffnet!
-        # Redirect stderr
-        r = Redirector(fd=2)
-        r.start()
         #
         ## Run training
+        logs.progress_start("Training in progress...")
+        r = Redirector(fd=2)  # Redirect stderr
+        r.start()
         t0 = time.time()
         self.running.value = 1
-        self.process = Process(target=net.train_tnc,
+        process = Process(target=net.train_tnc,
                                args=(inp, trg),
                                kwargs={'nproc':self.nproc,
                                        'maxfun': self.maxfun,
                                        'disp': self.messages,
                                        'callback': self._callback})
-        self.process.start()
-        self.process.join()
-        self.process.terminate()
+        process.start()
+        process.join()
+        process.terminate()
         running = self.running.value  # Keep for logging
         self.running.value = 0
         t1 = time.time()
+        logs.progress_stop()
         ## Training finished
         #
         # Get catched output
@@ -63,10 +64,10 @@ class TncTrainer(Trainer):
         if not running:
             logger.info('Training stopped by user.')
         else:
-            if not self.process.exception:
+            if not process.exception:
                 logger.info('Training finished normally.')
             else:
-                err, tb = self.process.exception
+                err, tb = process.exception
                 logger.info('Training finished with error:')
                 logger.info(tb.strip())
         # Log time
@@ -87,10 +88,14 @@ if __name__ == "__main__":
     net = ffnet(mlgraph((2,2,1)))
     inp = [[0,0], [1,1], [1,0], [0,1]]
     trg = [[1], [1], [0], [0]]
-    import logging
-    logger = logging.Logger('test', level=logging.DEBUG)
-    handler = logging.StreamHandler()
-    logger.addHandler(handler)
+    class Logs:
+        import logging
+        logger = logging.Logger('test', level=logging.DEBUG)
+        handler = logging.StreamHandler()
+        logger.addHandler(handler)
+        def progress_start(self, msg): pass
+        def progress_stop(self): pass
+
 
     tnc = TncTrainer()
-    tnc.train(net, inp, trg, logger)
+    tnc.train(net, inp, trg, Logs())

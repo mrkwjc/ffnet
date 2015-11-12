@@ -39,12 +39,13 @@ class Logger(HasTraits):
         return self._logs
 
     def _append_log(self, msg, endline = '\n'):
-        if self._progress_started:
-            self._progress_logs += msg + endline  # this should be safe because progress_logs are nor displayed
-        else:
-            def toappend():
+        def toappend():
+            if self._progress_started:
+                self._progress_logs += msg + endline  # this should be safe because progress_logs are nor displayed
+            else:
                 self._logs += msg + endline
-            GUI.invoke_later(toappend)  # to be thread safe when logs are displayed in gui
+        GUI.invoke_later(toappend)  # to be thread safe when logs are displayed in gui
+
 
     def _set_log(self, msg, endline = '\n'):
         def toset():
@@ -56,14 +57,12 @@ class Logger(HasTraits):
         self._progress_logs = ''
 
     def progress_start(self, msg):
+        import thread, time
         if self._progress_started:
             raise ValueError("Cannot start progress twice!")  # At the moment
-        import thread, time
-        messages = [msg + ': ' + s for s in "/-\|/-\|"]
-        self._progress_logs = self.logs[:]
-        self.logger.info(messages[-1])  # just to inform interested logging handlers
-        self.handler.flush()
         def toprogress():
+            messages = [msg + ': ' + s for s in "/-\|/-\|"]
+            self._progress_logs = self.logs
             self._progress_started = True
             while self._progress_started:
                 for m in messages:
@@ -73,14 +72,14 @@ class Logger(HasTraits):
                     else:
                         break
         thread.start_new_thread(toprogress, ())
+        #GUI.invoke_later(thread.start_new_thread, toprogress, ())
 
-    def progress_stop(self, msg = ''):
+    def progress_stop(self):
         if not self._progress_started:
             raise ValueError("Progress is not started!")
+        self._set_log(self._progress_logs.strip())
+        self._progress_logs = ''
         self._progress_started = False
-        self._progress_logs = ''  # this should be safe because progress_logs are nor displayed
-        if msg:
-            self.logger.info(msg)
 
     def __clear_fired(self):
         self.clear()
