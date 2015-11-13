@@ -4,7 +4,11 @@ import multiprocessing as mp
 from process import Process
 from redirfile import Redirector
 import time
+from exceptions import Exception
 
+class TrainigStopped(Exception):
+    def __init__(self, message = "Training stopped by user."):
+        super(TrainigStopped, self).__init__(message)
 
 class Trainer(HasTraits):
     name = Str
@@ -19,11 +23,10 @@ class TncTrainer(Trainer):
     nproc =  Int(mp.cpu_count())
     messages = Int(1)
 
-    # Is this good place for doing this?
+    # Is this a good place for doing all this?
     def _callback(self, x):
+        self.wdict['weights'] = x
         if self.running.value == 0:
-            self.net.weights[:] = x  #TODO: weights are not saved!
-            # If multiprocessing is used in fmin_tnc we need to terminate these processes
             if self.nproc > 1:
                 self.net._clean_mp()  # this raises AssertionError
             raise AssertionError
@@ -42,15 +45,18 @@ class TncTrainer(Trainer):
         r.start()
         t0 = time.time()
         self.running.value = 1
+        m = mp.Manager()
+        self.wdict = m.dict({'weights':net.weights})
         process = Process(target=net.train_tnc,
-                               args=(inp, trg),
-                               kwargs={'nproc':self.nproc,
-                                       'maxfun': self.maxfun,
-                                       'disp': self.messages,
-                                       'callback': self._callback})
+                          args=(inp, trg),
+                          kwargs={'nproc':self.nproc,
+                                  'maxfun': self.maxfun,
+                                  'disp': self.messages,
+                                  'callback': self._callback})
         process.start()
         process.join()
         process.terminate()
+        net.weights[:] = self.wdict['weights']
         running = self.running.value  # Keep for logging
         self.running.value = 0
         t1 = time.time()
