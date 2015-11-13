@@ -34,6 +34,8 @@ class Trainer(HasTraits):
     stop_training = Button
     logs = Instance(Logger, ())
 
+    
+    _garbage = Str
     values=Dict  # Put here variables to be accesible via shell
 
     def __init__(self, **traits):
@@ -80,58 +82,45 @@ class Trainer(HasTraits):
             self.network = n
             self.logger.info('Network loaded: %s' %n.name)
     
+    def _load_input_data(self):
+        self.input_data.configure_traits(view='all_view')
+
+    def _load_target_data(self):
+        self.target_data.configure_traits(view='all_view')
+    
     def _export(self):
         raise NotImplementedError
     
-    def _train_settings_fired(self):
-        self.train_algorithm.edit_traits(kind='modal')
+    def _train_settings(self):
+        self.edit_traits(view='setings_view', kind='modal')
+        #self.train_algorithm.edit_traits(kind='modal')
     
-    def _train_fired(self):
+    def _train(self):
         self.logger.info('Training network: %s' %self.network.name)
         self.logger.info("Using '%s' trainig algorithm." %self.train_algorithm.name)
         inp = self.input_data.load()
         trg = self.target_data.load()
         thread.start_new_thread(self.train_algorithm.train, (self.network.net, inp, trg, self.logs))
         time.sleep(0.1)  # Wait a while for ui to be updated (it may rely on train_algorithm values)
+        self._garbage = 'a'
+        #self.edit_traits(view = 'training_view', kind = 'livemodal')
 
-    def _stop_training_fired(self):
+    def _train_stop(self):
         self.train_algorithm.running.value = 0
+        time.sleep(0.1)  # Wait a while for ui to be updated (it may rely on train_algorithm values)
+        self._garbage = 'b'
 
-
-    traits_view = View(VSplit(Tabbed(
-                              VGroup(Group(UItem('network', emphasized=True, enabled_when='netlist')),
-                                     Item('input_data', style='custom'),
-                                     Item('target_data', style='custom'),
-                                     HGroup(
-                                            Item('train_algorithm'),
-                                            UItem('train_settings', label='Settings'),
-                                            #label = 'Train algorithm'
-                                            ),
-                                     UItem('train', emphasized=True, enabled_when='netlist and not object.train_algorithm.running.value'),
-                                     UItem('stop_training', emphasized=True, enabled_when='netlist and object.train_algorithm.running.value'),
-                                     label = 'Training',
-                                     show_border = True,
-                                     )),
+    traits_view = View(VSplit(Item('network', emphasized=True, enabled_when='netlist'),
                               Tabbed(
                                      Item('logs', style='custom'),
-                                     #Item('logs',
-                                          #style  = 'readonly',
-                                          #editor = CodeEditor(show_line_numbers = False,
-                                                              #selected_color    = 0xFFFFFF,
-                                                              #selected_line = 'logs_selected_line',
-                                                              #auto_scroll = True,
-                                                              #),
-                                          #dock   = 'tab',
-                                          #export = 'DockWindowShell'
-                                          #),
-                                    Item( 'values',
-                                        label  = 'Shell',
-                                        editor = ShellEditor( share = True ),
-                                        dock   = 'tab',
-                                        export = 'DockWindowShell'
+                                     Item('values',
+                                          label  = 'Shell',
+                                          editor = ShellEditor( share = True ),
+                                          dock   = 'tab',
+                                          export = 'DockWindowShell'
+                                     ),
+                                     show_labels = False
                                     ),
-                                    show_labels = False
-                                   ),
                              ),
                        title = 'ffnet - neural network trainer',
                        width=0.4,
@@ -140,6 +129,19 @@ class Trainer(HasTraits):
                        menubar = menubar,
                        toolbar = toolbar,
                        )
+
+    settings_view = View(Item('train_algorithm'),
+                         Item('object.train_algorithm.maxfun'),
+                         Item('object.train_algorithm.nproc'),
+                         Item('object.train_algorithm.messages'),
+                         buttons = ['OK', 'Cancel'],
+                         title = 'Training settings',
+                         width = 0.2,
+                         )
+    
+    training_view = View(UItem('stop_training'),
+                         title = 'Training network...',
+                         width = 0.2)
 
 if __name__=="__main__":
     from ffnet import loadnet, version
