@@ -103,15 +103,21 @@ class LoadTxt(HasTraits):
         return data
 
     ### VIEW STUFF
+    show_options = Button
+    show_options_status = Bool(False)
     options = Button
     preview = Button
-    
+
     def _options_fired(self):
-       self.edit_traits(view = 'options_view') 
-    
+        #self.show_options_status = not self.show_options_status
+        self.edit_traits(view = 'options_view') 
+
+    def _show_options_fired(self):
+        self.show_options_status = not self.show_options_status
+
     def _preview_fired(self):
-       self.load()
-       self.edit_traits(view = 'array_view') 
+        self.load()
+        self.edit_traits(view = 'array_view') 
 
     traits_view = View(HGroup(UItem('filename', resizable=True, springy=True),
                               UItem('options'),
@@ -120,7 +126,7 @@ class LoadTxt(HasTraits):
                        width = 0.4)
 
     options_view = View(Item('dtype',     label='Data type'),
-                        Item('decimal',   label='Decimal mark'),
+                        Item('decimal',   label='Decimal'),
                         Item('delimiter', label='Delimiter'),
                         Item('columns',   label='Columns'),
                         Item('rows',      label='Rows'),
@@ -131,14 +137,36 @@ class LoadTxt(HasTraits):
                         width = 0.2)
 
     array_view = View(Item('data', show_label = False,
-                           editor = ArrayViewEditor(titles=[''], format='%s', font = 'Arial 8')),
+                           editor = ArrayViewEditor(titles=[''],
+                                                    format='%s',
+                                                    font = 'Arial 10',
+                                                    show_index = False)),
                       title = 'Array preview...',
                       width = 0.3,
-                      height = 0.8,
+                      height = 0.5,
                       buttons = [OKButton, CancelButton],
                       resizable = True)
-        
+    
+    all_view = View(Item('filename', label=" File name", style='simple'),
+                    UItem('show_options', label = 'Show options...'),
+                    Item('skiprows',  label='Skip rows', visible_when='show_options_status'),
+                    Item('columns',   label='Columns', visible_when='show_options_status'),
+                    Item('rows',      label='Rows', visible_when='show_options_status'),
+                    Item('delimiter', label='Delimiter', visible_when='show_options_status'),
+                    Item('decimal',   label='Decimal', visible_when='show_options_status'),
+                    UItem('preview', label='Preview...'),
+                    title = 'Load array...',
+                    buttons = [OKButton, CancelButton],
+                    width = 0.25,
+                    height = 0.25,
+                    resizable=True,
+                    scrollable=True)
+
+
 # Do tests
 if __name__ == "__main__":
     l = LoadTxt()
-    l.configure_traits()
+    l.data = np.array([[]])
+    l.filename = 'black-scholes-input.dat'
+    l.load()
+    l.configure_traits(view = 'all_view')
