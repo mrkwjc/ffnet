@@ -29,9 +29,6 @@ class Trainer(HasTraits):
     target_data = Instance(LoadTxt, ())
     trainers = List([TncTrainer()])
     train_algorithm = Enum(values='trainers')
-    train_settings = Button
-    train = Button
-    stop_training = Button
     logs = Instance(Logger, ())
 
     
@@ -92,7 +89,7 @@ class Trainer(HasTraits):
         raise NotImplementedError
     
     def _train_settings(self):
-        self.edit_traits(view='setings_view', kind='modal')
+        self.edit_traits(view='settings_view', kind='modal')
         #self.train_algorithm.edit_traits(kind='modal')
     
     def _train(self):
