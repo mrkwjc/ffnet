@@ -41,7 +41,7 @@ class Logger(HasTraits):
     def _append_log(self, msg, endline = '\n'):
         def toappend():
             if self._progress_started:
-                self._progress_logs += msg + endline  # this should be safe because progress_logs are nor displayed
+                self._progress_logs += msg + endline
             else:
                 self._logs += msg + endline
         GUI.invoke_later(toappend)  # to be thread safe when logs are displayed in gui
@@ -68,7 +68,7 @@ class Logger(HasTraits):
                 for m in messages:
                     if self._progress_started:
                         self._set_log(self._progress_logs + m)
-                        time.sleep(0.1)
+                        time.sleep(0.05)
                     else:
                         break
         thread.start_new_thread(toprogress, ())
@@ -78,7 +78,7 @@ class Logger(HasTraits):
         if not self._progress_started:
             raise ValueError("Progress is not started!")
         self._set_log(self._progress_logs.strip())
-        self._progress_logs = ''
+        self._progress_logs = ''   # this should be safe because progress_logs are nor displayed
         self._progress_started = False
 
     def __clear_fired(self):

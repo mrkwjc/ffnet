@@ -39,11 +39,18 @@ class Network(HasTraits):
     biases_in_preview = Bool(False)
     net = Any  #Instance(ffnet) #, (mlgraph((2, 2, 1)), True))
     #create_button = Action(name = 'Create', action = 'create_button_handler')
-    preview = Button
+    preview_button = Button
     preview_figure = Instance(MPLFigureSimple, ())
 
     def __repr__(self):
         return self.name
+
+    def is_created(self):
+        try:
+            self.net.weights
+            return True
+        except:
+            return False
 
     def create_network(self):
         try:
@@ -89,33 +96,50 @@ class Network(HasTraits):
             path = dialog.path
             if not os.path.isfile(path):
                 pyface.error(None, "File '%s' does not exist!"%path)
-                return
+                return False
             self.net = loadnet(path)
             self.file_name = path
             self.name = os.path.splitext(os.path.basename(path))[0]
             return True
+        return False
 
-    def _preview_fired(self):
-        success = self.create_network()
-        if success:
-            graph = self.net.graph
-            nlist = sorted(self.net.graph.nodes())
-            if not self.biases_in_preview:
-                graph = graph.subgraph(nlist[1:])
-            axes = self.preview_figure.axes
-            matplotlib.rcParams['interactive']=False
-            nx.draw_graphviz(graph, ax = axes, prog='dot', with_labels=True,
+    def plot_preview(self):
+        if not self.is_created():
+            return
+        graph = self.net.graph
+        nlist = sorted(self.net.graph.nodes())
+        if not self.biases_in_preview:
+            graph = graph.subgraph(nlist[1:])
+        axes = self.preview_figure.axes
+        matplotlib.rcParams['interactive']=False
+        nx.draw_graphviz(graph, ax = axes, prog='dot', with_labels=True,
                             node_color='#A0CBE2', node_size=500,
                             edge_color='k')
-            matplotlib.rcParams['interactive']=True
+        matplotlib.rcParams['interactive']=True
+    
+    def clear_preview(self):
+        self.preview_figure.axes.clear()
+        self.preview_figure.figure.set_facecolor('white')
+        # self.preview_figure.axes.xaxis.set_visible(False)
+        # self.preview_figure.axes.xaxis.set_visible(False)
+        # self.preview_figure.axes.set_frame_on(False)
+        self.preview_figure.axes.axis('off')
+
+    def _preview_button_fired(self):
+        ok = True
+        if not self.is_created():
+            ok = self.create_network()
+        if ok:
+            self.plot_preview()
             self.preview_figure.edit_traits(kind='livemodal')
-            #self.edit_traits(view='preview_view', kind='livemodal')
+
+
 
     traits_view = View(Item('architecture', has_focus=True),
                        Item('connectivity_type'),
                        Item('biases'),
                        Item('biases_in_preview'),
-                       UItem('preview'),
+                       UItem('preview_button', label = 'Preview'),
                        handler = NetworkHandler(),
                        buttons = [OKButton, CancelButton],
                        resizable=True,
