@@ -13,6 +13,7 @@ import sys
 import time
 import uuid
 
+from mplfigure import MPLFigureEditor
 from logger import Logger
 from toolbar import toolbar, menubar
 
@@ -107,7 +108,9 @@ class Trainer(HasTraits):
         time.sleep(0.1)  # Wait a while for ui to be updated (it may rely on train_algorithm values)
         self._garbage = 'b'
 
-    traits_view = View(VSplit(Item('network', emphasized=True, enabled_when='netlist'),
+    traits_view = View(VSplit(Group(UItem('network', emphasized=True, enabled_when='netlist'),
+                                    # UItem('object.network.preview_figure', style='custom'),
+                                    scrollable=True),
                               Tabbed(
                                      Item('logs', style='custom'),
                                      Item('values',

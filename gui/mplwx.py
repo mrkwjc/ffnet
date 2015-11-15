@@ -35,7 +35,7 @@ class _MPLFigureEditor(Editor):
         sizer.Add(mpl_control, 1, wx.LEFT | wx.TOP | wx.GROW)
         toolbar = NavigationToolbar2Wx(mpl_control)
         sizer.Add(toolbar, 0, wx.EXPAND)
-        #self.value.canvas.SetMinSize((10,10))
+        self.value.canvas.SetMinSize((10,10))
         return panel
 
 class MPLFigureEditor(BasicEditorFactory):
@@ -73,6 +73,7 @@ if __name__ == "__main__":
 
         def __init__(self):
             super(Test, self).__init__()
+            #self.figure.canvas.SetMinSize((100,100))
             self.axes = self.figure.add_subplot(111)
             t = linspace(0, 2*pi, 200)
             self.axes.plot(sin(t)*(1+0.5*cos(11*t)), cos(t)*(1+0.5*cos(11*t)))
