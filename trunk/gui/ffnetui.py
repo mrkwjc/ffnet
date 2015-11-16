@@ -15,7 +15,7 @@ import uuid
 
 from mplfigure import MPLFigureEditor
 from logger import Logger
-from toolbar import toolbar, menubar
+from bars import toolbar, menubar
 
 class Trainer(HasTraits):
     netlist = List(values=Instance(Network))
@@ -126,7 +126,7 @@ class Trainer(HasTraits):
                        width=0.4,
                        height=0.5,
                        resizable = True,
-                       menubar = menubar,
+                       # menubar = menubar,
                        toolbar = toolbar,
                        )
 
