@@ -7,6 +7,7 @@ import pyface.api as pyface
 from ffnet_import import *
 
 from mplfigure import MPLFigureSimple
+from mplplots import PreviewFigure
 import matplotlib
 import networkx as nx
 import os
@@ -38,19 +39,27 @@ class Network(HasTraits):
     biases = Bool(True)
     biases_in_preview = Bool(False)
     net = Any  #Instance(ffnet) #, (mlgraph((2, 2, 1)), True))
-    #create_button = Action(name = 'Create', action = 'create_button_handler')
+    info = Property
     preview_button = Button
-    preview_figure = Instance(MPLFigureSimple, ())
+    preview_figure = Instance(PreviewFigure, ())
 
     def __repr__(self):
         return self.name
 
-    def is_created(self):
-        try:
-            self.net.weights
-            return True
-        except:
-            return False
+    def _architecture_changed(self):
+        self.net=None
+
+    def _connectivity_type_changed(self):
+        self.net=None
+
+    def _biases_changed(self):
+        self.net=None
+
+    @property
+    def info(self):
+        if self.net is not None:
+            return '\n' + self.net.__repr__()
+        return '\n'
 
     def create_network(self):
         try:
@@ -68,6 +77,9 @@ class Network(HasTraits):
             return False
 
     def save_as(self):
+        if self.net is None:
+           pyface.error(None, "Network neither created nor loaded!\n")
+           return
         wildcard = 'Network file (*.net)|*.net'
         dialog = pyface.FileDialog(parent=None,
                                    title='Save as',
@@ -97,43 +109,27 @@ class Network(HasTraits):
             if not os.path.isfile(path):
                 pyface.error(None, "File '%s' does not exist!"%path)
                 return False
-            self.net = loadnet(path)
+            try:
+                self.net = loadnet(path)  #try, except
+            except:
+                import sys
+                pyface.error(None, "Network cannot be loaded!\nWrong network file.\n")
+                return False
             self.file_name = path
             self.name = os.path.splitext(os.path.basename(path))[0]
             return True
         return False
 
-    def plot_preview(self):
-        if not self.is_created():
-            return
-        graph = self.net.graph
-        nlist = sorted(self.net.graph.nodes())
-        if not self.biases_in_preview:
-            graph = graph.subgraph(nlist[1:])
-        axes = self.preview_figure.axes
-        matplotlib.rcParams['interactive']=False
-        nx.draw_graphviz(graph, ax = axes, prog='dot', with_labels=True,
-                            node_color='#A0CBE2', node_size=500,
-                            edge_color='k')
-        matplotlib.rcParams['interactive']=True
-    
-    def clear_preview(self):
-        self.preview_figure.axes.clear()
-        self.preview_figure.figure.set_facecolor('white')
-        # self.preview_figure.axes.xaxis.set_visible(False)
-        # self.preview_figure.axes.xaxis.set_visible(False)
-        # self.preview_figure.axes.set_frame_on(False)
-        self.preview_figure.axes.axis('off')
-
     def _preview_button_fired(self):
         ok = True
-        if not self.is_created():
+        if self.net is None:
             ok = self.create_network()
         if ok:
-            self.plot_preview()
-            self.preview_figure.edit_traits(kind='livemodal')
-
-
+            self.preview_figure.show_status = False
+            self.preview_figure.biases_in_preview = self.biases_in_preview
+            self.preview_figure.net = self.net
+            self.preview_figure.show_status = True
+            self.preview_figure.edit_traits(view='simple_view', kind='live')
 
     traits_view = View(Item('architecture', has_focus=True),
                        Item('connectivity_type'),
@@ -144,7 +140,7 @@ class Network(HasTraits):
                        buttons = [OKButton, CancelButton],
                        resizable=True,
                        width=0.2)
-    
+
     #preview_view = View(UItem('preview_figure', style='custom'))
 
 

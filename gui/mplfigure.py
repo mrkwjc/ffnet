@@ -36,8 +36,8 @@ class MPLFigureSimple(HasTraits):
         self.rs = RectangleSelector(self.axes, onselect,
                                     drawtype='box',useblit=True)
 
-    view = View(Item('figure', editor=MPLFigureEditor(),
-                     show_label=False),
-                     handler=MPLInitHandler,
-                     resizable=True,
-                     )
+    traits_view = View(Item('figure', editor=MPLFigureEditor(),
+                       show_label=False),
+                       handler=MPLInitHandler,
+                       resizable=True,
+                       )
