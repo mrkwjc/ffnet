@@ -32,7 +32,6 @@ class Trainer(HasTraits):
     train_algorithm = Enum(values='trainers')
     logs = Instance(Logger, ())
 
-    
     _garbage = Str
     values=Dict  # Put here variables to be accesible via shell
 
@@ -92,7 +91,7 @@ class Trainer(HasTraits):
     def _train_settings(self):
         self.edit_traits(view='settings_view', kind='modal')
         #self.train_algorithm.edit_traits(kind='modal')
-    
+
     def _train(self):
         self.logger.info('Training network: %s' %self.network.name)
         self.logger.info("Using '%s' trainig algorithm." %self.train_algorithm.name)
@@ -108,23 +107,28 @@ class Trainer(HasTraits):
         time.sleep(0.1)  # Wait a while for ui to be updated (it may rely on train_algorithm values)
         self._garbage = 'b'
 
-    traits_view = View(VSplit(Group(UItem('network', emphasized=True, enabled_when='netlist'),
-                                    # UItem('object.network.preview_figure', style='custom'),
+    traits_view = View(UItem('network', emphasized=True, enabled_when='netlist'),
+                       VSplit(Tabbed(UItem('object.network.info',
+                                          style='readonly',
+                                          label='Info'),
+                                     UItem('object.network.preview_figure',
+                                          style='custom',
+                                          label='Architecture'),
                                     scrollable=True),
                               Tabbed(
-                                     Item('logs', style='custom'),
+                                     Item('logs', style='custom', height = 0.3),
                                      Item('values',
                                           label  = 'Shell',
                                           editor = ShellEditor( share = True ),
                                           dock   = 'tab',
                                           export = 'DockWindowShell'
-                                     ),
+                                          ),
                                      show_labels = False
                                     ),
                              ),
                        title = 'ffnet - neural network trainer',
                        width=0.4,
-                       height=0.5,
+                       height=1.0,
                        resizable = True,
                        # menubar = menubar,
                        toolbar = toolbar,
@@ -152,6 +156,7 @@ if __name__=="__main__":
     n = Network()
     path = 'testnet.net'
     n.net = loadnet(path)
+    n.preview_figure.net = n.net
     n.file_name = path
     n.name = os.path.splitext(os.path.basename(path))[0]
     t.netlist.append(n)
