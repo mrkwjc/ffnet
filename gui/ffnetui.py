@@ -18,119 +18,107 @@ from logger import Logger
 from bars import toolbar, menubar
 
 class Trainer(HasTraits):
-    netlist = List(values=Instance(Network))
-    network = Enum(values='netlist')
-    new = Button
-    remove = Button
-    save_as = Button
-    load = Button
-    export = Button
-    #
+    network = Instance(Network, ())
     input_data = Instance(LoadTxt, ())
     target_data = Instance(LoadTxt, ())
-    trainers = List([TncTrainer()])
-    train_algorithm = Enum(values='trainers')
+    trainer = Instance(TncTrainer, ())
     logs = Instance(Logger, ())
+    running = Bool(False)
+    logger = DelegatesTo('logs')
+    net = DelegatesTo('network')
+    inp = DelegatesTo('input_data', prefix='data')
+    trg = DelegatesTo('target_data', prefix='data')
 
-    _garbage = Str
-    values=Dict  # Put here variables to be accesible via shell
-
-    def __init__(self, **traits):
-        HasTraits.__init__(self, **traits)
-        self.logger = self.logs.logger
+    #def __init__(self, **traits):
+        #HasTraits.__init__(self, **traits)        
 
     def _new(self):
-        n = Network()
-        n.edit_traits(kind='livemodal')
-        if n.net is not None:
-            self.netlist.append(n)
-            self.network = n
-            self.logger.info('Network created: %s' %n.name)
-
-    def _remove(self):
-        if len(self.netlist) != 0:
-            idx = self.netlist.index(self.network)
-            name = self.network.name
-            del self.netlist[idx]
-            self.logger.info('Network removed: %s' %name)
-
-    def _save_as(self):
-        oldname = self.network.name
-        success = self.network.save_as() # Open dialog
-        if success:
-            # Hack for changing name in the Enum list
-            n = self.network
-            self.netlist.append(Network())
-            self.network = self.netlist[-1]
-            self.netlist = self.netlist[:-1]
-            self.network = n
-            # Log
-            newname = self.network.name
-            if newname == oldname:
-                self.logger.info('Network saved: %s' %oldname)
-            else:
-                self.logger.info('Network %s saved as: %s' %(oldname, newname))
+        self.network.create(logger=self.logs.logger)
 
     def _load(self):
-        n = Network()
-        n.load()  # Open dialog
-        if n.net is not None:
-            self.netlist.append(n)
-            self.network = n
-            self.logger.info('Network loaded: %s' %n.name)
-    
-    def _load_input_data(self):
-        self.input_data.configure_traits(view='all_view')
+        self.network.load(logger=self.logs.logger)
 
-    def _load_target_data(self):
-        self.target_data.configure_traits(view='all_view')
-    
+    def _save_as(self):
+        self.network.save_as(logger=self.logs.logger)
+
     def _export(self):
         raise NotImplementedError
-    
+
+    def _close(self):
+        self.network.close(logger=self.logs.logger)
+
+    def _load_input_data(self):
+        self.input_data.configure_traits(view='all_view', kind='modal')
+        if self.inp_is_ok and self.input_data.updated:
+            msg = "Loaded %i input patterns from file: %s" %(self.inp.shape[0],
+                                                             self.input_data.filename)
+            self.logs.logger.info(msg)
+            self.input_data.updated = False
+
+    def _load_target_data(self):
+        self.target_data.configure_traits(view='all_view', kind='modal')
+        if self.trg_is_ok and self.target_data.updated:
+            msg = "Loaded %i target patterns from file: %s" %(self.trg.shape[0],
+                                                              self.target_data.filename)
+            self.logs.logger.info(msg)
+            self.target_data.updated = False
+
+    @property
+    def inp_is_ok(self):
+        if self.net and self.inp is not None:
+            return self.inp.shape[1] == len(self.net.inno)
+        return False
+
+    @property
+    def trg_is_ok(self):
+        inp = self.inp
+        trg = self.trg
+        net = self.net
+        if self.net and inp is not None and trg is not None:
+            return trg.shape[1] == len(net.outno) and len(inp) == len(trg)
+        return False
+
     def _train_settings(self):
-        self.edit_traits(view='settings_view', kind='modal')
-        #self.train_algorithm.edit_traits(kind='modal')
+        #self.edit_traits(view='settings_view', kind='modal')
+        self.trainer.edit_traits(kind='modal')
 
     def _train(self):
-        self.logger.info('Training network: %s' %self.network.name)
-        self.logger.info("Using '%s' trainig algorithm." %self.train_algorithm.name)
-        inp = self.input_data.load()
-        trg = self.target_data.load()
-        thread.start_new_thread(self.train_algorithm.train, (self.network.net, inp, trg, self.logs))
-        time.sleep(0.1)  # Wait a while for ui to be updated (it may rely on train_algorithm values)
-        self._garbage = 'a'
-        #self.edit_traits(view = 'training_view', kind = 'livemodal')
+        self.logger.info('Training network: %s' %self.network.filename)
+        self.logger.info("Using '%s' trainig algorithm." %self.trainer.name)
+        thread.start_new_thread(self.trainer.train, (self,))
 
     def _train_stop(self):
-        self.train_algorithm.running.value = 0
-        time.sleep(0.1)  # Wait a while for ui to be updated (it may rely on train_algorithm values)
-        self._garbage = 'b'
+        self.trainer.running.value = 0
 
-    traits_view = View(UItem('network', emphasized=True, enabled_when='netlist'),
-                       VSplit(Tabbed(UItem('object.network.info',
-                                          style='readonly',
-                                          label='Info'),
-                                     UItem('object.network.preview_figure',
-                                          style='custom',
-                                          label='Architecture'),
-                                    scrollable=True),
+    def _randomweights(self):
+        self.net.randomweights()
+        self.logger.info('Weights has been randomized!')
+
+
+    traits_view = View(#UItem('network', emphasized=True, enabled_when='netlist'),
+                       #VSplit(Tabbed(UItem('object.network.info',
+                                          #style='readonly',
+                                          #label='Info'),
+                                     #UItem('object.network.preview_figure',
+                                          #style='custom',
+                                          #label='Architecture'),
+                                    #scrollable=True),
                               Tabbed(
                                      Item('logs', style='custom', height = 0.3),
-                                     Item('values',
-                                          label  = 'Shell',
-                                          editor = ShellEditor( share = True ),
-                                          dock   = 'tab',
-                                          export = 'DockWindowShell'
-                                          ),
+                                     #Item('values',
+                                          #label  = 'Shell',
+                                          #editor = ShellEditor( share = True ),
+                                          #dock   = 'tab',
+                                          #export = 'DockWindowShell'
+                                          #),
                                      show_labels = False
                                     ),
-                             ),
+                             #),
                        title = 'ffnet - neural network trainer',
                        width=0.4,
-                       height=1.0,
+                       height=0.5,
                        resizable = True,
-                       # menubar = menubar,
+                       #menubar = menubar,
                        toolbar = toolbar,
                        )
 
@@ -151,19 +139,22 @@ if __name__=="__main__":
     from ffnet import loadnet, version
     import os
     t = Trainer()
-    t.logger.info('Welcome! You are using ffnet-%s.' %version)
+    t.logs.logger.info('Welcome! You are using ffnet-%s.' %version)
     # Add test network
-    n = Network()
+    n = t.network
     path = 'testnet.net'
     n.net = loadnet(path)
-    n.preview_figure.net = n.net
-    n.file_name = path
-    n.name = os.path.splitext(os.path.basename(path))[0]
-    t.netlist.append(n)
-    t.network = n
+    #n.preview_figure.net = n.net
+    n.filename = path
+    #n.name = os.path.splitext(os.path.basename(path))[0]
+    #t.netlist.append(n)
+    #t.network = n
     # Add test data
     t.input_data.filename = 'black-scholes-input.dat'
+    t.input_data.load()
     t.target_data.filename = 'black-scholes-target.dat'
+    t.target_data.load()
+
     # Run
     t.configure_traits()
 

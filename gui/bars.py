@@ -6,80 +6,93 @@ from enthought.pyface.image_resource import ImageResource
 new_network_action = Action(
     name   = 'New...', 
     action = '_new',
-    image  = ImageResource('document-new')
+    image  = ImageResource('document-new'),
+    enabled_when = 'not running'
     )
 
 load_network_action = Action(
     name   = 'Load...', 
     action = '_load',
-    image  = ImageResource('document-open')
+    image  = ImageResource('document-open'),
+    enabled_when = 'not running'
     )
 
 save_as_network_action = Action(
     name   = 'Save...', 
     action = '_save_as',
     image  = ImageResource('document-save-as'),
-    enabled_when = 'object.netlist')
-
-remove_network_action = Action(
-    name   = 'Remove', 
-    action = '_remove',
-    image  = ImageResource('user-trash'),
-    enabled_when = 'object.netlist')
+    enabled_when = 'net and not running')
 
 export_network_action = Action(
     name   = 'Export', 
     action = '_export',
     image  = ImageResource('text-x-generic-template'),
-    enabled_when = 'True')
+    enabled_when = 'net and not running')
+
+close_network_action = Action(
+    name   = 'Close', 
+    action = '_close',
+    image  = ImageResource('process-stop'),
+    enabled_when = 'net and not running')
 
 input_data_action = Action(
     name   = 'Input', 
     action = '_load_input_data',
     image  = ImageResource('text-x-generic'),
-    enabled_when = 'netlist')
+    enabled_when = 'net and not running',
+    visible_when = 'False')
 
 target_data_action = Action(
     name   = 'Target', 
     action = '_load_target_data',
     image  = ImageResource('text-x-generic'),
-    enabled_when = 'object.netlist and object.input_data.filename')
+    enabled_when = 'net and object.inp.shape[1] == len(object.net.inno) and ' + \
+                   'not running')
 
-training_settings_action = Action(
-    name   = 'Settings', 
+training_setup_action = Action(
+    name   = 'Setup', 
     action = '_train_settings',
     image  = ImageResource('preferences-system'),
-    enabled_when = 'object.input_data and object.target_data')
+    enabled_when = 'net and  object.trg.shape[1] == len(object.net.outno) and ' + \
+                   'len(object.inp) == len(object.trg) and not running')
 
 train_action = Action(
     name   = 'Train!', 
     action = '_train',
     image  = ImageResource('go-next'),
-    enabled_when = 'netlist and not object.train_algorithm.running.value')
+    enabled_when = 'net and  object.trg.shape[1] == len(object.net.outno) and ' + \
+                   'len(object.inp) == len(object.trg) and not running')
 
 train_stop_action = Action(
     name   = 'Stop!', 
     action = '_train_stop',
     image  = ImageResource('media-record'),
-    enabled_when = 'netlist and object.train_algorithm.running.value')
+    enabled_when = 'running')
+
+train_reset_action = Action(
+    name   = 'Reset', 
+    action = '_randomweights',
+    image  = ImageResource('media-record'),
+    enabled_when = 'not running')
 
 
 # Groups of actions
-network_actions = Separator(
+network_actions = ActionGroup(
     new_network_action,
     load_network_action,
     save_as_network_action,
-    remove_network_action,
-    export_network_action)
+    export_network_action,
+    close_network_action)
 
-data_actions = Separator(
+data_actions = ActionGroup(
     input_data_action,
     target_data_action)
 
-train_actions = Separator(
-    training_settings_action,
+train_actions = ActionGroup(
+    training_setup_action,
     train_action,
-    train_stop_action)
+    train_stop_action,
+    train_reset_action)
 
 # File menu
 file_menu = Menu(network_actions,

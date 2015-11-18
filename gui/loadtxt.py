@@ -5,6 +5,7 @@
 from enthought.traits.api import *
 from enthought.traits.ui.api import *
 from enthought.traits.ui.ui_editors.array_view_editor import ArrayViewEditor
+import pyface.api as pyface
 import numpy
 from types import IntType
 
@@ -38,6 +39,15 @@ class SliceStr(BaseStr):
     def info(self):
         return "string for slicing "
 
+
+class LoadTxtHandler(Handler):
+    def close(self, info, is_ok):
+        if is_ok:
+            data = info.object.load()
+            return True if data is not None else False
+        else:
+            return True
+
 class LoadTxt(HasTraits):
     """
     Class for loading text files into numpy arrays.
@@ -53,22 +63,30 @@ class LoadTxt(HasTraits):
     comments = Str('#')
     converters = Dict(Int, Callable)
     data = CArray
+    updated = Bool(False)  # ff new data was loaded
    
     def load(self):
         """
         Loads text file to numpy array
         Array is returned and saved to 'data' attribute.
         """
-        file = self._openfile()
-        data = numpy.loadtxt(file,
-                             dtype = self.dtype,
-                             comments = self.comments or None,
-                             delimiter = self.delimiter or None,
-                             converters = self.converters,
-                             skiprows = self.skiprows,
-                             ndmin = 2)
-        self.data = self._sliced(data)
-        return self.data
+        try:
+            file = self._openfile()
+            data = numpy.loadtxt(file,
+                                dtype = self.dtype,
+                                comments = self.comments or None,
+                                delimiter = self.delimiter or None,
+                                converters = self.converters,
+                                skiprows = self.skiprows,
+                                ndmin = 2)
+            self.data = self._sliced(data)
+            self.updated = True
+            return self.data
+        except:
+            import sys
+            e = sys.exc_info()[1]
+            pyface.error(None, "Network cannot be created!\n\n" + e.message)
+            return None
 
     def _openfile(self):
         """
@@ -147,18 +165,21 @@ class LoadTxt(HasTraits):
                       buttons = [OKButton, CancelButton],
                       resizable = True)
     
-    all_view = View(Item('filename', label=" File name", style='simple'),
-                    UItem('show_options', label = 'Show options...'),
+    all_view = View(Item('filename', label="  File name", style='simple'),
+                    UItem('show_options', label = 'Show/Hide options...'),
                     Item('skiprows',  label='Skip rows', visible_when='show_options_status'),
                     Item('columns',   label='Columns', visible_when='show_options_status'),
                     Item('rows',      label='Rows', visible_when='show_options_status'),
                     Item('delimiter', label='Delimiter', visible_when='show_options_status'),
-                    Item('decimal',   label='Decimal', visible_when='show_options_status'),
+                    Item('comments',  label='Comments', visible_when='show_options_status'),
+                    Item('dtype',     label='Data type', visible_when='show_options_status'),
+                    Item('decimal',   label='Decimal', visible_when='show_options_status and dtype=="float"'),
                     UItem('preview', label='Preview...'),
                     title = 'Load array...',
                     buttons = [OKButton, CancelButton],
+                    handler = LoadTxtHandler(),
                     width = 0.25,
-                    height = 0.25,
+                    height = 0.3,
                     resizable=True,
                     scrollable=True)
 
