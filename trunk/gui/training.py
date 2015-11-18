@@ -6,6 +6,13 @@ from redirfile import Redirector
 import time
 from exceptions import Exception
 
+def parse_tnc_output(output):
+    import cStringIO
+    import numpy as np
+    f = cStringIO.StringIO(output)
+    res = np.loadtxt(f, skiprows=1)
+    return res
+
 class TrainigStopped(Exception):
     def __init__(self, message = "Training stopped by user."):
         super(TrainigStopped, self).__init__(message)
@@ -31,20 +38,25 @@ class TncTrainer(Trainer):
                 self.net._clean_mp()  # this raises AssertionError
             raise AssertionError
 
-    def train(self, net, inp, trg, logs):
+    def train(self, info):
         # Setup
-        logger = logs.logger
+        logger = info.logger
+        net = info.net
+        inp = info.inp
+        trg = info.trg
         self.net = net
         if not self.maxfun:
             self.maxfun = max(100, 10*len(net.weights))  # should be in ffnet!
         self.nproc = min(self.nproc, len(inp))  # should be in ffnet!
         #
         ## Run training
-        logs.progress_start("Training in progress...")
+        info.logs.progress_start("Training in progress...")
+        #logger.info("Training in progress. Please wait ...")
         r = Redirector(fd=2)  # Redirect stderr
         r.start()
         t0 = time.time()
         self.running.value = 1
+        info.running = True
         m = mp.Manager()
         self.wdict = m.dict({'weights':net.weights})
         process = Process(target=net.train_tnc,
@@ -59,12 +71,14 @@ class TncTrainer(Trainer):
         net.weights[:] = self.wdict['weights']
         running = self.running.value  # Keep for logging
         self.running.value = 0
+        info.running = False
         t1 = time.time()
-        logs.progress_stop()
+        info.logs.progress_stop()
         ## Training finished
         #
         # Get catched output
         output = r.stop()
+        self.output = parse_tnc_output(output)
         logger.info(output.strip())
         # Discover and log reason of termination
         if not running:

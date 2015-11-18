@@ -4,20 +4,19 @@ from mplfigure import MPLFigureSimple, MPLInitHandler, MPLFigureEditor
 
 class PreviewFigure(MPLFigureSimple):
     net = Any
-    biases_in_preview = Bool(False)
-
-    def _net_changed(self):
-        self.plot()
-
-    def _biases_in_preview_changed(self):
-        self.plot()
+    biases = Bool(False)
 
     def mpl_setup(self):
         self.figure.set_facecolor('white')
         self.axes.xaxis.set_visible(False)
         self.axes.yaxis.set_visible(False)
         self.axes.set_frame_on(False)
-        #self.axes.axis('off')
+
+    def _net_changed(self):
+        self.plot()
+
+    def _biases_changed(self):
+        self.plot()
 
     def plot(self):
         if self.net is None:
@@ -27,9 +26,8 @@ class PreviewFigure(MPLFigureSimple):
         self.axes.clear()
         net = self.net
         graph = net.graph
-        if 0 in net.graph.nodes() and not self.biases_in_preview:
+        if 0 in net.graph.nodes() and not self.biases:
             nlist = sorted(net.graph.nodes())
-            # if not self.biases_in_preview:
             graph = graph.subgraph(nlist[1:])
         axes = self.axes
         matplotlib.rcParams['interactive']=False
