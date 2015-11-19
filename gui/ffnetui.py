@@ -18,17 +18,45 @@ from logger import Logger
 from bars import toolbar, menubar
 from mplplots import ErrorFigure
 
+import multiprocessing as mp
+
+class TrainingSettings(HasTraits):
+    training_algorithm = Enum('tnc')
+    # tnc options
+    maxfun = Int(0)
+    nproc = Int(mp.cpu_count())
+    # other
+    validation_patterns = Range(0, 50, 10)  # %
+    validation_type = Enum('random', 'last')
+    normalize = Bool(True)
+    
+    traits_view = View(Item('training_algorithm'),
+                       Item('maxfun', visible_when='training_algorithm == "tnc"'),
+                       Item('nproc', visible_when='training_algorithm == "tnc"'),
+                       Item('validation_patterns', label = 'Validation patterns [%]'),
+                       Item('validation_type'),
+                       Item('normalize'),
+                       buttons = ['OK', 'Cancel'],
+                       title = 'Training settings',
+                       resizable = True,
+                       width = 0.2)
+
+
 class Trainer(HasTraits):
     network = Instance(Network, ())
     input_data = Instance(LoadTxt, ())
     target_data = Instance(LoadTxt, ())
     trainer = Instance(TncTrainer, ())
+    settings = Instance(TrainingSettings, ())
     logs = Instance(Logger, ())
     running = Bool(False)
     logger = DelegatesTo('logs')
     net = DelegatesTo('network')
     inp = DelegatesTo('input_data', prefix='data')
     trg = DelegatesTo('target_data', prefix='data')
+    validation_patterns = DelegatesTo('settings')
+    validation_type = DelegatesTo('settings')
+    normalize = DelegatesTo('settings')
     error_figure = Instance(ErrorFigure, ())
 
     #def __init__(self, **traits):
@@ -57,6 +85,8 @@ class Trainer(HasTraits):
                                                              self.input_data.filename)
             self.logs.logger.info(msg)
             self.input_data.updated = False
+            self._set_validation_mask()
+
 
     def _load_target_data(self):
         self.target_data.configure_traits(view='all_view', kind='modal')
@@ -65,10 +95,11 @@ class Trainer(HasTraits):
                                                               self.target_data.filename)
             self.logs.logger.info(msg)
             self.target_data.updated = False
+            self._set_validation_mask()
 
     @property
     def inp_is_ok(self):
-        if self.net and self.inp is not None:
+        if self.net and len(self.inp) > 0:
             return self.inp.shape[1] == len(self.net.inno)
         return False
 
@@ -77,13 +108,13 @@ class Trainer(HasTraits):
         inp = self.inp
         trg = self.trg
         net = self.net
-        if self.net and inp is not None and trg is not None:
+        if self.net and len(inp) > 0 and len(trg) > 0:
             return trg.shape[1] == len(net.outno) and len(inp) == len(trg)
         return False
 
     def _train_settings(self):
         #self.edit_traits(view='settings_view', kind='modal')
-        self.trainer.edit_traits(kind='modal')
+        self.settings.edit_traits(kind='modal')
 
     def _train(self):
         self.logger.info('Training network: %s' %self.network.filename)
@@ -99,6 +130,29 @@ class Trainer(HasTraits):
             self.logger.info('Weights has been randomized!')
         self.trainer.reset()
         self.error_figure.reset()
+
+    def _set_validation_mask(self):
+        npat = len(self.inp)
+        self.vmask = ~np.ones(npat, np.bool)
+        if self.trg_is_ok:
+            percent = self.settings.validation_patterns
+            npat_v = percent*npat/100
+            type_ = self.validation_type
+            if type_ == 'random':
+                idx = np.random.choice(npat, npat_v)
+                mask = np.in1d(np.arange(npat), idx)
+                self.vmask = mask
+            if type_ == 'last':
+                mask = np.ones(npat, np.bool)
+                mask[:npat-npat_v] = False
+                self.vmask = mask
+            self.logger.info('%i training patterns chosen for validation (%s)' %(npat_v, type_))
+
+    def _validation_patterns_changed(self):
+        self._set_validation_mask()
+    
+    def _validation_type_changed(self):
+        self._set_validation_mask()    
 
     traits_view = View(#UItem('network', emphasized=True, enabled_when='netlist'),
                        VSplit(#Tabbed(UItem('object.network.info',
