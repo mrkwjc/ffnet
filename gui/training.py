@@ -5,10 +5,11 @@ from process import Process
 from redirfile import Redirector
 import time
 from exceptions import Exception
+import numpy as np
+
 
 def parse_tnc_output(output):
     import cStringIO
-    import numpy as np
     f = cStringIO.StringIO(output)
     res = np.loadtxt(f, skiprows=1)
     return res
@@ -29,10 +30,24 @@ class TncTrainer(Trainer):
     maxfun = Int(0)
     nproc =  Int(mp.cpu_count())
     messages = Int(1)
+    elist = List([])
+    manager = Any
+    wlist = Any
+    continued = Bool(False)
+
+    def __init__(self, **traits):
+        HasTraits.__init__(self, **traits)
+        self.manager = mp.Manager()
+        self.wlist = self.manager.list([])
+
+    def reset(self):
+        self.wlist = self.manager.list([])
+        self.elist = []
+        self.continued = False
 
     # Is this a good place for doing all this?
     def _callback(self, x):
-        self.wdict['weights'] = x
+        self.wlist.append(x)
         if self.running.value == 0:
             if self.nproc > 1:
                 self.net._clean_mp()  # this raises AssertionError
@@ -57,8 +72,8 @@ class TncTrainer(Trainer):
         t0 = time.time()
         self.running.value = 1
         info.running = True
-        m = mp.Manager()
-        self.wdict = m.dict({'weights':net.weights})
+        if not self.continued:
+            self.wlist.append(net.weights)
         process = Process(target=net.train_tnc,
                           args=(inp, trg),
                           kwargs={'nproc':self.nproc,
@@ -68,7 +83,7 @@ class TncTrainer(Trainer):
         process.start()
         process.join()
         process.terminate()
-        net.weights[:] = self.wdict['weights']
+        net.weights[:] = self.wlist[-1]
         running = self.running.value  # Keep for logging
         self.running.value = 0
         info.running = False
@@ -78,7 +93,13 @@ class TncTrainer(Trainer):
         #
         # Get catched output
         output = r.stop()
-        self.output = parse_tnc_output(output)
+        err = parse_tnc_output(output).T[2].tolist()
+        if self.continued:
+            err = err[1:]
+        if not running:
+            err = err[:-1]
+        self.elist += err
+        info.error_figure.plot(range(len(self.elist)), self.elist)
         logger.info(output.strip())
         # Discover and log reason of termination
         if not running:
@@ -92,6 +113,7 @@ class TncTrainer(Trainer):
                 logger.info(tb.strip())
         # Log time
         logger.info('Execution time: %3.3f seconds.' %(t1-t0))
+        self.continued = True
 
 
     traits_view = View(
