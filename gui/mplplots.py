@@ -59,13 +59,22 @@ class ErrorFigure(MPLFigureSimple):
         ax.set_yscale("log")
         ax.grid()
         ax.set_xlabel('Iteration')
-        ax.set_ylabel('$$\sum_i\sum_j\left(t_{ij} - o_{ij}\\right)^2$$')
-        ax.set_title('Training error')
+        ax.set_ylabel('$$\sum_i\sum_j\left(o_{ij} - t_{ij}\\right)^2$$')
+        #ax.set_title('Training error')
         self.figure.tight_layout()
+        ax.legend()
 
     def plot(self, it, err):
         ax = self.axes
-        ax.plot(it, err, 'ro-', lw=2)
+        ax.plot(it, err, 'ro-', lw=2, label='Training error')
+        ax.legend()
+        self.draw()
+    plott = plot
+    
+    def plotv(self, it, err):
+        ax = self.axes
+        ax.plot(it, err, 'gv-', lw=2, label='Validation error')
+        ax.legend()
         self.draw()
 
 #class PreviewFigure(MPLFigureSimple):

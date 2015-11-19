@@ -64,9 +64,11 @@ class Trainer(HasTraits):
 
     def _new(self):
         self.network.create(logger=self.logs.logger)
+        self.normalize = self.net.renormalize
 
     def _load(self):
         self.network.load(logger=self.logs.logger)
+        self.normalize = self.net.renormalize
 
     def _save_as(self):
         self.network.save_as(logger=self.logs.logger)
@@ -152,7 +154,7 @@ class Trainer(HasTraits):
         self._set_validation_mask()
     
     def _validation_type_changed(self):
-        self._set_validation_mask()    
+        self._set_validation_mask()
 
     traits_view = View(#UItem('network', emphasized=True, enabled_when='netlist'),
                        VSplit(#Tabbed(UItem('object.network.info',
@@ -214,6 +216,7 @@ if __name__=="__main__":
     t.input_data.load()
     t.target_data.filename = 'black-scholes-target.dat'
     t.target_data.load()
+    t._set_validation_mask()
 
     # Run
     t.configure_traits()
