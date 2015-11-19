@@ -99,6 +99,7 @@ class TncTrainer(Trainer):
         if not running:
             err = err[:-1]
         self.elist += err
+        info.error_figure.reset()
         info.error_figure.plot(range(len(self.elist)), self.elist)
         logger.info(output.strip())
         # Discover and log reason of termination

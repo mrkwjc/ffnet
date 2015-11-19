@@ -58,6 +58,9 @@ class ErrorFigure(MPLFigureSimple):
         ax = self.axes
         ax.set_yscale("log")
         ax.grid()
+        ax.set_xlabel('Iteration')
+        ax.set_ylabel('$$\sum_i\sum_j\left(t_{ij} - o_{ij}\\right)^2$$')
+        ax.set_title('Training error')
         self.figure.tight_layout()
 
     def plot(self, it, err):
