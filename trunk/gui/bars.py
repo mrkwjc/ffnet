@@ -71,9 +71,9 @@ train_stop_action = Action(
 
 train_reset_action = Action(
     name   = 'Reset', 
-    action = '_randomweights',
-    image  = ImageResource('media-record'),
-    enabled_when = 'not running')
+    action = '_reset',
+    image  = ImageResource('edit-clear'),
+    enabled_when = 'net and not running')
 
 
 # Groups of actions

@@ -16,6 +16,7 @@ import uuid
 from mplfigure import MPLFigureEditor
 from logger import Logger
 from bars import toolbar, menubar
+from mplplots import ErrorFigure
 
 class Trainer(HasTraits):
     network = Instance(Network, ())
@@ -28,6 +29,7 @@ class Trainer(HasTraits):
     net = DelegatesTo('network')
     inp = DelegatesTo('input_data', prefix='data')
     trg = DelegatesTo('target_data', prefix='data')
+    error_figure = Instance(ErrorFigure, ())
 
     #def __init__(self, **traits):
         #HasTraits.__init__(self, **traits)        
@@ -46,6 +48,7 @@ class Trainer(HasTraits):
 
     def _close(self):
         self.network.close(logger=self.logs.logger)
+        self._reset()
 
     def _load_input_data(self):
         self.input_data.configure_traits(view='all_view', kind='modal')
@@ -90,21 +93,24 @@ class Trainer(HasTraits):
     def _train_stop(self):
         self.trainer.running.value = 0
 
-    def _randomweights(self):
-        self.net.randomweights()
-        self.logger.info('Weights has been randomized!')
-
+    def _reset(self):
+        if self.net:
+            self.net.randomweights()
+            self.logger.info('Weights has been randomized!')
+        self.trainer.reset()
+        self.error_figure.reset()
 
     traits_view = View(#UItem('network', emphasized=True, enabled_when='netlist'),
-                       #VSplit(Tabbed(UItem('object.network.info',
+                       VSplit(#Tabbed(UItem('object.network.info',
                                           #style='readonly',
                                           #label='Info'),
                                      #UItem('object.network.preview_figure',
                                           #style='custom',
                                           #label='Architecture'),
                                     #scrollable=True),
+                        UItem('error_figure', style='custom'),
                               Tabbed(
-                                     Item('logs', style='custom', height = 0.3),
+                                     Item('logs', style='custom', height = 0.3, resizable = True),
                                      #Item('values',
                                           #label  = 'Shell',
                                           #editor = ShellEditor( share = True ),
@@ -112,11 +118,11 @@ class Trainer(HasTraits):
                                           #export = 'DockWindowShell'
                                           #),
                                      show_labels = False
-                                    ),
+                                    )),
                              #),
                        title = 'ffnet - neural network trainer',
                        width=0.4,
-                       height=0.5,
+                       height=0.8,
                        resizable = True,
                        #menubar = menubar,
                        toolbar = toolbar,

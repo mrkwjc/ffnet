@@ -1,12 +1,26 @@
 from enthought.traits.api import *
 from enthought.traits.ui.api import *
 from mplfigure import MPLFigureSimple, MPLInitHandler, MPLFigureEditor
+from pyface.api import GUI
+
+class Plots(HasTraits):
+    plot = Enum('Architecture',
+                'Training error',
+                'Output vs. input',
+                'Output vs. input (derivatives)',
+                'Output vs.target',
+                'Regression',
+                'None')
+    #arch = Instance(PreviewFigure, ())
+    #error = Instance(ErrorFigure, ())
+
+
 
 class PreviewFigure(MPLFigureSimple):
     net = Any
     biases = Bool(False)
 
-    def mpl_setup(self):
+    def setup(self):
         self.figure.set_facecolor('white')
         self.axes.xaxis.set_visible(False)
         self.axes.yaxis.set_visible(False)
@@ -36,6 +50,20 @@ class PreviewFigure(MPLFigureSimple):
                             edge_color='k')
         matplotlib.rcParams['interactive']=True
         self.figure.tight_layout()
+        self.draw()
+
+
+class ErrorFigure(MPLFigureSimple):
+    def setup(self):
+        ax = self.axes
+        ax.set_yscale("log")
+        ax.grid()
+        self.figure.tight_layout()
+
+    def plot(self, it, err):
+        ax = self.axes
+        ax.plot(it, err, 'ro-', lw=2)
+        self.draw()
 
 #class PreviewFigure(MPLFigureSimple):
     #show = Button
