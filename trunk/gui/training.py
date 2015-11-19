@@ -31,9 +31,10 @@ class TncTrainer(Trainer):
     nproc =  Int(mp.cpu_count())
     messages = Int(1)
     elist = List([])
+    vlist = List([])
     manager = Any
     wlist = Any
-    continued = Bool(False)
+    continued = Int(0)
 
     def __init__(self, **traits):
         HasTraits.__init__(self, **traits)
@@ -43,7 +44,24 @@ class TncTrainer(Trainer):
     def reset(self):
         self.wlist = self.manager.list([])
         self.elist = []
-        self.continued = False
+        self.vlist = []
+        self.continued = 0
+
+    #def tsqerror(self):
+        #w0 = self.net.weights
+        #for w in self.wlist:
+            #self.net.weights = w
+            #e = self.net.sqerror(self.inpt, self.trgt)
+            #self.elist.append(e)
+        #self.net.weights = w0
+    
+    def vsqerror(self):
+        w0 = self.net.weights[:]
+        for w in self.wlist[self.continued:]:
+            self.net.weights[:] = w
+            v = self.net.sqerror(self.inpv, self.trgv)
+            self.vlist.append(v)
+        self.net.weights[:] = w0
 
     # Is this a good place for doing all this?
     def _callback(self, x):
@@ -59,10 +77,18 @@ class TncTrainer(Trainer):
         net = info.net
         inp = info.inp
         trg = info.trg
+        net.renormalize = info.normalize
+        net._setnorm(inp, trg)  # this sets
+        info.normalize = net.renormalize
+        vmask = info.vmask
+        self.inpt = inp[~vmask]
+        self.trgt = trg[~vmask]
+        self.inpv = inp[vmask]
+        self.trgv = trg[vmask]
         self.net = net
         if not self.maxfun:
             self.maxfun = max(100, 10*len(net.weights))  # should be in ffnet!
-        self.nproc = min(self.nproc, len(inp))  # should be in ffnet!
+        self.nproc = min(self.nproc, len(self.inpt))  # should be in ffnet!
         #
         ## Run training
         info.logs.progress_start("Training in progress...")
@@ -75,7 +101,7 @@ class TncTrainer(Trainer):
         if not self.continued:
             self.wlist.append(net.weights)
         process = Process(target=net.train_tnc,
-                          args=(inp, trg),
+                          args=(self.inpt, self.trgt),
                           kwargs={'nproc':self.nproc,
                                   'maxfun': self.maxfun,
                                   'disp': self.messages,
@@ -99,8 +125,10 @@ class TncTrainer(Trainer):
         if not running:
             err = err[:-1]
         self.elist += err
+        self.vsqerror()
         info.error_figure.reset()
         info.error_figure.plot(range(len(self.elist)), self.elist)
+        info.error_figure.plotv(range(len(self.vlist)), self.vlist)
         logger.info(output.strip())
         # Discover and log reason of termination
         if not running:
@@ -114,7 +142,7 @@ class TncTrainer(Trainer):
                 logger.info(tb.strip())
         # Log time
         logger.info('Execution time: %3.3f seconds.' %(t1-t0))
-        self.continued = True
+        self.continued = len(self.wlist)
 
 
     traits_view = View(
