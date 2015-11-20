@@ -56,12 +56,13 @@ class TncTrainer(Trainer):
         #self.net.weights = w0
     
     def vsqerror(self):
-        w0 = self.net.weights[:]
-        for w in self.wlist[self.continued:]:
-            self.net.weights[:] = w
-            v = self.net.sqerror(self.inpv, self.trgv)
-            self.vlist.append(v)
-        self.net.weights[:] = w0
+        if len(self.inpv)>0:
+            w0 = self.net.weights[:]
+            for w in self.wlist[self.continued:]:
+                self.net.weights[:] = w
+                v = self.net.sqerror(self.inpv, self.trgv)
+                self.vlist.append(v)
+            self.net.weights[:] = w0
 
     # Is this a good place for doing all this?
     def _callback(self, x):
