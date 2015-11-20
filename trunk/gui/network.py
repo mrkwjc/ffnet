@@ -50,13 +50,13 @@ class NetworkCreator(HasTraits):
     def _preview_button_fired(self):
         net = self.create()
         if net:
-            self.preview_figure.net = net
+            self.preview_figure.control.net = net
             self.preview_figure.edit_traits(kind='livemodal')
 
     traits_view = View(Item('architecture', has_focus=True),
                        Item('connectivity_type'),
                        Item('biases'),
-                       Item('object.preview_figure.biases', label='Biases in preview'),
+                       #Item('object.preview_figure.biases', label='Biases in preview'),
                        UItem('preview_button', label = 'Preview'),
                        handler = CreateHandler(),
                        buttons = [OKButton, CancelButton],

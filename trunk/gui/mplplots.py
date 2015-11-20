@@ -1,6 +1,6 @@
 from enthought.traits.api import *
 from enthought.traits.ui.api import *
-from mplfigure import MPLFigureSimple, MPLInitHandler, MPLFigureEditor
+from mplfigure import MPLFigureWithControl, FigureControl
 from pyface.api import GUI
 
 class Plots(HasTraits):
@@ -15,10 +15,25 @@ class Plots(HasTraits):
     #error = Instance(ErrorFigure, ())
 
 
-
-class PreviewFigure(MPLFigureSimple):
+class PreviewFigureControl(FigureControl):
     net = Any
-    biases = Bool(False)
+    show_bias_node = Bool(False)
+
+    def _net_changed(self):
+        self.figure.reset()
+        self.figure.plot()
+
+    def _show_bias_node_changed(self):
+        self.figure.reset()
+        self.figure.plot()
+
+    view = View(Item('show_bias_node'))
+
+
+class PreviewFigure(MPLFigureWithControl):
+    control = Instance(PreviewFigureControl, ())
+    # net = DelegatesTo('control')
+    # show_bias_node = DelegatesTo('control')
 
     def setup(self):
         self.figure.set_facecolor('white')
@@ -26,21 +41,15 @@ class PreviewFigure(MPLFigureSimple):
         self.axes.yaxis.set_visible(False)
         self.axes.set_frame_on(False)
 
-    def _net_changed(self):
-        self.plot()
-
-    def _biases_changed(self):
-        self.plot()
-
     def plot(self):
-        if self.net is None:
+        net = self.control.net
+        show_bias_node = self.control.show_bias_node
+        if net is None:
             return
         import matplotlib
         import networkx as nx
-        self.axes.clear()
-        net = self.net
         graph = net.graph
-        if 0 in net.graph.nodes() and not self.biases:
+        if 0 in net.graph.nodes() and not show_bias_node:
             nlist = sorted(net.graph.nodes())
             graph = graph.subgraph(nlist[1:])
         axes = self.axes
@@ -53,11 +62,23 @@ class PreviewFigure(MPLFigureSimple):
         self.draw()
 
 
-class ErrorFigure(MPLFigureSimple):
+class ErrorFigureControl(FigureControl):
+    grid = Bool(True)
+
+    def _grid_changed(self):
+        self.figure.axes.grid(self.grid)
+        self.figure.draw()
+
+    view = View(Item('grid'))
+
+
+class ErrorFigure(MPLFigureWithControl):
+    control = Instance(ErrorFigureControl, ())
+
     def setup(self):
         ax = self.axes
         ax.set_yscale("log")
-        ax.grid()
+        ax.grid(self.control.grid)
         ax.set_xlabel('Iteration')
         ax.set_ylabel('$$\sum_i\sum_j\left(o_{ij} - t_{ij}\\right)^2$$')
         #ax.set_title('Training error')

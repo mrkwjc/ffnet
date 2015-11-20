@@ -177,7 +177,7 @@ class Trainer(HasTraits):
                                     )),
                              #),
                        title = 'ffnet - neural network trainer',
-                       width=0.4,
+                       width=0.6,
                        height=0.8,
                        resizable = True,
                        #menubar = menubar,
