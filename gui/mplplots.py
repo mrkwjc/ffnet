@@ -3,17 +3,6 @@ from enthought.traits.ui.api import *
 from mplfigure import MPLFigureWithControl, FigureControl
 from pyface.api import GUI
 
-class Plots(HasTraits):
-    plot = Enum('Architecture',
-                'Training error',
-                'Output vs. input',
-                'Output vs. input (derivatives)',
-                'Output vs.target',
-                'Regression',
-                'None')
-    #arch = Instance(PreviewFigure, ())
-    #error = Instance(ErrorFigure, ())
-
 
 class PreviewFigureControl(FigureControl):
     net = Any
@@ -58,7 +47,7 @@ class PreviewFigure(MPLFigureWithControl):
                             node_color='#A0CBE2', node_size=500,
                             edge_color='k')
         matplotlib.rcParams['interactive']=True
-        self.figure.tight_layout()
+        #self.figure.tight_layout()
         self.draw()
 
 
@@ -80,15 +69,14 @@ class ErrorFigure(MPLFigureWithControl):
         ax.set_yscale("log")
         ax.grid(self.control.grid)
         ax.set_xlabel('Iteration')
-        ax.set_ylabel('$$\sum_i\sum_j\left(o_{ij} - t_{ij}\\right)^2$$')
-        #ax.set_title('Training error')
-        self.figure.tight_layout()
+        ax.set_ylabel('$\sum_i\sum_j\left(o_{ij} - t_{ij}\\right)^2$')
         ax.legend()
 
     def plot(self, it, err):
         ax = self.axes
         ax.plot(it, err, 'ro-', lw=2, label='Training error')
         ax.legend()
+        #self.figure.tight_layout()
         self.draw()
     plott = plot
     
@@ -98,65 +86,34 @@ class ErrorFigure(MPLFigureWithControl):
         ax.legend()
         self.draw()
 
-#class PreviewFigure(MPLFigureSimple):
-    #show = Button
-    #show_status = Bool(False)
-    #net = Any
-    #biases_in_preview = Bool(False)
-    #self._plotted = Bool(False)
 
-    #def __init__(self, net=None, biases_in_preview=False):
-        #super(PreviewFigure, self).__init__()
-        #self.net = net
-        #self.biases_in_preview = biases_in_preview
+class Plots(HasTraits):
+    selected = Enum('none',
+                    'architecture',
+                    'error',
+                    'out-vs-inp',
+                    'out-vs-inp-deriv'
+                    'out-vs-trg',
+                    'regression')
+    architecture = Instance(PreviewFigure, ())
+    error = Instance(ErrorFigure, ())
 
-    #def _show_fired(self):
-        #self.show_status = not self.show_status
-
-    #def _show_status_changed(self):
-        #if self.show_status:
-            #self.plot()
+    view = View(UItem('selected'),
+                UItem('architecture',
+                      visible_when = 'selected == "architecture"',
+                      style = 'custom',
+                      resizable = True),
+                UItem('error',
+                      visible_when = 'selected == "error"',
+                      style = 'custom',
+                      resizable = True),
+                resizable = True)
     
-    #def _net_changed(self):
-        #self._plotted = False
-        #if self.show_status:
-            #self.plot()
+    #plot = Enum('Architecture',
+                #'Training error',
+                #'Output vs. input',
+                #'Output vs. input (derivatives)',
+                #'Output vs.target',
+                #'Regression',
+                #'None')
 
-    #def _biases_in_preview_changed(self):
-        #self._plotted = True
-        #if self.show_status:
-            #self.plot()
-
-    #def mpl_setup(self):
-        #self.figure.set_facecolor('white')
-        #self.axes.xaxis.set_visible(False)
-        #self.axes.yaxis.set_visible(False)
-        #self.axes.set_frame_on(False)
-        ##self.axes.axis('off')
-
-    #def plot(self):
-        #if self.net is None or self._plotted:
-            #return
-        #import matplotlib
-        #import networkx as nx
-        #self.axes.clear()
-        #net = self.net
-        #graph = net.graph
-        #if 0 in net.graph.nodes() and not self.biases_in_preview:
-            #nlist = sorted(net.graph.nodes())
-            ## if not self.biases_in_preview:
-            #graph = graph.subgraph(nlist[1:])
-        #axes = self.axes
-        #matplotlib.rcParams['interactive']=False
-        #nx.draw_graphviz(graph, ax = axes, prog='dot', with_labels=True,
-                            #node_color='#A0CBE2', node_size=500,
-                            #edge_color='k')
-        #matplotlib.rcParams['interactive']=True
-        #self.figure.tight_layout()
-        #self._plotted = True
-
-    #traits_view = View(UItem('show'),
-                       #UItem('figure', editor=MPLFigureEditor(), visible_when='show_status'),
-                       #handler=MPLInitHandler,
-                       #resizable=True,
-                       #)

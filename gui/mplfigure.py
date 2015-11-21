@@ -31,14 +31,14 @@ class MPLFigureSimple(HasTraits):
 
     def setup(self):
         pass
-    
+
     def draw(self):
         try:
         #if self.figure.canvas is not None:
             GUI.invoke_later(self.figure.canvas.draw)
         except:
             pass
-    
+
     def reset(self):
         self.axes.clear()
         self.setup()
@@ -52,7 +52,7 @@ class MPLFigureSimple(HasTraits):
 
 class FigureControl(HasTraits):
     figure = Instance(MPLFigureSimple)
-    
+
     view = View()
 
 
@@ -63,8 +63,8 @@ class MPLFigureWithControl(MPLFigureSimple):
         super(MPLFigureWithControl, self).__init__()
         self.control.figure = self
 
-    traits_view = View(HSplit(Item('figure', editor=MPLFigureEditor(), show_label=False),
-                              UItem('control', style='custom', width=0.4)),
+    traits_view = View(HSplit(UItem('figure', editor=MPLFigureEditor()),
+                              UItem('control', style='custom', width=0.3)),
                        handler=MPLInitHandler,
                        resizable=True,
                        width = 0.6)

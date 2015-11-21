@@ -16,7 +16,7 @@ import uuid
 from mplfigure import MPLFigureEditor
 from logger import Logger
 from bars import toolbar, menubar
-from mplplots import ErrorFigure
+from mplplots import ErrorFigure, Plots
 
 import multiprocessing as mp
 
@@ -29,7 +29,7 @@ class TrainingSettings(HasTraits):
     validation_patterns = Range(0, 50, 10)  # %
     validation_type = Enum('random', 'last')
     normalize = Bool(True)
-    
+
     traits_view = View(Item('training_algorithm'),
                        Item('maxfun', visible_when='training_algorithm == "tnc"'),
                        Item('nproc', visible_when='training_algorithm == "tnc"'),
@@ -42,7 +42,7 @@ class TrainingSettings(HasTraits):
                        width = 0.2)
 
 
-class Trainer(HasTraits):
+class FFnetRoot(HasTraits):
     network = Instance(Network, ())
     input_data = Instance(LoadTxt, ())
     target_data = Instance(LoadTxt, ())
@@ -57,10 +57,14 @@ class Trainer(HasTraits):
     validation_patterns = DelegatesTo('settings')
     validation_type = DelegatesTo('settings')
     normalize = DelegatesTo('settings')
-    error_figure = Instance(ErrorFigure, ())
+    plots = Instance(Plots, ())
 
     #def __init__(self, **traits):
-        #HasTraits.__init__(self, **traits)        
+        #HasTraits.__init__(self, **traits)
+        #self.plots.root = self
+
+    #def _net_changed(self):
+        #self.plots.architecture.control.net = self.net
 
     def _new(self):
         self.network.create(logger=self.logs.logger)
@@ -121,6 +125,7 @@ class Trainer(HasTraits):
     def _train(self):
         self.logger.info('Training network: %s' %self.network.filename)
         self.logger.info("Using '%s' trainig algorithm." %self.trainer.name)
+        self.plots.selected = 'error'
         thread.start_new_thread(self.trainer.train, (self,))
 
     def _train_stop(self):
@@ -152,29 +157,21 @@ class Trainer(HasTraits):
 
     def _validation_patterns_changed(self):
         self._set_validation_mask()
-    
+
     def _validation_type_changed(self):
         self._set_validation_mask()
 
-    traits_view = View(#UItem('network', emphasized=True, enabled_when='netlist'),
-                       VSplit(#Tabbed(UItem('object.network.info',
-                                          #style='readonly',
-                                          #label='Info'),
-                                     #UItem('object.network.preview_figure',
-                                          #style='custom',
-                                          #label='Architecture'),
-                                    #scrollable=True),
-                        UItem('error_figure', style='custom'),
-                              Tabbed(
-                                     Item('logs', style='custom', height = 0.3, resizable = True),
+    traits_view = View(VSplit(UItem('plots', style='custom'),
+                              Tabbed(UItem('logs', style='custom', dock = 'tab', height = 0.25),
                                      #Item('values',
                                           #label  = 'Shell',
                                           #editor = ShellEditor( share = True ),
                                           #dock   = 'tab',
                                           #export = 'DockWindowShell'
                                           #),
-                                     show_labels = False
-                                    )),
+                                     #show_labels = False
+                                    )
+                              ),
                              #),
                        title = 'ffnet - neural network trainer',
                        width=0.6,
@@ -183,15 +180,6 @@ class Trainer(HasTraits):
                        #menubar = menubar,
                        toolbar = toolbar,
                        )
-
-    settings_view = View(Item('train_algorithm'),
-                         Item('object.train_algorithm.maxfun'),
-                         Item('object.train_algorithm.nproc'),
-                         Item('object.train_algorithm.messages'),
-                         buttons = ['OK', 'Cancel'],
-                         title = 'Training settings',
-                         width = 0.2,
-                         )
     
     training_view = View(UItem('stop_training'),
                          title = 'Training network...',
@@ -200,7 +188,7 @@ class Trainer(HasTraits):
 if __name__=="__main__":
     from ffnet import loadnet, version
     import os
-    t = Trainer()
+    t = FFnetRoot()
     t.logs.logger.info('Welcome! You are using ffnet-%s.' %version)
     # Add test network
     n = t.network
