@@ -75,6 +75,13 @@ train_reset_action = Action(
     image  = ImageResource('edit-clear'),
     enabled_when = 'net and not running')
 
+error_plot_action = Action(
+    name   = 'Error',
+    style = 'toggle',
+    action = 'object.plots.select_error_plot',
+    image  = ImageResource(''),
+    enabled_when = 'True')
+
 
 # Groups of actions
 network_actions = ActionGroup(
@@ -93,6 +100,8 @@ train_actions = ActionGroup(
     train_action,
     train_stop_action,
     train_reset_action)
+
+#plot_actions = ActionGroup(
 
 # File menu
 file_menu = Menu(network_actions,
