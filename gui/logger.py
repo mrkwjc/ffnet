@@ -94,7 +94,7 @@ class Logger(HasTraits):
                                                  ),
                              resizable = True,
                              ),
-                        UItem('_clear', label="Clear"),
+                       #  UItem('_clear', label="Clear"),
                        )
 
 

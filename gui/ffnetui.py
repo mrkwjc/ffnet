@@ -154,7 +154,7 @@ class FFnetRoot(HasTraits):
     def _validation_type_changed(self):
         self._set_validation_mask()
 
-    traits_view = View(VSplit(UItem('object.network.creator.preview_figure.figure', style='custom'),
+    traits_view = View(VSplit(UItem('object.plots.figure', style='custom'),
                               Tabbed(UItem('logs', style='custom', dock = 'tab', height = 0.25),
                                      #Item('values',
                                           #label  = 'Shell',
