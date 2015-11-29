@@ -3,7 +3,9 @@
 #ETSConfig.toolkit = 'qt4'
 from traits.api import *
 from traitsui.api import *
+import pyface.api as pyface
 from mplfigure import MPLPlotter
+from graph_layout import layered_layout
 # from mpltools import hexcolor
 import numpy as np
 import networkx as nx
@@ -11,13 +13,12 @@ import matplotlib
 
 
 class GraphPlot(MPLPlotter):
-    graph = Instance(nx.Graph) #, live = True)
-    show_biases = Bool(False) #, live = True)
-    node_labels = Bool(True) #, live = True)
-    node_size = Range(1, 20, 5) #, live = True)
-    edge_width = Range(0.1, 2., 1.) #, live = True)
-    layout = Enum('dot') #, live = True)
-    draw_network = Button
+    graph = Instance(nx.Graph, live = True)
+    show_biases = Bool(False, live = True)
+    node_labels = Bool(True, live = True)
+    node_size = Range(1, 20, 5, live = True)
+    edge_width = Range(0.1, 2., 1., live = True)
+    layout = Enum('layered', 'spring', 'circular', 'random', live = True)
     #node_color = Color('red', live = True)
     #edge_color = Color('black', live = True)
 
@@ -32,10 +33,13 @@ class GraphPlot(MPLPlotter):
         graph = self._get_graph()
         if graph is None:
             return
+        pos = self._get_pos(graph)
+        #if pos is None:
+            #return
         matplotlib.rcParams['interactive'] = False
-        nx.draw_graphviz(graph,
+        nx.draw_networkx(graph,
+                         pos         = pos,
                          ax          = self.figure.axes,
-                         prog        = self.layout,
                          with_labels = self.node_labels,
                          node_color  = '#A0CBE2',  # hexcolor(self.node_color),
                          node_size   = self.node_size*100,
@@ -52,8 +56,25 @@ class GraphPlot(MPLPlotter):
                 graph = graph.subgraph(nlist[1:])
         return graph
 
-    def _draw_network_fired(self):
-        self._plot()
+    def _get_pos(self, graph):
+        if self.layout == 'layered':  # only DAGs
+            try:
+                pos = layered_layout(graph)
+            except:
+                import sys
+                e = sys.exc_info()[1]
+                pyface.error(None, "Layered layout cannot be created!\n\n" + e.message)
+                pos  = None
+        elif self.layout == 'spring':
+            pos = nx.spring_layout(graph)
+        elif self.layout == 'circular':
+            pos = nx.circular_layout(graph)
+        elif self.layout == 'random':
+            pos = nx.random_layout(graph)
+        else:
+            pos = None
+        return pos
+
 
     view = View(Item('show_biases'),
                 Item('node_labels'),
@@ -62,10 +83,14 @@ class GraphPlot(MPLPlotter):
                 Item('layout'),
                 # Item('node_color', style = 'custom'),
                 # Item('edge_color', style = 'custom'),
-                UItem('draw_network'),
                 resizable = True)
 
 if __name__ == "__main__":
     p = GraphPlot()
-    p.graph = nx.balanced_tree(2, 3).to_directed()
+    #p.graph = nx.balanced_tree(2, 3).to_directed()
+    def randdag():
+        G = nx.gnp_random_graph(20,0.5,directed=True)
+        DAG = nx.DiGraph([(u,v) for (u,v) in G.edges() if u<v])
+        return DAG
+    p.graph = randdag()
     p.figure.configure_traits()
