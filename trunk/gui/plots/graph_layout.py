@@ -16,9 +16,11 @@ def layered_layout(G):
             ip = i # Set new layer start
             nxp = nx_
         else:
-            pos[i, 0] = nxp # if nx_ < nxp else nx_
+            pos[i, 0] = nxp  # Never go back 
         ny = nyp + 2
         pos[i, 1] = ny
+        nyp = ny
+        # Assure successors are beyond
         successors = G.successors(node)
         for snode in successors:
             j = topological_sort.index(snode)
@@ -27,16 +29,13 @@ def layered_layout(G):
                 sx = nx_ + 2
             pos[j, 0] = sx
         posdict[node] = pos[i]
-        #nxp = nx_
-        nyp = ny
     # Shift last layer
     layery = pos[ip:n, 1]
     layery[:] = layery[:] - (len(layery)-1)
     return posdict
 
-
 if __name__ == "__main__":
-    from ffnet import mlgraph, tmlgraph
+    #from ffnet import mlgraph, tmlgraph
     #conec = tmlgraph((1,2,1,1,2), biases = False)
     #G = nx.DiGraph()
     #G.add_edges_from(conec)

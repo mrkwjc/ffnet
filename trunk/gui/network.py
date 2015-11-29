@@ -60,6 +60,7 @@ class NetworkCreator(HasTraits):
                        handler = CreateHandler(),
                        buttons = [OKButton, CancelButton],
                        resizable=True,
+                       title = 'Layered network creation',
                        width=0.2)
 
 class Network(HasTraits):
