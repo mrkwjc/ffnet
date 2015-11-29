@@ -17,36 +17,6 @@ if ETSConfig.toolkit == 'qt4':
 
 from mplconfig import BasicMPLFigureConfig
 
-class MPLPlotter(HasTraits):
-    figure = Any
-
-    def __init__(self, **traits):
-        super(MPLPlotter, self).__init__(**traits)
-        self.figure = MPLFigure()
-        self.figure.plotter = self
-
-    @on_trait_change('+live')
-    def _plot(self):
-        self.clear()
-        self.setup()
-        self.plot()
-        self.draw()
-
-    def _setup(self):
-        self.setup()
-
-    def clear(self):
-        self.figure.axes.clear()
-
-    def draw(self):
-        self.figure.draw()
-
-    def setup(self):  # Implement this for initial setup
-        pass
-
-    def plot(self):  # Implement this for real plots
-        pass
-
 
 class MPLFigureHandler(Handler):
     def init(self, info):
@@ -57,7 +27,6 @@ class MPLFigureHandler(Handler):
 class MPLFigure(HasTraits):
     figure = Instance(Figure, ())
     config = Any
-    plotter = Instance(MPLPlotter)
 
     def __init__(self, **traits):
         super(MPLFigure, self).__init__(**traits)
@@ -66,8 +35,6 @@ class MPLFigure(HasTraits):
 
     def _setup(self):
         self.setup()
-        if self.plotter is not None:
-            self.plotter.setup()
 
     def _draw(self):
         try:
@@ -103,12 +70,62 @@ class MPLFigure(HasTraits):
             return
         self.config(self).edit_traits(kind = 'livemodal')
 
-    plotter_width = 0.4
+
+    view = View(UItem('figure', editor = MPLFigureEditor()),
+                handler = MPLFigureHandler,
+                resizable = True,
+                width = 1024,
+                height = 640)
+
+
+class MPLPlotter(HasTraits):
+    figure = Instance(MPLFigure)
+
+    def __init__(self, **traits):
+        super(MPLPlotter, self).__init__(**traits)
+        self.figure = MPLFigureWithPlotter()
+        self.figure.plotter = self
+
+    @on_trait_change('+live', post_init=True)
+    def _plot(self):
+        self.clear()
+        self.setup()
+        self.plot()
+        self.draw()
+
+    def _setup(self):
+        self.setup()
+
+    def clear(self):
+        self.figure.axes.clear()
+
+    def draw(self):
+        self.figure.draw()
+
+    def setup(self):  # Implement this for initial setup
+        pass
+
+    def plot(self):  # Implement this for real plots
+        pass
+    
+    view = View(resizable = True)
+
+
+class MPLFigureWithPlotter(MPLFigure):
+    plotter = Instance(MPLPlotter)
+    plotter_width = 0.35
+
+    def _setup(self):
+        self.setup()
+        if self.plotter is not None:
+            self.plotter.setup()
+
     def default_traits_view(self):
+        width = self.plotter_width
         if self.plotter is None:
-            self.plotter_width = 0.0
+            width = 0.0
         return View(HSplit(UItem('figure', editor = MPLFigureEditor()),
-                           UItem('plotter', style = 'custom', width = self.plotter_width)),
+                           UItem('plotter', style = 'custom', width = width)),
                     handler = MPLFigureHandler,
                     resizable = True,
                     width = 1024,

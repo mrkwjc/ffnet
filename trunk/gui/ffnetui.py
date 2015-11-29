@@ -13,12 +13,12 @@ import sys
 import time
 import uuid
 
-from mplfigure import MPLFigureEditor
 from logger import Logger
 from bars import toolbar, menubar
-from mplplots import ErrorFigure, Plots
+from plots.error_plot import ErrorPlot as Plots
 
 import multiprocessing as mp
+import numpy as np
 
 class TrainingSettings(HasTraits):
     training_algorithm = Enum('tnc')
@@ -58,13 +58,6 @@ class FFnetRoot(HasTraits):
     validation_type = DelegatesTo('settings')
     normalize = DelegatesTo('settings')
     plots = Instance(Plots, ())
-
-    #def __init__(self, **traits):
-        #HasTraits.__init__(self, **traits)
-        #self.plots.root = self
-
-    #def _net_changed(self):
-        #self.plots.architecture.control.net = self.net
 
     def _new(self):
         self.network.create(logger=self.logs.logger)
@@ -161,7 +154,7 @@ class FFnetRoot(HasTraits):
     def _validation_type_changed(self):
         self._set_validation_mask()
 
-    traits_view = View(VSplit(UItem('plots', style='custom'),
+    traits_view = View(VSplit(UItem('object.network.creator.preview_figure.figure', style='custom'),
                               Tabbed(UItem('logs', style='custom', dock = 'tab', height = 0.25),
                                      #Item('values',
                                           #label  = 'Shell',
@@ -192,7 +185,7 @@ if __name__=="__main__":
     t.logs.logger.info('Welcome! You are using ffnet-%s.' %version)
     # Add test network
     n = t.network
-    path = 'testnet.net'
+    path = 'data/testnet.net'
     n.net = loadnet(path)
     #n.preview_figure.net = n.net
     n.filename = path
@@ -200,9 +193,9 @@ if __name__=="__main__":
     #t.netlist.append(n)
     #t.network = n
     # Add test data
-    t.input_data.filename = 'black-scholes-input.dat'
+    t.input_data.filename = 'data/black-scholes-input.dat'
     t.input_data.load()
-    t.target_data.filename = 'black-scholes-target.dat'
+    t.target_data.filename = 'data/black-scholes-target.dat'
     t.target_data.load()
     t._set_validation_mask()
 

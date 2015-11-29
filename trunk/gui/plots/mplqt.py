@@ -27,7 +27,9 @@ from traits.api import Any, Instance
 from traitsui.qt4.editor import Editor
 from traitsui.qt4.basic_editor_factory import BasicEditorFactory
 from traitsui.api import Handler
+
 import os
+basedir = os.path.dirname(__file__)
 
 class NavigationToolbar(NavigationToolbar2QTAgg):
     def __init__(self, canvas, parent, tools=('Home', 'Pan', 'Zoom', 'Save'), **kwargs):
@@ -40,7 +42,7 @@ class NavigationToolbar(NavigationToolbar2QTAgg):
         """
         We define custom actions here
         """
-        icon = QtGui.QIcon('images/preferences-system-mpl.png')
+        icon = QtGui.QIcon(basedir+'/images/preferences-system-mpl.png')
         tool = self.addAction(icon, 'Customize', self._on_config)
         tool.setToolTip('Customize')
 
