@@ -127,9 +127,11 @@ class TncTrainer(Trainer):
             err = err[:-1]
         self.elist += err
         self.vsqerror()
-        info.plots.error.reset()
-        info.plots.error.plot(range(len(self.elist)), self.elist)
-        info.plots.error.plotv(range(len(self.vlist)), self.vlist)
+        info.plots.training_error = self.elist
+        info.plots.validation_error = self.vlist
+        #info.plots.error.reset()
+        #info.plots.error.plot(range(len(self.elist)), self.elist)
+        #info.plots.error.plotv(range(len(self.vlist)), self.vlist)
         logger.info(output.strip())
         # Discover and log reason of termination
         if not running:

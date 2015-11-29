@@ -13,6 +13,8 @@ from traitsui.wx.editor import Editor
 from traitsui.wx.basic_editor_factory import BasicEditorFactory
 from traitsui.api import Handler
 
+import os
+basedir = os.path.dirname(__file__)
 
 class NavigationToolbar(NavigationToolbar2WxAgg): 
     ON_CONFIG  = wx.NewId()
@@ -24,15 +26,15 @@ class NavigationToolbar(NavigationToolbar2WxAgg):
             if tool[0] not in tools:
                 self.DeleteToolByPos(pos-i)
                 i+=1
-        self.AddSimpleTool(self.ON_CONFIG, wx.Bitmap('images/preferences-system-mpl.png'),
+        self.AddSimpleTool(self.ON_CONFIG, wx.Bitmap(basedir+'/images/preferences-system-mpl.png'),
                            'Customize', 'Customize')
         wx.EVT_TOOL(self, self.ON_CONFIG, self._on_config)
 
     def _on_config(self, evt):
-        #try:
+        try:
             self.canvas.figure.traited.configure()
-        #except:
-            #pass
+        except:
+            pass
 
 
 class _MPLFigureEditor(Editor):

@@ -6,8 +6,7 @@ import pyface.api as pyface
 
 from ffnet_import import *
 
-from mplfigure import MPLFigureSimple
-from mplplots import PreviewFigure
+from plots.graph_plot import GraphPlot
 import matplotlib
 import networkx as nx
 import os
@@ -29,7 +28,7 @@ class NetworkCreator(HasTraits):
     biases = Bool(True)
     net = Any
     preview_button = Button
-    preview_figure = Instance(PreviewFigure, ())
+    preview_figure = Instance(GraphPlot, ())
 
     def create(self):
         try:
@@ -50,8 +49,8 @@ class NetworkCreator(HasTraits):
     def _preview_button_fired(self):
         net = self.create()
         if net:
-            self.preview_figure.control.net = net
-            self.preview_figure.edit_traits(kind='livemodal')
+            self.preview_figure.graph = net.graph
+            self.preview_figure.figure.configure_traits(kind='livemodal')
 
     traits_view = View(Item('architecture', has_focus=True),
                        Item('connectivity_type'),
@@ -66,14 +65,16 @@ class NetworkCreator(HasTraits):
 class Network(HasTraits):
     net = Any
     filename = Str
+    creator = Instance(NetworkCreator, ())
 
     def create(self, logger=None):
-        nc = NetworkCreator()
-        nc.edit_traits(kind='livemodal')
-        if nc.net:
+        #nc = NetworkCreator()
+        self.creator.edit_traits(kind='livemodal')
+        net = self.creator.net
+        if net:
             self.close(logger=logger)
-            self.net = nc.net
-            self.filename = nc.net.name
+            self.net = net
+            self.filename = net.name
             if logger:
                 logger.info('Network created: %s' %self.filename)
 

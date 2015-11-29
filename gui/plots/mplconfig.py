@@ -103,7 +103,7 @@ class BasicMPLFigureConfig(MPLFigureConfig):
                        buttons = ['Apply', 'OK', 'Cancel'],
                        handler = MPLFigureConfigHandler(),
                        title = 'Graph configuration',
-                       width = 0.3,
+                       width = 0.25,
                        resizable = True)
 
 if __name__=="__main__":

@@ -4,6 +4,7 @@
 from traits.api import *
 from traitsui.api import *
 from mplfigure import MPLPlotter
+import numpy as np
 
 class ErrorPlot(MPLPlotter):
     training_error = CArray(live = True)
@@ -42,7 +43,6 @@ class ErrorPlot(MPLPlotter):
                 resizable = True)
 
 if __name__ == "__main__":
-    import numpy as np
     ep = ErrorPlot()
     ep.training_error = np.random.rand(50)
     ep.validation_error = np.random.rand(50)
