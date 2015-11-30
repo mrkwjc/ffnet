@@ -93,7 +93,7 @@ class TncTrainer(Trainer):
         #
         ## Run training
         info.logs.progress_start("Training in progress...")
-        info.plots.is_training = True
+        info.plots.is_running = True
         #logger.info("Training in progress. Please wait ...")
         r = Redirector(fd=2)  # Redirect stderr
         r.start()
@@ -117,6 +117,7 @@ class TncTrainer(Trainer):
         info.running = False
         t1 = time.time()
         info.logs.progress_stop()
+        info.plots.is_running = False
         ## Training finished
         #
         # Get catched output
@@ -134,7 +135,6 @@ class TncTrainer(Trainer):
         #info.plots.error.plot(range(len(self.elist)), self.elist)
         #info.plots.error.plotv(range(len(self.vlist)), self.vlist)
         logger.info(output.strip())
-        info.plots.is_training = False
         # Discover and log reason of termination
         if not running:
             logger.info('Training stopped by user.')
