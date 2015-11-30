@@ -1,9 +1,10 @@
 #-*- coding: utf-8 -*-
-#from traits.etsconfig.api import ETSConfig
-#ETSConfig.toolkit = 'qt4'
+##from traits.etsconfig.api import ETSConfig
+##ETSConfig.toolkit = 'qt4'
 from traits.api import *
 from traitsui.api import *
 from mplfigure import MPLPlotter
+from progress import * # ProgressInfiniteWaiter
 import numpy as np
 
 class ErrorPlot(MPLPlotter):
@@ -12,8 +13,8 @@ class ErrorPlot(MPLPlotter):
     step = Int(1, live = True)
     show_validation_error = Bool(True, live = True)
     show_training_error = Bool(True, live = True)
-    _training_progress = Range(0, 99)
-    is_training = Bool(False)
+    training_in_progress = Instance(ProgressInfiniteWaiter, ())
+    is_running = DelegatesTo('training_in_progress')
 
     def setup(self):
         ax = self.figure.axes
@@ -40,29 +41,10 @@ class ErrorPlot(MPLPlotter):
         ax.set_ylabel('$\sum_i\sum_j\left(o_{ij} - t_{ij}\\right)^2$')
         ax.legend(loc='best')
 
-    def _is_training_changed(self):
-        self._training_progress = 0
-        import thread, time
-        def torun():
-            while self.is_training:
-                for j in range(99):
-                    if self.is_training:
-                        self._training_progress += 1
-                        time.sleep(0.05)
-                    else:
-                        break
-                self._training_progress = 0
-        if self.is_training:
-            thread.start_new_thread(torun, ())
-
 
     view = View(Item('show_training_error', label = "Training error"),
                 Item('show_validation_error', label = "Validation error"),
-                Group(UItem('_training_progress',
-                            editor = ProgressEditor(message = 'Training',
-                                                    min = 0,
-                                                    max = 100),
-                            visible_when = 'is_training')),
+                Group(Item('training_in_progress', style='custom', visible_when = 'is_running')),
                 resizable = True)
 
 if __name__ == "__main__":
