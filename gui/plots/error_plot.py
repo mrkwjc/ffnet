@@ -13,7 +13,7 @@ class ErrorPlot(MPLPlotter):
     step = Int(1, live = True)
     show_validation_error = Bool(True, live = True)
     show_training_error = Bool(True, live = True)
-    training_in_progress = Instance(ProgressInfiniteWaiter, ())
+    training_in_progress = Instance(TxtInfiniteWaiter, ('Training...',))
     is_running = DelegatesTo('training_in_progress')
 
     def setup(self):

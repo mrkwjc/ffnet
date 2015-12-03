@@ -58,6 +58,10 @@ class FFnetRoot(HasTraits):
     validation_type = DelegatesTo('settings')
     normalize = DelegatesTo('settings')
     plots = Instance(Plots, ())
+    #_progress = Property(depends_on='plots.training_in_progress._progress')
+
+    #def _get__progress(self):
+        #return self.plots.training_in_progress._progress
 
     def _new(self):
         self.network.create(logger=self.logs.logger)
@@ -172,6 +176,7 @@ class FFnetRoot(HasTraits):
                        resizable = True,
                        #menubar = menubar,
                        toolbar = toolbar,
+                       #statusbar = [StatusItem(name = '_progress', width=200)]
                        )
     
     training_view = View(UItem('stop_training'),

@@ -5,6 +5,7 @@ from traits.api import *
 from traitsui.api import *
 from traits.etsconfig.api import ETSConfig
 from matplotlib.figure import Figure
+import matplotlib.animation as animation
 from pyface.api import GUI
 import collections
 import sys
@@ -61,7 +62,7 @@ class MPLFigure(HasTraits):
 
     def reset(self):
         self.axes.clear()
-        self.setup()
+        self._setup()
         self.draw()
 
     def configure(self):
@@ -80,6 +81,7 @@ class MPLFigure(HasTraits):
 
 class MPLPlotter(HasTraits):
     figure = Instance(MPLFigure)
+    live = Bool(True)
 
     def __init__(self, **traits):
         super(MPLPlotter, self).__init__(**traits)
@@ -87,14 +89,15 @@ class MPLPlotter(HasTraits):
         self.figure.plotter = self
 
     @on_trait_change('+live', post_init=True)
-    def _plot(self):
-        self.clear()
-        self.setup()
-        self.plot()
-        self.draw()
+    def _plot(self, name, value):
+        if self.live and self.trait(name).live:
+            self.clear()
+            self.setup()
+            self.plot()
+            self.draw()
 
-    def _setup(self):
-        self.setup()
+    #def _setup(self):
+        #self.setup()
 
     def clear(self):
         self.figure.axes.clear()
@@ -107,8 +110,64 @@ class MPLPlotter(HasTraits):
 
     def plot(self):  # Implement this for real plots
         pass
-    
+
     view = View(resizable = True)
+
+
+class MPLAnimator(HasTraits):
+    figure = Instance(MPLFigure)
+    interval = Int(200)
+    repeat = Bool(False)
+    blit = Bool(False)
+    running = Bool(False)
+    startstop = Button
+
+    def __init__(self, **traits):
+        super(MPLAnimator, self).__init__(**traits)
+        self.figure = MPLFigureWithAnimator()
+        self.figure.plotter = self
+
+    def setup(self):
+        pass
+
+    def plot_init(self):
+        pass
+
+    def plot_data(self):
+        while self.running:
+            yield
+
+    def plot(self, data = None):
+        pass
+
+    def start(self):
+        self.running = True
+        self.animator = animation.FuncAnimation(self.figure.figure,
+                                                self.plot,
+                                                frames = self.plot_data,
+                                                init_func = self.plot_init,
+                                                interval = self.interval,
+                                                blit = self.blit,
+                                                repeat = self.repeat)
+        self.animator._start()
+
+    def stop(self):
+        self.running = False
+        self.animator._stop()
+
+    def relim(self):
+        ax = self.figure.axes
+        ax.relim()
+        ax.autoscale_view()
+
+    def _startstop_fired(self):
+        if not self.running:
+            self.start()
+        else:
+            self.stop()
+
+    view = View(UItem('startstop', label = 'Start/Stop'),
+                resizable = True)
 
 
 class MPLFigureWithPlotter(MPLFigure):
@@ -132,6 +191,11 @@ class MPLFigureWithPlotter(MPLFigure):
                     height = 640
                     )
 
+
+class MPLFigureWithAnimator(MPLFigureWithPlotter):
+    plotter = Instance(MPLAnimator)
+
+
 if __name__=="__main__":
-    p = MPLFigure()
-    p.configure_traits()
+    p = MPLPlotter()
+    p.figure.configure_traits()
