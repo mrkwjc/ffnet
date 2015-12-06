@@ -7,7 +7,7 @@ from enthought.traits.ui.api import *
 from pyface.api import GUI
 from loadtxt import LoadTxt
 from network import Network
-from training import TncTrainer
+from training2 import TncTrainer
 import thread
 import sys
 import time
@@ -15,7 +15,7 @@ import uuid
 
 from logger import Logger
 from bars import toolbar, menubar
-from plots.error_plot import ErrorPlot as Plots
+from plots.error_animation import ErrorAnimation
 
 import multiprocessing as mp
 import numpy as np
@@ -41,7 +41,6 @@ class TrainingSettings(HasTraits):
                        resizable = True,
                        width = 0.2)
 
-
 class FFnetRoot(HasTraits):
     network = Instance(Network, ())
     input_data = Instance(LoadTxt, ())
@@ -49,7 +48,7 @@ class FFnetRoot(HasTraits):
     trainer = Instance(TncTrainer, ())
     settings = Instance(TrainingSettings, ())
     logs = Instance(Logger, ())
-    running = Bool(False)
+    running = DelegatesTo('trainer') #Bool(False)
     logger = DelegatesTo('logs')
     net = DelegatesTo('network')
     inp = DelegatesTo('input_data', prefix='data')
@@ -57,7 +56,7 @@ class FFnetRoot(HasTraits):
     validation_patterns = DelegatesTo('settings')
     validation_type = DelegatesTo('settings')
     normalize = DelegatesTo('settings')
-    plots = Instance(Plots, ())
+    plots = Instance(ErrorAnimation, ())
     #_progress = Property(depends_on='plots.training_in_progress._progress')
 
     #def _get__progress(self):
@@ -123,17 +122,32 @@ class FFnetRoot(HasTraits):
         self.logger.info('Training network: %s' %self.network.filename)
         self.logger.info("Using '%s' trainig algorithm." %self.trainer.name)
         self.plots.selected = 'error'
-        thread.start_new_thread(self.trainer.train, (self,))
+        self.plots.training_error = self.trainer.elist
+        self.plots.validation_error = self.trainer.vlist
+        self.plots.iterations = self.trainer.ilist
+        self.plots.condition = self.trainer.condition
+        self.trainer.maxfun = self.settings.maxfun
+        self.trainer.animator = self.plots
+        self.trainer.net = self.net
+        vmask = self.vmask
+        self.trainer.input = self.inp[~vmask]
+        self.trainer.target = self.trg[~vmask]
+        self.trainer.input_v = self.inp[vmask]
+        self.trainer.target_v = self.trg[vmask]
+        self.trainer.logger = self.logger
+        thread.start_new_thread(self.trainer.train, ())
 
     def _train_stop(self):
-        self.trainer.running.value = 0
+        self.trainer.mprunning.value = 0
+        self.running = False
 
     def _reset(self):
         if self.net:
             self.net.randomweights()
             self.logger.info('Weights has been randomized!')
-        self.trainer.reset()
-        self.error_figure.reset()
+        self.trainer.__init__()
+        self.plots.plot_init()
+        self.plots.figure.draw()
 
     def _set_validation_mask(self):
         npat = len(self.inp)
@@ -157,6 +171,9 @@ class FFnetRoot(HasTraits):
 
     def _validation_type_changed(self):
         self._set_validation_mask()
+
+    def _normalize_changed(self):
+        self.net.renormalize = self.normalize
 
     traits_view = View(VSplit(UItem('object.plots.figure', style='custom'),
                               Tabbed(UItem('logs', style='custom', dock = 'tab', height = 0.25),

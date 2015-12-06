@@ -116,7 +116,7 @@ class MPLPlotter(HasTraits):
 
 class MPLAnimator(HasTraits):
     figure = Instance(MPLFigure)
-    interval = Int(200)
+    interval = Int(50)
     repeat = Bool(False)
     blit = Bool(False)
     running = Bool(False)

@@ -4,9 +4,10 @@ import multiprocessing as mp
 from process import Process
 from redirfile import Redirector
 import time
-from exceptions import Exception
 import numpy as np
-
+from ffnet import ffnet, ffnetmodule
+import logging
+from plots.error_animation import ErrorAnimation
 
 def parse_tnc_output(output):
     import cStringIO
@@ -14,129 +15,124 @@ def parse_tnc_output(output):
     res = np.loadtxt(f, skiprows=1)
     return res
 
-class TrainigStopped(Exception):
-    def __init__(self, message = "Training stopped by user."):
-        super(TrainigStopped, self).__init__(message)
-
 class Trainer(HasTraits):
     name = Str
-    running = Instance(mp.Value, ('i', 0))  # shared memory value
+    #manager = Instance(mp.Manager)
+    net = Any(ffnet)
+    input = CArray()
+    target = CArray()
+    input_v = CArray()
+    target_v = CArray()
+    iteration = Int(0)
+    logger = Instance(logging.Logger)
+    running = Bool(False)
 
     def __repr__(self):
         return self.name
+
+    def __init__(self, **traits):
+        super(Trainer, self).__init__(**traits)
+        self.manager = mp.Manager()
+        self.condition = self.manager.Condition()
+        #self.common = self.manager.Namespace()
+        self.mprunning = mp.Value('i', 0)
+        self.wlist = self.manager.list([])
+        self.elist = self.manager.list([])
+        self.vlist = self.manager.list([])
+        self.ilist = self.manager.list([]) # integers
+        self.logger = logging.getLogger()
+        self.iteration = 0
+
+    def _running_changed(self):
+        self.mprunning.value = self.running
+        if len(self.ilist):
+            self.iteration = self.ilist[-1]
+            self.net.weights[:] = self.wlist[-1]
+
+    def _set_normlized_data(self):
+        self.net._setnorm(np.vstack([self.input, self.input_v]),
+                          np.vstack([self.target, self.target_v]))  # First set parameters
+        self.input_n, self.target_n = self.net._setnorm(self.input, self.target)
+        if len(self.input_v) > 0:
+            self.input_v_n, self.target_v_n = self.net._setnorm(self.input_v, self.target_v)
+
+    def _sqerror(self, inp, trg):
+        err = ffnetmodule.netprop.sqerror
+        e  = err(self.net.weights, self.net.conec, self.net.units,
+                 self.net.inno, self.net.outno, inp, trg)
+        return e
+
+    def save_iteration(self):
+        e = self._sqerror(self.input_n, self.target_n)
+        #e = self.net.sqerror(self.input, self.target)
+        if len(self.input_v) > 0:
+            v = self._sqerror(self.input_v_n, self.target_v_n)
+            #v = self.net.sqerror(self.input_v, self.target_v)
+        #with self.condition:   # plots are using this data, we need to synchronize
+        self.ilist.append(self.iteration)
+        self.wlist.append(self.net.weights)
+        self.elist.append(e)
+        if len(self.input_v) > 0:
+            self.vlist.append(v)
+        self.iteration += 1
+        #self.condition.notify_all()
+
+    def callback(self, x):  # This will be called in child process
+        self.net.weights = x
+        self.save_iteration()
+        self.stopper()
+
 
 class TncTrainer(Trainer):
     name = Str('tnc')
     maxfun = Int(0)
     nproc =  Int(mp.cpu_count())
     messages = Int(1)
-    elist = List([])
-    vlist = List([])
-    manager = Any
-    wlist = Any
-    continued = Int(0)
 
-    def __init__(self, **traits):
-        HasTraits.__init__(self, **traits)
-        self.manager = mp.Manager()
-        self.wlist = self.manager.list([])
+    def _net_changed(self):
+        if self.maxfun == 0:
+            self.maxfun = max(100, 10*len(self.net.weights))  # should be in ffnet ?!
 
-    def reset(self):
-        self.wlist = self.manager.list([])
-        self.elist = []
-        self.vlist = []
-        self.continued = 0
+    def _input_changed(self):
+        self.nproc = min(self.nproc, len(self.input))  # should be in ffnet ?!
 
-    #def tsqerror(self):
-        #w0 = self.net.weights
-        #for w in self.wlist:
-            #self.net.weights = w
-            #e = self.net.sqerror(self.inpt, self.trgt)
-            #self.elist.append(e)
-        #self.net.weights = w0
-    
-    def vsqerror(self):
-        if len(self.inpv)>0:
-            w0 = self.net.weights[:]
-            for w in self.wlist[self.continued:]:
-                self.net.weights[:] = w
-                v = self.net.sqerror(self.inpv, self.trgv)
-                self.vlist.append(v)
-            self.net.weights[:] = w0
-
-    # Is this a good place for doing all this?
-    def _callback(self, x):
-        self.wlist.append(x)
-        if self.running.value == 0:
+    def stopper(self):
+        if self.mprunning.value == 0:
             if self.nproc > 1:
                 self.net._clean_mp()  # this raises AssertionError
             raise AssertionError
-
-    def train(self, info):
-        # Setup
-        logger = info.logger
-        net = info.net
-        inp = info.inp
-        trg = info.trg
-        net.renormalize = info.normalize
-        net._setnorm(inp, trg)  # this sets
-        info.normalize = net.renormalize
-        vmask = info.vmask
-        self.inpt = inp[~vmask]
-        self.trgt = trg[~vmask]
-        self.inpv = inp[vmask]
-        self.trgv = trg[vmask]
-        self.net = net
-        if not self.maxfun:
-            self.maxfun = max(100, 10*len(net.weights))  # should be in ffnet!
-        self.nproc = min(self.nproc, len(self.inpt))  # should be in ffnet!
-        #
-        ## Run training
-        info.logs.progress_start("Training in progress...")
-        info.plots.is_running = True
-        #logger.info("Training in progress. Please wait ...")
+    
+    def train(self):  # run this is separate thread !
+        logger = self.logger
+        logger.info("Training in progress...")
         r = Redirector(fd=2)  # Redirect stderr
         r.start()
+        self.animator.start()
         t0 = time.time()
-        self.running.value = 1
-        info.running = True
-        if not self.continued:
-            self.wlist.append(net.weights)
-        process = Process(target=net.train_tnc,
-                          args=(self.inpt, self.trgt),
+        self.running =  True
+        self.mprunning.value = True
+        self._set_normlized_data()  # be sure normalized data are correct before training
+        if self.iteration == 0:  # we just started
+            self.save_iteration()
+        self._net_changed()  # HACK for maxfun
+        process = Process(target=self.net.train_tnc,
+                          args=(self.input, self.target),
                           kwargs={'nproc':self.nproc,
                                   'maxfun': self.maxfun,
                                   'disp': self.messages,
-                                  'callback': self._callback})
+                                  'callback': self.callback})
         process.start()
         process.join()
         process.terminate()
-        net.weights[:] = self.wlist[-1]
-        running = self.running.value  # Keep for logging
-        self.running.value = 0
-        info.running = False
+        self.net.weights[:] = self.wlist[-1]
+        running_status = self.mprunning.value  # Keep for logging
+        self.running = False
         t1 = time.time()
-        info.logs.progress_stop()
-        info.plots.is_running = False
-        ## Training finished
-        #
-        # Get catched output
+        self.animator.stop()
         output = r.stop()
-        err = parse_tnc_output(output).T[2].tolist()
-        if self.continued:
-            err = err[1:]
-        if not running:
-            err = err[:-1]
-        self.elist += err
-        self.vsqerror()
-        info.plots.training_error = self.elist
-        info.plots.validation_error = self.vlist
-        #info.plots.error.reset()
-        #info.plots.error.plot(range(len(self.elist)), self.elist)
-        #info.plots.error.plotv(range(len(self.vlist)), self.vlist)
+        # Log things
         logger.info(output.strip())
-        # Discover and log reason of termination
-        if not running:
+        if not running_status:
             logger.info('Training stopped by user.')
         else:
             if not process.exception:
@@ -147,31 +143,13 @@ class TncTrainer(Trainer):
                 logger.info(tb.strip())
         # Log time
         logger.info('Execution time: %3.3f seconds.' %(t1-t0))
-        self.continued = len(self.wlist)
 
-
-    traits_view = View(
-                       Item('maxfun'),
-                       Item('nproc'),
-                       Item('messages'),
-                       buttons = ['OK', 'Cancel'],
-                       title = 'Tnc training options',
-                       width = 0.2,
-                       )
 
 if __name__ == "__main__":
     from ffnet_import import *
     net = ffnet(mlgraph((2,2,1)))
     inp = [[0,0], [1,1], [1,0], [0,1]]
     trg = [[1], [1], [0], [0]]
-    class Logs:
-        import logging
-        logger = logging.Logger('test', level=logging.DEBUG)
-        handler = logging.StreamHandler()
-        logger.addHandler(handler)
-        def progress_start(self, msg): pass
-        def progress_stop(self): pass
-
-
+    
     tnc = TncTrainer()
-    tnc.train(net, inp, trg, Logs())
+    #tnc.train(net, inp, trg, Logs())
