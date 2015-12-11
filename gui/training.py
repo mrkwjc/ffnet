@@ -49,7 +49,7 @@ class Trainer(HasTraits):
             self.iteration = self.ilist[-1]
             self.net.weights[:] = self.wlist[-1]
 
-    def _set_normlized_data(self):
+    def _set_normalized_data(self):
         self.net._setnorm(np.vstack([self.input, self.input_v]),
                           np.vstack([self.target, self.target_v]))  # First set parameters
         self.input_n, self.target_n = self.net._setnorm(self.input, self.target)
@@ -107,11 +107,10 @@ class TncTrainer(Trainer):
         logger.info("Training in progress...")
         r = Redirector(fd=2)  # Redirect stderr
         r.start()
-        self.animator.start()
         t0 = time.time()
         self.running =  True
         self.mprunning.value = True
-        self._set_normlized_data()  # be sure normalized data are correct before training
+        self._set_normalized_data()  # be sure normalized data are correct before training
         if self.iteration == 0:  # we just started
             self.save_iteration()
         self._net_changed()  # HACK for maxfun
@@ -128,8 +127,8 @@ class TncTrainer(Trainer):
         running_status = self.mprunning.value  # Keep for logging
         self.running = False
         t1 = time.time()
-        self.animator.stop()
         output = r.stop()
+        self.plot.stop()
         # Log things
         logger.info(output.strip())
         if not running_status:

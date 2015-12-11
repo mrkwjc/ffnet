@@ -1,6 +1,6 @@
 #-*- coding: utf-8 -*-
-from traits.etsconfig.api import ETSConfig
-ETSConfig.toolkit = 'qt4'
+#from traits.etsconfig.api import ETSConfig
+#ETSConfig.toolkit = 'qt4'
 
 from enthought.traits.api import *
 from enthought.traits.ui.api import *
@@ -56,7 +56,7 @@ class FFnetApp(HasTraits):
     #validation_type = DelegatesTo('settings')
     normalize = DelegatesTo('settings')
     data_status = DelegatesTo('data', prefix='status')
-    plots = Instance(ErrorAnimation, ())
+    plot = Instance(ErrorAnimation, ())
     #_progress = Property(depends_on='plots.training_in_progress._progress')
 
     #def _get__progress(self):
@@ -93,22 +93,23 @@ class FFnetApp(HasTraits):
         #self.edit_traits(view='settings_view', kind='modal')
         self.settings.edit_traits(kind='livemodal')
 
-    def _train(self):
+    def _train_start(self):
         self.logger.info('Training network: %s' %self.network.filename)
         self.logger.info("Using '%s' trainig algorithm." %self.trainer.name)
-        self.plots.selected = 'error'
-        self.plots.training_error = self.trainer.elist
-        self.plots.validation_error = self.trainer.vlist
-        self.plots.iterations = self.trainer.ilist
-        self.plots.condition = self.trainer.condition
+        self.plot.selected = 'error'
+        self.plot.training_error = self.trainer.elist
+        self.plot.validation_error = self.trainer.vlist
+        self.plot.iterations = self.trainer.ilist
+        self.plot.condition = self.trainer.condition
+        self.trainer.plot = self.plot
         self.trainer.maxfun = self.settings.maxfun
-        self.trainer.animator = self.plots
         self.trainer.net = self.net
         self.trainer.input = self.data.input_t
         self.trainer.target = self.data.target_t
         self.trainer.input_v = self.data.input_v
         self.trainer.target_v = self.data.target_v
         self.trainer.logger = self.logger
+        self.plot.start()  # for qt this must be before trining thread!
         thread.start_new_thread(self.trainer.train, ())
 
     def _train_stop(self):
@@ -126,7 +127,7 @@ class FFnetApp(HasTraits):
     def _normalize_changed(self):
         self.net.renormalize = self.normalize
 
-    traits_view = View(VSplit(UItem('object.plots.figure', style='custom'),
+    traits_view = View(VSplit(UItem('object.plot.figure', style='custom'),
                               Tabbed(UItem('logs', style='custom', dock = 'tab', height = 0.25),
                                      #Item('values',
                                           #label  = 'Shell',

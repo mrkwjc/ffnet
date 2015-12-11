@@ -49,9 +49,9 @@ training_setup_action = Action(
     #enabled_when = 'net and  object.trg.shape[1] == len(object.net.outno) and ' + \
                    #'len(object.inp) == len(object.trg) and not running')
 
-train_action = Action(
+train_start_action = Action(
     name   = 'Train!', 
-    action = '_train',
+    action = '_train_start',
     image  = ImageResource('go-next'),
     enabled_when = 'net and data_status == 2 and not running')
 
@@ -88,7 +88,7 @@ data_actions = ActionGroup(
 
 train_actions = ActionGroup(
     training_setup_action,
-    train_action,
+    train_start_action,
     train_stop_action,
     train_reset_action)
 
