@@ -35,33 +35,25 @@ close_network_action = Action(
     image  = ImageResource('process-stop'),
     enabled_when = 'net and not running')
 
-input_data_action = Action(
-    name   = 'Input', 
-    action = '_load_input_data',
+load_data_action = Action(
+    name   = 'Data', 
+    action = '_load_data',
     image  = ImageResource('text-x-generic'),
-    enabled_when = 'net and not running',
-    visible_when = 'False')
-
-target_data_action = Action(
-    name   = 'Target', 
-    action = '_load_target_data',
-    image  = ImageResource('text-x-generic'),
-    enabled_when = 'net and object.inp.shape[1] == len(object.net.inno) and ' + \
-                   'not running')
+    enabled_when = 'net and not running')
 
 training_setup_action = Action(
     name   = 'Setup', 
     action = '_train_settings',
     image  = ImageResource('preferences-system'),
-    enabled_when = 'net and  object.trg.shape[1] == len(object.net.outno) and ' + \
-                   'len(object.inp) == len(object.trg) and not running')
+    enabled_when = 'net and data_status == 2 and not running')
+    #enabled_when = 'net and  object.trg.shape[1] == len(object.net.outno) and ' + \
+                   #'len(object.inp) == len(object.trg) and not running')
 
 train_action = Action(
     name   = 'Train!', 
     action = '_train',
     image  = ImageResource('go-next'),
-    enabled_when = 'net and  object.trg.shape[1] == len(object.net.outno) and ' + \
-                   'len(object.inp) == len(object.trg) and not running')
+    enabled_when = 'net and data_status == 2 and not running')
 
 train_stop_action = Action(
     name   = 'Stop!', 
@@ -73,7 +65,7 @@ train_reset_action = Action(
     name   = 'Reset', 
     action = '_reset',
     image  = ImageResource('edit-clear'),
-    enabled_when = 'net and not running')
+    enabled_when = 'net and data_status == 2 and not running')
 
 error_plot_action = Action(
     name   = 'Error',
@@ -92,8 +84,7 @@ network_actions = ActionGroup(
     close_network_action)
 
 data_actions = ActionGroup(
-    input_data_action,
-    target_data_action)
+    load_data_action)
 
 train_actions = ActionGroup(
     training_setup_action,

@@ -1,20 +1,20 @@
 #-*- coding: utf-8 -*-
-#from traits.etsconfig.api import ETSConfig
-#ETSConfig.toolkit = 'qt4'
+from traits.etsconfig.api import ETSConfig
+ETSConfig.toolkit = 'qt4'
 
 from enthought.traits.api import *
 from enthought.traits.ui.api import *
 from pyface.api import GUI
-from loadtxt import LoadTxt
+from data import TrainingData
 from network import Network
-from training2 import TncTrainer
+from training import TncTrainer
 import thread
 import sys
 import time
 import uuid
 
 from logger import Logger
-from bars import toolbar, menubar
+from actions import toolbar, menubar
 from plots.error_animation import ErrorAnimation
 
 import multiprocessing as mp
@@ -41,26 +41,32 @@ class TrainingSettings(HasTraits):
                        resizable = True,
                        width = 0.2)
 
-class FFnetRoot(HasTraits):
+class FFnetApp(HasTraits):
     network = Instance(Network, ())
-    input_data = Instance(LoadTxt, ())
-    target_data = Instance(LoadTxt, ())
+    data = Instance(TrainingData, ())
     trainer = Instance(TncTrainer, ())
     settings = Instance(TrainingSettings, ())
     logs = Instance(Logger, ())
     running = DelegatesTo('trainer') #Bool(False)
     logger = DelegatesTo('logs')
     net = DelegatesTo('network')
-    inp = DelegatesTo('input_data', prefix='data')
-    trg = DelegatesTo('target_data', prefix='data')
-    validation_patterns = DelegatesTo('settings')
-    validation_type = DelegatesTo('settings')
+    #inp = DelegatesTo('input_data', prefix='data')
+    #trg = DelegatesTo('target_data', prefix='data')
+    #validation_patterns = DelegatesTo('settings')
+    #validation_type = DelegatesTo('settings')
     normalize = DelegatesTo('settings')
+    data_status = DelegatesTo('data', prefix='status')
     plots = Instance(ErrorAnimation, ())
     #_progress = Property(depends_on='plots.training_in_progress._progress')
 
     #def _get__progress(self):
         #return self.plots.training_in_progress._progress
+
+    def __init__(self, **traits):
+        super(FFnetApp, self).__init__(**traits)
+        self.data.app = self
+        self.data.input_loader.app = self
+        self.data.target_loader.app = self
 
     def _new(self):
         self.network.create(logger=self.logs.logger)
@@ -80,43 +86,12 @@ class FFnetRoot(HasTraits):
         self.network.close(logger=self.logs.logger)
         self._reset()
 
-    def _load_input_data(self):
-        self.input_data.configure_traits(view='all_view', kind='modal')
-        if self.inp_is_ok and self.input_data.updated:
-            msg = "Loaded %i input patterns from file: %s" %(self.inp.shape[0],
-                                                             self.input_data.filename)
-            self.logs.logger.info(msg)
-            self.input_data.updated = False
-            self._set_validation_mask()
-
-
-    def _load_target_data(self):
-        self.target_data.configure_traits(view='all_view', kind='modal')
-        if self.trg_is_ok and self.target_data.updated:
-            msg = "Loaded %i target patterns from file: %s" %(self.trg.shape[0],
-                                                              self.target_data.filename)
-            self.logs.logger.info(msg)
-            self.target_data.updated = False
-            self._set_validation_mask()
-
-    @property
-    def inp_is_ok(self):
-        if self.net and len(self.inp) > 0:
-            return self.inp.shape[1] == len(self.net.inno)
-        return False
-
-    @property
-    def trg_is_ok(self):
-        inp = self.inp
-        trg = self.trg
-        net = self.net
-        if self.net and len(inp) > 0 and len(trg) > 0:
-            return trg.shape[1] == len(net.outno) and len(inp) == len(trg)
-        return False
+    def _load_data(self):
+        self.data.edit_traits(kind='livemodal')
 
     def _train_settings(self):
         #self.edit_traits(view='settings_view', kind='modal')
-        self.settings.edit_traits(kind='modal')
+        self.settings.edit_traits(kind='livemodal')
 
     def _train(self):
         self.logger.info('Training network: %s' %self.network.filename)
@@ -129,11 +104,10 @@ class FFnetRoot(HasTraits):
         self.trainer.maxfun = self.settings.maxfun
         self.trainer.animator = self.plots
         self.trainer.net = self.net
-        vmask = self.vmask
-        self.trainer.input = self.inp[~vmask]
-        self.trainer.target = self.trg[~vmask]
-        self.trainer.input_v = self.inp[vmask]
-        self.trainer.target_v = self.trg[vmask]
+        self.trainer.input = self.data.input_t
+        self.trainer.target = self.data.target_t
+        self.trainer.input_v = self.data.input_v
+        self.trainer.target_v = self.data.target_v
         self.trainer.logger = self.logger
         thread.start_new_thread(self.trainer.train, ())
 
@@ -148,29 +122,6 @@ class FFnetRoot(HasTraits):
         self.trainer.__init__()
         self.plots.plot_init()
         self.plots.figure.draw()
-
-    def _set_validation_mask(self):
-        npat = len(self.inp)
-        self.vmask = ~np.ones(npat, np.bool)
-        if self.trg_is_ok:
-            percent = self.settings.validation_patterns
-            npat_v = percent*npat/100
-            type_ = self.validation_type
-            if type_ == 'random':
-                idx = np.random.choice(npat, npat_v)
-                mask = np.in1d(np.arange(npat), idx)
-                self.vmask = mask
-            if type_ == 'last':
-                mask = np.ones(npat, np.bool)
-                mask[:npat-npat_v] = False
-                self.vmask = mask
-            self.logger.info('%i training patterns chosen for validation (%s)' %(npat_v, type_))
-
-    def _validation_patterns_changed(self):
-        self._set_validation_mask()
-
-    def _validation_type_changed(self):
-        self._set_validation_mask()
 
     def _normalize_changed(self):
         self.net.renormalize = self.normalize
@@ -203,7 +154,7 @@ class FFnetRoot(HasTraits):
 if __name__=="__main__":
     from ffnet import loadnet, version
     import os
-    t = FFnetRoot()
+    t = FFnetApp()
     t.logs.logger.info('Welcome! You are using ffnet-%s.' %version)
     # Add test network
     n = t.network
@@ -215,11 +166,10 @@ if __name__=="__main__":
     #t.netlist.append(n)
     #t.network = n
     # Add test data
-    t.input_data.filename = 'data/black-scholes-input.dat'
-    t.input_data.load()
-    t.target_data.filename = 'data/black-scholes-target.dat'
-    t.target_data.load()
-    t._set_validation_mask()
+    t.data.input_loader.filename = 'data/black-scholes-input.dat'
+    t.data.input_loader.load()
+    t.data.target_loader.filename = 'data/black-scholes-target.dat'
+    t.data.target_loader.load()
 
     # Run
     t.configure_traits()
