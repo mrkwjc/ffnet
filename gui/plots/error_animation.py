@@ -47,6 +47,7 @@ class ErrorAnimation(MPLAnimator):
         if len(verr) > 0:
             self.vline.set_data(it, verr)
         self.relim()
+        #self.figure.draw()
         return self.tline, self.vline
 
     #def relim(self):
@@ -58,16 +59,22 @@ class ErrorAnimation(MPLAnimator):
         #ax.set_xlim((xl, xh))
         #ax.autoscale_view()
 
-    view = View(Item('relative_error'),
-                resizable = True)
+    traits_view = View(Item('relative_error'),
+                            resizable = True)
+
+    #traits_view = View(Item('startstop', label='Start/Stop'),
+                          #Item('relative_error'),
+                          #resizable = True)
 
 
 if __name__ == "__main__":
     p = ErrorAnimation()
     p.interval = 100
     import thread, threading
+    import time
     lock = threading.Lock()
     def generate_data(p):
+        time.sleep(0.1)
         for i in range(300):
             t = np.arange(0, 0.05*i, 0.05)
             terr = np.sin(2*np.pi*t) * np.exp(-t/10.)
@@ -77,7 +84,6 @@ if __name__ == "__main__":
             p.validation_error = verr
             p.iterations = t*20
             lock.release()
-            import time
             time.sleep(0.05)
         p.stop()
     thread.start_new_thread(generate_data, (p,))

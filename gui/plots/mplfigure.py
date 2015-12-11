@@ -154,6 +154,7 @@ class MPLAnimator(HasTraits):
     def stop(self):
         self.running = False
         self.animator._stop()
+        self.figure.figure.canvas.toolbar.update()
 
     def relim(self):
         ax = self.figure.axes
