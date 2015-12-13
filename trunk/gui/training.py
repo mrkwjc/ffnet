@@ -8,6 +8,8 @@ import numpy as np
 from ffnet import ffnet, ffnetmodule
 import logging
 from plots.error_animation import ErrorAnimation
+import thread
+
 
 def parse_tnc_output(output):
     import cStringIO
@@ -15,120 +17,86 @@ def parse_tnc_output(output):
     res = np.loadtxt(f, skiprows=1)
     return res
 
+
 class Trainer(HasTraits):
     name = Str
-    #manager = Instance(mp.Manager)
-    net = Any(ffnet)
-    input = CArray()
-    target = CArray()
-    input_v = CArray()
-    target_v = CArray()
-    iteration = Int(0)
-    logger = Instance(logging.Logger)
     running = Bool(False)
+    iteration = Int(0)
+    step = 1
 
     def __repr__(self):
         return self.name
 
-    def __init__(self, **traits):
+    def __init__(self, app=None, **traits):
         super(Trainer, self).__init__(**traits)
-        self.manager = mp.Manager()
-        self.condition = self.manager.Condition()
-        #self.common = self.manager.Namespace()
-        self.mprunning = mp.Value('i', 0)
-        self.wlist = self.manager.list([])
-        self.elist = self.manager.list([])
-        self.vlist = self.manager.list([])
-        self.ilist = self.manager.list([]) # integers
-        self.logger = logging.getLogger()
-        self.iteration = 0
+        self.app = app
 
     def _running_changed(self):
-        self.mprunning.value = self.running
-        if len(self.ilist):
-            self.iteration = self.ilist[-1]
-            self.net.weights[:] = self.wlist[-1]
+        self.app.shared.running.value = int(self.running)
 
-    def _set_normalized_data(self):
-        self.net._setnorm(np.vstack([self.input, self.input_v]),
-                          np.vstack([self.target, self.target_v]))  # First set parameters
-        self.input_n, self.target_n = self.net._setnorm(self.input, self.target)
-        if len(self.input_v) > 0:
-            self.input_v_n, self.target_v_n = self.net._setnorm(self.input_v, self.target_v)
+    def _save_iteration(self):
+        w = self.app.network.net.weights[:]
+        e = self.error_t()
+        v = self.error_v()
+        i = self.iteration
+        if not i%self.step:
+            self.app.shared.wlist.append(w)
+            self.app.shared.tlist.append(e)
+            if v is not None:
+                self.app.shared.vlist.append(v)
+            self.app.shared.ilist.append(i)
+        self.iteration += 1
 
-    def _sqerror(self, inp, trg):
+    def sqerror(self, inp, trg):
+        net = self.app.network.net
         err = ffnetmodule.netprop.sqerror
-        e  = err(self.net.weights, self.net.conec, self.net.units,
-                 self.net.inno, self.net.outno, inp, trg)
+        e  = err(net.weights, net.conec, net.units, net.inno, net.outno, inp, trg)
         return e
 
-    def save_iteration(self):
-        e = self._sqerror(self.input_n, self.target_n)
-        #e = self.net.sqerror(self.input, self.target)
-        if len(self.input_v) > 0:
-            v = self._sqerror(self.input_v_n, self.target_v_n)
-            #v = self.net.sqerror(self.input_v, self.target_v)
-        #with self.condition:   # plots are using this data, we need to synchronize
-        self.ilist.append(self.iteration)
-        self.wlist.append(self.net.weights)
-        self.elist.append(e)
-        if len(self.input_v) > 0:
-            self.vlist.append(v)
-        self.iteration += 1
-        #self.condition.notify_all()
+    def error_t(self):
+        inp = self.app.data.input_t_n
+        trg = self.app.data.target_t_n
+        return self.sqerror(inp, trg)
 
-    def callback(self, x):  # This will be called in child process
-        self.net.weights = x
-        self.save_iteration()
-        self.stopper()
+    def error_v(self):
+        inp = self.app.data.input_v_n
+        trg = self.app.data.target_v_n
+        if len(inp):
+            return self.sqerror(inp, trg)
+        else:
+            return None
 
+    def callback(self, x):  # This is called in child process
+        self.app.network.net.weights[:] = x
+        self._save_iteration()
+        self.stopper()  # This is actually the only way to stop C based optimizer
 
-class TncTrainer(Trainer):
-    name = Str('tnc')
-    maxfun = Int(0)
-    nproc =  Int(mp.cpu_count())
-    messages = Int(1)
+    def assign_best_weights(self):
+        self.app.network.net.weights[:] = self.app.shared.wlist[-1]
 
-    def _net_changed(self):
-        if self.maxfun == 0:
-            self.maxfun = max(100, 10*len(self.net.weights))  # should be in ffnet ?!
-
-    def _input_changed(self):
-        self.nproc = min(self.nproc, len(self.input))  # should be in ffnet ?!
-
-    def stopper(self):
-        if self.mprunning.value == 0:
-            if self.nproc > 1:
-                self.net._clean_mp()  # this raises AssertionError
-            raise AssertionError
-    
-    def train(self):  # run this is separate thread !
-        logger = self.logger
-        logger.info("Training in progress...")
+    def _train(self):
+        logger = self.app.logs.logger
+        logger.info('Using "%s" trainig algorithm.' %self.name)
+        logger.info('Training in progress...')
         r = Redirector(fd=2)  # Redirect stderr
         r.start()
         t0 = time.time()
-        self.running =  True
-        self.mprunning.value = True
-        self._set_normalized_data()  # be sure normalized data are correct before training
         if self.iteration == 0:  # we just started
-            self.save_iteration()
-        self._net_changed()  # HACK for maxfun
-        process = Process(target=self.net.train_tnc,
-                          args=(self.input, self.target),
-                          kwargs={'nproc':self.nproc,
-                                  'maxfun': self.maxfun,
-                                  'disp': self.messages,
-                                  'callback': self.callback})
+            self._save_iteration()
+        ## RUN 
+        self.running = True
+        self.setup()
+        process = self.training_process()
         process.start()
         process.join()
         process.terminate()
-        self.net.weights[:] = self.wlist[-1]
-        running_status = self.mprunning.value  # Keep for logging
+        self.assign_best_weights()
+        running_status = self.running  # Keep for logging
         self.running = False
         t1 = time.time()
         output = r.stop()
-        self.plot.stop()
+        self.app.plot.stop()  # This is inside training thread
+        ##
         # Log things
         logger.info(output.strip())
         if not running_status:
@@ -140,8 +108,48 @@ class TncTrainer(Trainer):
                 err, tb = process.exception
                 logger.info('Training finished with error:')
                 logger.info(tb.strip())
-        # Log time
         logger.info('Execution time: %3.3f seconds.' %(t1-t0))
+
+    def train(self):
+        self.app.plot.start()  # for Qt this must be outside thread
+        thread.start_new_thread(self._train, ())
+
+    def setup(self):
+        raise NotImplementedError
+
+    def training_process(self):
+        raise NotImplementedError
+
+    def stopper(self):
+        raise NotImplementedError
+
+
+class TncTrainer(Trainer):
+    name = Str('tnc')
+    maxfun = Int(0)
+    nproc =  Int(mp.cpu_count())
+    messages = Int(1)
+
+    def setup(self):
+        if self.maxfun == 0:
+            self.maxfun = max(100, 10*len(self.app.network.net.weights))  # should be in ffnet ?!
+        self.nproc = min(self.nproc, len(self.app.data.input_t))  # should be in ffnet ?!
+
+    def stopper(self):
+        if self.app.shared.running.value == 0:
+            if self.nproc > 1:
+                self.app.network.net._clean_mp()  # this raises AssertionError
+            raise AssertionError
+
+    def training_process(self):
+        process = Process(target=self.app.network.net.train_tnc,
+                          args=(self.app.data.input_t, self.app.data.target_t),
+                          kwargs={'nproc':self.nproc,
+                                  'maxfun': self.maxfun,
+                                  'disp': self.messages,
+                                  'callback': self.callback})
+        return process
+
 
 
 if __name__ == "__main__":
