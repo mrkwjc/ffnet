@@ -7,17 +7,18 @@ from enthought.traits.ui.api import *
 from pyface.api import GUI
 from data import TrainingData
 from network import Network
-from training import TncTrainer
-import thread
+from training3 import TncTrainer
 import sys
 import time
 import uuid
 
+import thread
 from logger import Logger
 from actions import toolbar, menubar
 from plots.error_animation import ErrorAnimation
 
 import multiprocessing as mp
+from shared import Shared
 import numpy as np
 
 class TrainingSettings(HasTraits):
@@ -44,16 +45,13 @@ class TrainingSettings(HasTraits):
 class FFnetApp(HasTraits):
     network = Instance(Network, ())
     data = Instance(TrainingData, ())
+    shared = Instance(Shared, ())
     trainer = Instance(TncTrainer, ())
     settings = Instance(TrainingSettings, ())
     logs = Instance(Logger, ())
-    running = DelegatesTo('trainer') #Bool(False)
+    running = DelegatesTo('trainer')
     logger = DelegatesTo('logs')
     net = DelegatesTo('network')
-    #inp = DelegatesTo('input_data', prefix='data')
-    #trg = DelegatesTo('target_data', prefix='data')
-    #validation_patterns = DelegatesTo('settings')
-    #validation_type = DelegatesTo('settings')
     normalize = DelegatesTo('settings')
     data_status = DelegatesTo('data', prefix='status')
     plot = Instance(ErrorAnimation, ())
@@ -67,6 +65,8 @@ class FFnetApp(HasTraits):
         self.data.app = self
         self.data.input_loader.app = self
         self.data.target_loader.app = self
+        self.trainer.app = self
+        self.plot.app = self
 
     def _new(self):
         self.network.create(logger=self.logs.logger)
@@ -95,26 +95,10 @@ class FFnetApp(HasTraits):
 
     def _train_start(self):
         self.logger.info('Training network: %s' %self.network.filename)
-        self.logger.info("Using '%s' trainig algorithm." %self.trainer.name)
-        self.plot.selected = 'error'
-        self.plot.training_error = self.trainer.elist
-        self.plot.validation_error = self.trainer.vlist
-        self.plot.iterations = self.trainer.ilist
-        self.plot.condition = self.trainer.condition
-        self.trainer.plot = self.plot
-        self.trainer.maxfun = self.settings.maxfun
-        self.trainer.net = self.net
-        self.trainer.input = self.data.input_t
-        self.trainer.target = self.data.target_t
-        self.trainer.input_v = self.data.input_v
-        self.trainer.target_v = self.data.target_v
-        self.trainer.logger = self.logger
-        self.plot.start()  # for qt this must be before trining thread!
-        thread.start_new_thread(self.trainer.train, ())
+        self.trainer.train()
 
     def _train_stop(self):
-        self.trainer.mprunning.value = 0
-        self.running = False
+        self.trainer.running = False
 
     def _reset(self):
         if self.net:

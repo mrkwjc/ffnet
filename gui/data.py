@@ -101,11 +101,17 @@ class TrainingData(HasTraits):
     target_loader = Instance(LoadTarget, ())
     input = DelegatesTo('input_loader', prefix='data')
     target = DelegatesTo('target_loader', prefix='data')
+    input_n = CArray
+    target_n = CArray
     vmask = CArray(dtype=np.bool)
     input_t = Property(CArray)
     target_t = Property(CArray)
     input_v = Property(CArray)
     target_v = Property(CArray)
+    input_t_n = Property(CArray)
+    target_t_n = Property(CArray)
+    input_v_n = Property(CArray)
+    target_v_n = Property(CArray)
     validation_patterns = Range(0, 50, 10)
     validation_type = Enum('random', 'last')
     status = Int(0)  # 1 - input loaded, 2 - input and target loaded
@@ -135,7 +141,18 @@ class TrainingData(HasTraits):
     def _get_target_v(self):
         return self.target[self.vmask]
 
-    @on_trait_change('input', 'target')
+    def _get_input_t_n(self):
+        return self.input_n[~self.vmask]
+
+    def _get_input_v_n(self):
+        return self.input_n[self.vmask]
+
+    def _get_target_t_n(self):
+        return self.target_n[~self.vmask]
+
+    def _get_target_v_n(self):
+        return self.target_n[self.vmask]
+
     def _set_status(self):
         ni = len(self.input)
         nt = len(self.target)
@@ -151,7 +168,14 @@ class TrainingData(HasTraits):
             self.status = 0
             status_info = 'No data loaded.'
 
-    @on_trait_change('validation_patterns', 'validation_type', 'input', 'target')
+    @on_trait_change('input, target')
+    def normalize_data(self):
+        self._set_status()
+        net = self.app.network.net
+        if net and self.status == 2:
+            self.input_n, self.target_n = net._setnorm(self.input, self.target)
+
+    @on_trait_change('validation_patterns, validation_type, input, target')
     def _set_validation_mask(self):
         self._set_status()
         if self.status == 2:  # input and target are not empty and of the same length

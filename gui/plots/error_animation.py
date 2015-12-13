@@ -8,10 +8,11 @@ import numpy as np
 import multiprocessing as mp
 
 class ErrorAnimation(MPLAnimator):
-    iterations = Any([])
-    training_error = Any([])
-    validation_error = Any([])
     relative_error = Bool(False)
+
+    def __init__(self, app=None, **traits):
+        super(ErrorAnimation, self).__init__(**traits)
+        self.app = app
 
     def plot_init(self):
         self.figure.axes.clear()
@@ -28,9 +29,9 @@ class ErrorAnimation(MPLAnimator):
 
     def plot_data(self):
         while self.running:
-            it = self.iterations
-            terr = self.training_error
-            verr = self.validation_error
+            it = self.app.shared.ilist
+            terr = self.app.shared.tlist
+            verr = self.app.shared.vlist
             if self.relative_error:
                 terr = [t/terr[0] for t in terr]
                 verr = [v/verr[0] for v in verr]
@@ -47,7 +48,6 @@ class ErrorAnimation(MPLAnimator):
         if len(verr) > 0:
             self.vline.set_data(it, verr)
         self.relim()
-        #self.figure.draw()
         return self.tline, self.vline
 
     #def relim(self):

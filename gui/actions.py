@@ -7,7 +7,7 @@ new_network_action = Action(
     name   = 'New...', 
     action = '_new',
     image  = ImageResource('document-new'),
-    enabled_when = 'not running'
+    enabled_when = 'not object.trainer.running'
     )
 
 load_network_action = Action(
