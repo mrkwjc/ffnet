@@ -7,7 +7,7 @@ from enthought.traits.ui.api import *
 from pyface.api import GUI
 from data import TrainingData
 from network import Network
-from training3 import TncTrainer
+from training import TncTrainer
 import sys
 import time
 import uuid
