@@ -21,7 +21,7 @@ def parse_tnc_output(output):
 class Trainer(HasTraits):
     name = Str
     running = Bool(False)
-    iteration = Int(0)
+    iteration = Property(Int(0))
     step = 1
 
     def __repr__(self):
@@ -33,6 +33,12 @@ class Trainer(HasTraits):
 
     def _running_changed(self):
         self.app.shared.running.value = int(self.running)
+
+    def _get_iteration(self):
+        return self.app.shared.iteration.value
+
+    def _set_iteration(self, value):
+         self.app.shared.iteration.value = value
 
     def _save_iteration(self):
         w = self.app.network.net.weights[:]
