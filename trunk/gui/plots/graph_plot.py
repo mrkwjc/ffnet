@@ -12,7 +12,7 @@ import networkx as nx
 import matplotlib
 
 
-class GraphPlot(MPLPlotter):
+class GraphPlotter(MPLPlotter):
     graph = Instance(nx.Graph, live = True)
     show_biases = Bool(False, live = True)
     node_labels = Bool(True, live = True)
@@ -29,11 +29,11 @@ class GraphPlot(MPLPlotter):
         self.figure.axes.set_frame_on(False)
         self.figure.axes.set_position([0, 0, 1, 1])
 
-    def plot(self):
-        graph = self._get_graph()
+    def plot(self, data=None):
+        graph = self.__get_graph()
         if graph is None:
             return
-        pos = self._get_pos(graph)
+        pos = self.__get_pos(graph)
         #if pos is None:
             #return
         matplotlib.rcParams['interactive'] = False
@@ -48,15 +48,16 @@ class GraphPlot(MPLPlotter):
                          )
         matplotlib.rcParams['interactive'] = True
 
-    def _get_graph(self):
+    def __get_graph(self):
         graph = self.graph
         if graph is not None:
             if 0 in graph.nodes() and not self.show_biases:
                 nlist = sorted(graph.nodes())
                 graph = graph.subgraph(nlist[1:])
+                print 'removed'
         return graph
 
-    def _get_pos(self, graph):
+    def __get_pos(self, graph):
         if self.layout == 'layered':  # only DAGs
             try:
                 pos = layered_layout(graph)
@@ -76,7 +77,7 @@ class GraphPlot(MPLPlotter):
         return pos
 
 
-    view = View(Item('show_biases'),
+    traits_view = View(Item('show_biases'),
                 Item('node_labels'),
                 Item('node_size'),
                 Item('edge_width'),
@@ -85,9 +86,9 @@ class GraphPlot(MPLPlotter):
                 # Item('edge_color', style = 'custom'),
                 resizable = True)
 
+
 if __name__ == "__main__":
-    p = GraphPlot()
-    #p.graph = nx.balanced_tree(2, 3).to_directed()
+    p = GraphPlotter()
     def randdag():
         G = nx.gnp_random_graph(20,0.5,directed=True)
         DAG = nx.DiGraph([(u,v) for (u,v) in G.edges() if u<v])

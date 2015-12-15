@@ -79,53 +79,48 @@ class MPLFigure(HasTraits):
                 height = 640)
 
 
+#class MPLPlotter(HasTraits):
+    #figure = Instance(MPLFigure)
+    #live = Bool(True)
+
+    #def __init__(self, **traits):
+        #super(MPLPlotter, self).__init__(**traits)
+        #self.figure = MPLFigureWithPlotter()
+        #self.figure.plotter = self
+
+    #@on_trait_change('+live', post_init=True)
+    #def _plot(self, name, value):
+        #if self.live and self.trait(name).live:
+            #self.clear()
+            #self.setup()
+            #self.plot()
+            #self.draw()
+
+    ##def _setup(self):
+        ##self.setup()
+
+    #def clear(self):
+        #self.figure.axes.clear()
+
+    #def draw(self):
+        #self.figure.draw()
+
+    #def setup(self):  # Implement this for initial setup
+        #pass
+
+    #def plot(self):  # Implement this for real plots
+        #pass
+
+    #view = View(resizable = True)
+
+
 class MPLPlotter(HasTraits):
-    figure = Instance(MPLFigure)
     live = Bool(True)
+    figure = Instance(MPLFigure)
 
     def __init__(self, **traits):
         super(MPLPlotter, self).__init__(**traits)
         self.figure = MPLFigureWithPlotter()
-        self.figure.plotter = self
-
-    @on_trait_change('+live', post_init=True)
-    def _plot(self, name, value):
-        if self.live and self.trait(name).live:
-            self.clear()
-            self.setup()
-            self.plot()
-            self.draw()
-
-    #def _setup(self):
-        #self.setup()
-
-    def clear(self):
-        self.figure.axes.clear()
-
-    def draw(self):
-        self.figure.draw()
-
-    def setup(self):  # Implement this for initial setup
-        pass
-
-    def plot(self):  # Implement this for real plots
-        pass
-
-    view = View(resizable = True)
-
-
-class MPLAnimator(HasTraits):
-    live = Bool(True)
-    figure = Instance(MPLFigure)
-    interval = Int(100)
-    repeat = Bool(False)
-    blit = Bool(False)
-    running = Bool(False)
-    startstop = Button
-
-    def __init__(self, **traits):
-        super(MPLAnimator, self).__init__(**traits)
-        self.figure = MPLFigureWithAnimator()
         self.figure.plotter = self
 
     @on_trait_change('+live', post_init=True)
@@ -151,6 +146,21 @@ class MPLAnimator(HasTraits):
 
     def plot(self, data = None):
         pass
+
+    traits_view = View(resizable = True)
+
+    figure_view = View(UItem('figure', style = 'custom'),
+                             resizable = True,
+                             width = 1024,
+                             height = 640)
+
+
+class MPLAnimator(MPLPlotter):
+    interval = Int(100)
+    repeat = Bool(False)
+    blit = Bool(False)
+    running = Bool(False)
+    startstop = Button
 
     def animation_data(self):
         while self.running:
@@ -216,10 +226,6 @@ class MPLFigureWithPlotter(MPLFigure):
                     width = 1024,
                     height = 640
                     )
-
-
-class MPLFigureWithAnimator(MPLFigureWithPlotter):
-    plotter = Instance(MPLAnimator)
 
 
 if __name__=="__main__":
