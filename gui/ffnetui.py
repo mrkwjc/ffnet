@@ -15,7 +15,9 @@ import uuid
 import thread
 from logger import Logger
 from actions import toolbar, menubar
-from plots.error_animation import ErrorAnimation
+#from plots.error_animation import ErrorAnimation
+#from plots.to_animation import TOAnimation
+from animations import Plots
 
 import multiprocessing as mp
 from shared import Shared
@@ -54,7 +56,9 @@ class FFnetApp(HasTraits):
     net = DelegatesTo('network')
     normalize = DelegatesTo('settings')
     data_status = DelegatesTo('data', prefix='status')
-    plot = Instance(ErrorAnimation, ())
+    plots = Instance(Plots, ())
+    #plot = Instance(TOAnimation, ())
+
     #_progress = Property(depends_on='plots.training_in_progress._progress')
 
     #def _get__progress(self):
@@ -66,7 +70,8 @@ class FFnetApp(HasTraits):
         self.data.input_loader.app = self
         self.data.target_loader.app = self
         self.trainer.app = self
-        self.plot.app = self
+        self.plots.app = self
+        self.plots.selected = self.plots.plist[0]
 
     def _new(self):
         self.network.create(logger=self.logs.logger)
@@ -111,7 +116,7 @@ class FFnetApp(HasTraits):
     def _normalize_changed(self):
         self.net.renormalize = self.normalize
 
-    traits_view = View(VSplit(UItem('object.plot.figure', style='custom'),
+    traits_view = View(VSplit(UItem('object.plots', style='custom'),
                               Tabbed(UItem('logs', style='custom', dock = 'tab', height = 0.25),
                                      #Item('values',
                                           #label  = 'Shell',
