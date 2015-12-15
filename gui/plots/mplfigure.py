@@ -115,6 +115,7 @@ class MPLPlotter(HasTraits):
 
 
 class MPLAnimator(HasTraits):
+    live = Bool(True)
     figure = Instance(MPLFigure)
     interval = Int(100)
     repeat = Bool(False)
@@ -126,6 +127,18 @@ class MPLAnimator(HasTraits):
         super(MPLAnimator, self).__init__(**traits)
         self.figure = MPLFigureWithAnimator()
         self.figure.plotter = self
+
+    @on_trait_change('+live', post_init=True)
+    def _replot(self, name, value):
+        if self.live and self.trait(name).live:
+            self.replot()
+
+    def replot(self):
+        self.figure.axes.clear()
+        self.setup()
+        self.plot_init()
+        self.plot(self.plot_data())
+        self.figure.draw()
 
     def setup(self):
         pass
