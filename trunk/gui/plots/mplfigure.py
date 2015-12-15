@@ -116,7 +116,7 @@ class MPLPlotter(HasTraits):
 
 class MPLAnimator(HasTraits):
     figure = Instance(MPLFigure)
-    interval = Int(50)
+    interval = Int(100)
     repeat = Bool(False)
     blit = Bool(False)
     running = Bool(False)
@@ -134,17 +134,22 @@ class MPLAnimator(HasTraits):
         pass
 
     def plot_data(self):
-        while self.running:
-            yield
+        pass
 
     def plot(self, data = None):
         pass
 
+    def animation_data(self):
+        while self.running:
+            yield self.plot_data()
+
     def start(self):
+        if self.running:
+            return  # Do not start again!
         self.running = True
         self.animator = animation.FuncAnimation(self.figure.figure,
                                                 self.plot,
-                                                frames = self.plot_data,
+                                                frames = self.animation_data,
                                                 init_func = self.plot_init,
                                                 interval = self.interval,
                                                 blit = self.blit,
@@ -152,6 +157,8 @@ class MPLAnimator(HasTraits):
         self.animator._start()
 
     def stop(self):
+        if not self.running:
+            return  # Do not stop when we are not running
         self.running = False
         self.animator._stop()
         self.figure.figure.canvas.toolbar.update()
@@ -167,8 +174,13 @@ class MPLAnimator(HasTraits):
         else:
             self.stop()
 
-    view = View(UItem('startstop', label = 'Start/Stop'),
-                resizable = True)
+    traits_view = View(UItem('startstop', label = 'Start/Stop'),
+                       resizable = True)
+
+    figure_view = View(UItem('figure', style = 'custom'),
+                             resizable = True,
+                             width = 1024,
+                             height = 640)
 
 
 class MPLFigureWithPlotter(MPLFigure):
@@ -198,5 +210,5 @@ class MPLFigureWithAnimator(MPLFigureWithPlotter):
 
 
 if __name__=="__main__":
-    p = MPLPlotter()
-    p.figure.configure_traits()
+    p = MPLAnimator()
+    p.configure_traits(view='figure_view')

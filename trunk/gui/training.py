@@ -101,7 +101,7 @@ class Trainer(HasTraits):
         self.running = False
         t1 = time.time()
         output = r.stop()
-        self.app.plot.stop()  # This is inside training thread
+        self.app.plots.selected.stop()  # This is inside training thread
         ##
         # Log things
         logger.info(output.strip())
@@ -117,7 +117,7 @@ class Trainer(HasTraits):
         logger.info('Execution time: %3.3f seconds.' %(t1-t0))
 
     def train(self):
-        self.app.plot.start()  # for Qt this must be outside thread
+        self.app.plots.selected.start()  # for Qt this must be outside thread
         thread.start_new_thread(self._train, ())
 
     def setup(self):
