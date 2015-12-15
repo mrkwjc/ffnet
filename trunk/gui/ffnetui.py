@@ -136,7 +136,7 @@ class FFnetApp(HasTraits):
                        toolbar = toolbar,
                        #statusbar = [StatusItem(name = '_progress', width=200)]
                        )
-    
+
     training_view = View(UItem('stop_training'),
                          title = 'Training network...',
                          width = 0.2)

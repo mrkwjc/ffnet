@@ -11,7 +11,7 @@ import numpy as np
 class ErrorAnimation(MPLAnimator):
     name = Str('Training error')
     app = Any
-    relative_error = Bool(False)
+    relative_error = Bool(False, live=True)
 
     def plot_init(self):
         self.figure.axes.clear()
@@ -40,7 +40,7 @@ class ErrorAnimation(MPLAnimator):
         return it[:n], terr[:n], verr[:n]
 
     def plot(self, data=None):
-        it, terr, verr = data if data is not None else self.plot_data()
+        it, terr, verr = data #if data is not None else self.plot_data()
         ax = self.figure.axes
         self.tline.set_data(it, terr)
         if len(verr) > 0:
@@ -56,7 +56,7 @@ class TOAnimation(MPLAnimator):
     name = Str('Target vs. Output')
     app = Any
     outputs = Property(List, depends_on='app.network.net')
-    output = Enum(values='outputs')
+    output = Enum(values='outputs', live=True)
 
     def _get_outputs(self):
         if self.app is not None and self.app.network.net is not None:
@@ -97,7 +97,7 @@ class TOAnimation(MPLAnimator):
             yield self.plot_data()
 
     def plot(self, data=None):
-        tt, ot, tv, ov, x, y = data if data is not None else self.plot_data()
+        tt, ot, tv, ov, x, y = data #if data is not None else self.plot_data()
         ax = self.figure.axes
         self.tline.set_data(tt, ot)
         self.vline.set_data(tv, ov)
@@ -106,7 +106,7 @@ class TOAnimation(MPLAnimator):
         return self.tline, self.vline, self.rline
 
 
-    traits_view = View(Item('output'),
+    traits_view = View(Item('output', label = 'Network output'),
                             resizable = True)
 
 
@@ -133,10 +133,9 @@ class Plots(HasTraits):
                     new.start()
                 except:
                     # But simple plot can be also
-                    new.plot()
+                    new.replot()
             else:
-                new.plot_init()
-                new.plot()
+                new.replot()
 
     traits_view = View(Item('plist',
                             style='custom',
