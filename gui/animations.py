@@ -110,9 +110,20 @@ class TOAnimation(MPLAnimator):
                             resizable = True)
 
 
+from plots.graph_plot import GraphPlotter
+
+class GraphPlot(GraphPlotter):
+    app = Any
+    graph = Property(live = True)
+    show_biases = Bool(False, live = True)
+
+    def _get_graph(self):
+        if self.app is not None and self.app.network.net is not None:
+            return self.app.network.net.graph
+
 class Plots(HasTraits):
     app = Any
-    plist = List([ErrorAnimation(), TOAnimation()])
+    plist = List([ErrorAnimation(), TOAnimation(), GraphPlot()])
     selected = Any
 
     def _app_changed(self):
