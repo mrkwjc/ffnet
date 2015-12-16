@@ -54,7 +54,6 @@ class GraphPlotter(MPLPlotter):
             if 0 in graph.nodes() and not self.show_biases:
                 nlist = sorted(graph.nodes())
                 graph = graph.subgraph(nlist[1:])
-                print 'removed'
         return graph
 
     def __get_pos(self, graph):

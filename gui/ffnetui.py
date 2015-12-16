@@ -116,8 +116,8 @@ class FFnetApp(HasTraits):
     def _normalize_changed(self):
         self.net.renormalize = self.normalize
 
-    traits_view = View(VSplit(UItem('object.plots', style='custom'),
-                              Tabbed(UItem('logs', style='custom', dock = 'tab', height = 0.25),
+    traits_view = View(VSplit(UItem('object.plots', style='custom', height=0.75),
+                              Tabbed(UItem('logs', style='custom', dock = 'tab'),
                                      #Item('values',
                                           #label  = 'Shell',
                                           #editor = ShellEditor( share = True ),
