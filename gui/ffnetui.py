@@ -1,6 +1,6 @@
 #-*- coding: utf-8 -*-
-#from traits.etsconfig.api import ETSConfig
-#ETSConfig.toolkit = 'qt4'
+## from traits.etsconfig.api import ETSConfig
+## ETSConfig.toolkit = 'qt4'
 
 from enthought.traits.api import *
 from enthought.traits.ui.api import *
@@ -51,18 +51,21 @@ class FFnetApp(HasTraits):
     trainer = Instance(TncTrainer, ())
     settings = Instance(TrainingSettings, ())
     logs = Instance(Logger, ())
-    running = DelegatesTo('trainer')
-    logger = DelegatesTo('logs')
-    net = DelegatesTo('network')
-    normalize = DelegatesTo('settings')
-    data_status = DelegatesTo('data', prefix='status')
     plots = Instance(Plots, ())
-    #plot = Instance(TOAnimation, ())
+    shell = Dict
 
     #_progress = Property(depends_on='plots.training_in_progress._progress')
 
     #def _get__progress(self):
         #return self.plots.training_in_progress._progress
+
+    def __getstate__(self):
+        # managers, loggers and figures are not picklable
+        self.shared.manager = None
+        state = self.__dict__.copy()
+        del state['logs']
+        del state['plots']
+        return state
 
     def __init__(self, **traits):
         super(FFnetApp, self).__init__(**traits)
@@ -72,6 +75,7 @@ class FFnetApp(HasTraits):
         self.trainer.app = self
         self.plots.app = self
         self.plots.selected = self.plots.plist[0]
+        self.shell = {'app':self}
 
     def _new(self):
         self.network.create(logger=self.logs.logger)
@@ -99,7 +103,7 @@ class FFnetApp(HasTraits):
         self.settings.edit_traits(kind='livemodal')
 
     def _train_start(self):
-        self.logger.info('Training network: %s' %self.network.filename)
+        self.logs.logger.info('Training network: %s' %self.network.filename)
         self.trainer.train()
 
     def _train_stop(self):
@@ -118,12 +122,12 @@ class FFnetApp(HasTraits):
 
     traits_view = View(VSplit(UItem('object.plots', style='custom', height=0.75),
                               Tabbed(UItem('logs', style='custom', dock = 'tab'),
-                                     #Item('values',
-                                          #label  = 'Shell',
-                                          #editor = ShellEditor( share = True ),
-                                          #dock   = 'tab',
-                                          #export = 'DockWindowShell'
-                                          #),
+                                     UItem('shell',
+                                           label  = 'Shell',
+                                           editor = ShellEditor( share = True ),
+                                           dock   = 'tab',
+                                           export = 'DockWindowShell'
+                                           ),
                                      #show_labels = False
                                     )
                               ),
