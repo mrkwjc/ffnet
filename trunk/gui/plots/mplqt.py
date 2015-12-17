@@ -20,7 +20,7 @@ ETSConfig.toolkit = 'qt4'
 # We want matplotlib to use a QT backend
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg
+from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT
 from matplotlib.backends.qt_compat import QtWidgets
 
 from traits.api import Any, Instance
@@ -31,12 +31,12 @@ from traitsui.api import Handler
 import os
 basedir = os.path.dirname(__file__)
 
-class NavigationToolbar(NavigationToolbar2QTAgg):
+class NavigationToolbar(NavigationToolbar2QT):
     def __init__(self, canvas, parent, tools=('Home', 'Pan', 'Zoom', 'Save'), **kwargs):
         mpl.backends.backend_qt4.figureoptions = None
         mpl.backends.backend_qt5.figureoptions = None
-        self.toolitems = [t for t in NavigationToolbar2QTAgg.toolitems if t[0] in tools]
-        NavigationToolbar2QTAgg.__init__(self, canvas, parent, **kwargs)
+        self.toolitems = [t for t in NavigationToolbar2QT.toolitems if t[0] in tools]
+        NavigationToolbar2QT.__init__(self, canvas, parent, **kwargs)
 
     def custom_tools(self):
         """
