@@ -2,8 +2,8 @@
 ## from traits.etsconfig.api import ETSConfig
 ## ETSConfig.toolkit = 'qt4'
 
-from enthought.traits.api import *
-from enthought.traits.ui.api import *
+from traits.api import *
+from traitsui.api import *
 from pyface.api import GUI
 from data import TrainingData
 from network import Network

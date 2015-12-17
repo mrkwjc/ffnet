@@ -1,7 +1,7 @@
 #from traits.etsconfig.api import ETSConfig
 #ETSConfig.toolkit = 'qt4'
-from enthought.traits.api import *
-from enthought.traits.ui.api import *
+from traits.api import *
+from traitsui.api import *
 from pyface.api import GUI
 import logging
 import sys, uuid
