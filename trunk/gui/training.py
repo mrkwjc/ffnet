@@ -19,9 +19,10 @@ def parse_tnc_output(output):
 
 
 class Trainer(HasTraits):
+    app = Any
     name = Str
     running = Bool(False)
-    iteration = Property(Int(0))
+    iteration = Property(Int(0), transient=True)  # transient for non-pickling
     step = 1
 
     def __repr__(self):
@@ -140,6 +141,9 @@ class TncTrainer(Trainer):
         if self.maxfun == 0:
             self.maxfun = max(100, 10*len(self.app.network.net.weights))  # should be in ffnet ?!
         self.nproc = min(self.nproc, len(self.app.data.input_t))  # should be in ffnet ?!
+        import sys
+        if sys.platform.startswith('win'):
+            self.nproc = 1  # TODO, why nproc > 1 is so memory hungry?
 
     def stopper(self):
         if self.app.shared.running.value == 0:
