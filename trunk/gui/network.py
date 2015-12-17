@@ -1,7 +1,7 @@
-from enthought.traits.api import *
-from enthought.traits.ui.api import *
-from enthought.traits.ui.file_dialog import open_file, save_file
-from enthought.traits.ui.ui_editors.array_view_editor import ArrayViewEditor
+from traits.api import *
+from traitsui.api import *
+from traitsui.file_dialog import open_file, save_file
+from traitsui.ui_editors.array_view_editor import ArrayViewEditor
 import pyface.api as pyface
 
 from ffnet_import import *

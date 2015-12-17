@@ -2,9 +2,9 @@
 #from traits.etsconfig.api import ETSConfig
 #ETSConfig.toolkit = 'qt4'
 
-from enthought.traits.api import *
-from enthought.traits.ui.api import *
-from enthought.traits.ui.ui_editors.array_view_editor import ArrayViewEditor
+from traits.api import *
+from traitsui.api import *
+from traitsui.ui_editors.array_view_editor import ArrayViewEditor
 from messages import display_error
 import numpy
 from types import IntType
@@ -201,7 +201,7 @@ class LoadTxt(HasTraits):
 # Do tests
 if __name__ == "__main__":
     l = LoadTxt()
-    l.data = np.array([[]])
+    l.data = numpy.array([[]])
     l.filename = 'data/black-scholes-input.dat'
     l.load()
     l.configure_traits()

@@ -1,6 +1,6 @@
-from enthought.traits.api import *
-from enthought.traits.ui.api import *
-from enthought.pyface.image_resource import ImageResource
+from traits.api import *
+from traitsui.api import *
+from pyface.image_resource import ImageResource
 
 # Actions
 new_network_action = Action(

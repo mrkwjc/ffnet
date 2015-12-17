@@ -2,8 +2,8 @@
 #from traits.etsconfig.api import ETSConfig
 #ETSConfig.toolkit = 'qt4'
 
-from enthought.traits.api import *
-from enthought.traits.ui.api import *
+from traits.api import *
+from traitsui.api import *
 import pyface.api as pyface
 from loadtxt import LoadTxt
 from messages import display_error, display_confirm
