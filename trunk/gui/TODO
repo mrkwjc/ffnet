@@ -1,0 +1,13 @@
+###########
+1. Reorganize plots (where graph_plot should be?)
+2. Network should have app attribute, how to deal with preview?
+3. Training settings have to be rewritten
+4. Needed tool for dumping network output
+###########
+
+On Windows:
+* figures are not visible?
+* redirecting of output do not work
+* PySide is needed for Qt? Qt not working
+* Config button of figure toolbar do not appear
+* Starting training is slow, training is memory hungry, especially for nproc>1, to much pickling i think.
