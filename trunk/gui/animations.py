@@ -191,7 +191,8 @@ class GraphAnimation(MPLAnimator):
         matplotlib.rcParams['interactive'] = True
 
     def _get_ninp(self):
-        return max(1, len(self.app.data.input))
+        if self.app is not None and self.app.data.status > 0:
+            return max(1, len(self.app.data.input))
 
     def _get_graph(self):
         return self._graph
