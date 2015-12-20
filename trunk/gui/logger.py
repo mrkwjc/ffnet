@@ -20,6 +20,8 @@ class LogsLoggerHandler(logging.Handler):
 class Logger(HasTraits):
     _logs = Code
     _clear = Button
+    logger = Instance(logging.Logger, transient=True)
+    handler = Instance(logging.Handler, transient=True)
 
     def __init__(self, level=logging.DEBUG, **traits):
         HasTraits.__init__(self, **traits)

@@ -52,20 +52,20 @@ class FFnetApp(HasTraits):
     settings = Instance(TrainingSettings, ())
     logs = Instance(Logger, ())
     plots = Instance(Plots, ())
-    shell = Dict
+    shell = PythonValue(Dict)
 
     #_progress = Property(depends_on='plots.training_in_progress._progress')
 
     #def _get__progress(self):
         #return self.plots.training_in_progress._progress
 
-    def __getstate__(self):
-        # managers, loggers and figures are not picklable
-        self.shared.manager = None
-        state = self.__dict__.copy()
-        del state['logs']
-        del state['plots']
-        return state
+    #def __getstate__(self):
+        ## managers, loggers and figures are not picklable
+        #self.shared.manager = None
+        #state = self.__dict__.copy()
+        #del state['logs']
+        #del state['plots']
+        #return state
 
     def __init__(self, **traits):
         super(FFnetApp, self).__init__(**traits)
