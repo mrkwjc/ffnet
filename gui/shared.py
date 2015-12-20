@@ -1,9 +1,13 @@
 #-*- coding: utf-8 -*-
+from traits.api import *
+from traitsui.api import *
 import multiprocessing as mp
+from multiprocessing.managers import SyncManager
 
+class Shared(HasTraits):
+    manager = Instance(SyncManager, transient = True)
 
-class Shared(object):
-    def __init__(self):
+    def __init__(self, ncpu=1):
         self.manager = mp.Manager()
         self.populate()
 

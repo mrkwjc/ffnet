@@ -152,6 +152,7 @@ class TncTrainer(Trainer):
             raise AssertionError
 
     def training_process(self):
+        #from threading import Thread as Process
         process = Process(target=self.app.network.net.train_tnc,
                           args=(self.app.data.input_t, self.app.data.target_t),
                           kwargs={'nproc':self.nproc,
