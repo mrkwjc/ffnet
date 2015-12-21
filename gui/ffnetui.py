@@ -17,7 +17,8 @@ from logger import Logger
 from actions import toolbar, menubar
 #from plots.error_animation import ErrorAnimation
 #from plots.to_animation import TOAnimation
-from animations import Plots
+from animations import *
+from plots.mplfigure import MPLPlotter
 
 import multiprocessing as mp
 from shared import Shared
@@ -51,7 +52,9 @@ class FFnetApp(HasTraits):
     trainer = Instance(TncTrainer, ())
     settings = Instance(TrainingSettings, ())
     logs = Instance(Logger, ())
-    plots = Instance(Plots, ())
+    #plots = Instance(Plots, ())
+    plist = List([ErrorAnimation(), TOAnimation(), GraphAnimation()], transient=True)
+    selected = Instance(MPLPlotter, transient=True)
     shell = PythonValue(Dict)
 
     #_progress = Property(depends_on='plots.training_in_progress._progress')
@@ -73,8 +76,12 @@ class FFnetApp(HasTraits):
         self.data.input_loader.app = self
         self.data.target_loader.app = self
         self.trainer.app = self
-        self.plots.app = self
-        self.plots.selected = self.plots.plist[0]
+        for p in self.plist:
+            p.app = self
+            p.interval=500
+        self.selected = self.plist[0]
+        #self.plots.app = self
+        #self.plots.selected = self.plots.plist[0]
         self.shell = {'app':self}
 
     def _new(self):
@@ -120,7 +127,33 @@ class FFnetApp(HasTraits):
     def _normalize_changed(self):
         self.net.renormalize = self.normalize
 
-    traits_view = View(VSplit(UItem('plots', style='custom', height=0.75),
+    def _selected_changed(self, old, new):
+        if self.trainer.running:
+            try:
+                # Assume we have animation
+                old.stop()
+            except:
+                # But simple plot can be also
+                pass
+            try:
+                # Assume we have animation
+                new.start()
+            except:
+                # But simple plot can be also
+                new.replot()
+        else:
+            new.replot()
+
+    traits_view = View(VSplit(Item('plist',
+                            style='custom',
+                            show_label=False,
+                            height = 0.75,
+                            editor=ListEditor(use_notebook=True,
+                                              deletable=False,
+                                              dock_style='tab',
+                                              selected='selected',
+                                              view = 'figure_view',
+                                              page_name = '.name')),
                               Tabbed(UItem('logs',
                                            style='custom',
                                            dock = 'tab',
