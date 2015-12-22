@@ -184,6 +184,7 @@ class FFnetApp(HasTraits):
 if __name__=="__main__":
     from ffnet import loadnet, version
     import os
+    mp.freeze_support()
     t = FFnetApp()
     t.logs.logger.info('Welcome! You are using ffnet-%s.' %version)
     # Add test network
