@@ -85,8 +85,8 @@ class Trainer(HasTraits):
         logger = self.app.logs.logger
         logger.info('Using "%s" trainig algorithm.' %self.name)
         logger.info('Training in progress...')
-        r = Redirector(fd=2)  # Redirect stderr
-        r.start()
+        #r = Redirector(fd=2)  # Redirect stderr
+        #r.start()
         t0 = time.time()
         if self.iteration == 0:  # we just started
             self._save_iteration()
@@ -101,11 +101,11 @@ class Trainer(HasTraits):
         running_status = self.running  # Keep for logging
         self.running = False
         t1 = time.time()
-        output = r.stop()
+        #output = r.stop()
         self.app.selected.stop()  # This is inside training thread
         ##
         # Log things
-        logger.info(output.strip())
+        #ogger.info(output.strip())
         if not running_status:
             logger.info('Training stopped by user.')
         else:
@@ -152,6 +152,7 @@ class TncTrainer(Trainer):
             raise AssertionError
 
     def training_process(self):
+        # self.app.trait('plist').transient = True  #Why this not works on 'selected'?
         #from threading import Thread as Process
         process = Process(target=self.app.network.net.train_tnc,
                           args=(self.app.data.input_t, self.app.data.target_t),
