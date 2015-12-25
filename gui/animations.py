@@ -60,8 +60,8 @@ class ErrorAnimation(MPLAnimator):
 class TOAnimation(MPLAnimator):
     name = Str('Target vs. Output')
     app = Any
-    outputs = Property(List, depends_on='app.network.net')
-    output = Enum(values='outputs', live=True)
+    outputs = Property(List, depends_on='app.network.net', transient=True)
+    output = Enum(values='outputs', live=True, transient=True)
 
     def _get_outputs(self):
         if self.app is not None and self.app.network.net is not None:
@@ -116,7 +116,7 @@ class TOAnimation(MPLAnimator):
 
 class GraphAnimation(MPLAnimator):
     app = Any
-    graph = Property
+    graph = Property(transient=True)
     _graph = Instance(nx.DiGraph)
     pos = Dict(live = True)
     show_biases = Bool(False, live = True)
