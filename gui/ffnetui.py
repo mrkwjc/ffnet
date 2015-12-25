@@ -52,10 +52,12 @@ class FFnetApp(HasTraits):
     trainer = Instance(TncTrainer, ())
     settings = Instance(TrainingSettings, ())
     logs = Instance(Logger, ())
-    #plots = Instance(Plots, ())
-    plist = List([ErrorAnimation(), TOAnimation(), GraphAnimation()], transient=True)
-    selected = Instance(MPLPlotter, transient=True)
+    plist = List([ErrorAnimation(), TOAnimation(), GraphAnimation()], value=MPLPlotter, transient=True) 
+    selected = Instance(MPLPlotter, transient=True)  # Cannot be pickled when animation runs
     shell = PythonValue(Dict)
+    running = DelegatesTo('trainer')
+    net = DelegatesTo('network')
+    data_status = DelegatesTo('data',  prefix='status')
 
     #_progress = Property(depends_on='plots.training_in_progress._progress')
 
