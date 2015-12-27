@@ -67,11 +67,10 @@ train_reset_action = Action(
     image  = ImageResource('edit-clear'),
     enabled_when = 'net and data_status == 2 and not running')
 
-error_plot_action = Action(
-    name   = 'Error',
-    style = 'toggle',
-    action = 'object.plots.select_error_plot',
-    image  = ImageResource(''),
+plots_select_action = Action(
+    name   = 'Plots',
+    action = 'object.plots.plots_select',
+    image  = ImageResource('matplotlib'),
     enabled_when = 'True')
 
 
@@ -90,7 +89,8 @@ train_actions = ActionGroup(
     training_setup_action,
     train_start_action,
     train_stop_action,
-    train_reset_action)
+    train_reset_action,
+    plots_select_action)
 
 #plot_actions = ActionGroup(
 
