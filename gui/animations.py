@@ -4,13 +4,13 @@
 
 from traits.api import *
 from traitsui.api import *
-from plots.mplfigure import MPLAnimator
-from messages import display_error
-from plots.graph_layout import layered_layout
 import numpy as np
 import networkx as nx
 import matplotlib
 
+from plots.mplfigure import MPLAnimator
+from messages import display_error
+from graph_layout import layered_layout
 
 
 class ErrorAnimation(MPLAnimator):
@@ -236,17 +236,6 @@ class GraphAnimation(MPLAnimator):
                      editor = RangeEditor(low=0, high_name='ninp')),
                 resizable = True)
 
-
-from plots.graph_plot import GraphPlotter
-
-class GraphPlot(GraphPlotter):
-
-    app = Any
-    graph = Property(live = True)
-
-    def _get_graph(self):
-        if self.app is not None and self.app.network.net is not None:
-            return self.app.network.net.graph
 
 class Plots(HasTraits):
     app = Any

@@ -7,7 +7,6 @@ import time
 import numpy as np
 from ffnet import ffnet, ffnetmodule
 import logging
-from plots.error_animation import ErrorAnimation
 import thread
 
 

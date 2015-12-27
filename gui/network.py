@@ -6,7 +6,7 @@ import pyface.api as pyface
 
 from ffnet_import import *
 
-from plots.graph_plot import GraphPlotter
+from animations import GraphAnimation
 import matplotlib
 import networkx as nx
 import os
@@ -28,7 +28,7 @@ class NetworkCreator(HasTraits):
     biases = Bool(True)
     net = Any
     preview_button = Button
-    preview_figure = Instance(GraphPlotter, ())
+    preview_figure = Instance(GraphAnimation, ())
 
     def create(self):
         try:
