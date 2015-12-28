@@ -1,17 +1,21 @@
+#-*- coding: utf-8 -*-
+## from traits.etsconfig.api import ETSConfig
+## ETSConfig.toolkit = 'qt4'
+
 from traits.api import *
 from traitsui.api import *
 from traitsui.file_dialog import open_file, save_file
 from traitsui.ui_editors.array_view_editor import ArrayViewEditor
 import pyface.api as pyface
-
-from ffnet_import import *
-
-from animations import GraphAnimation
 import matplotlib
 import networkx as nx
 import os
+import copy
 
-#from logger import HasLogger
+from ffnet_import import *
+from messages import display_error
+from animations import GraphAnimation
+
 
 class CreateHandler(Handler):
     def close(self, info, is_ok):
@@ -23,12 +27,12 @@ class CreateHandler(Handler):
             return True
 
 class NetworkCreator(HasTraits):
+    app = Any
     architecture = Str
     connectivity_type = Enum('mlgraph', 'tmlgraph', 'imlgraph')
     biases = Bool(True)
     net = Any
     preview_button = Button
-    preview_figure = Instance(GraphAnimation, ())
 
     def create(self):
         try:
@@ -40,17 +44,20 @@ class NetworkCreator(HasTraits):
             self.net.name = self.architecture.replace(',', '-')
             return self.net
         except:
-            import sys
-            e = sys.exc_info()[1]
-            pyface.error(None, "Network cannot be created!\n\n" + e.message)
+            display_error("Network cannot be created!")
             self.net = None
             return None
 
     def _preview_button_fired(self):
         net = self.create()
         if net:
-            self.preview_figure.graph = net.graph
-            self.preview_figure.figure.configure_traits(kind='livemodal')
+            fig = GraphAnimation()
+            app2 = copy.deepcopy(self.app)  # Use copy
+            app2.net = net
+            app2.data.clear()
+            fig.app = app2
+            fig.replot()
+            fig.configure_traits(kind='livemodal', view='figure_view')
 
     traits_view = View(Item('architecture', has_focus=True),
                        Item('connectivity_type'),
@@ -64,14 +71,16 @@ class NetworkCreator(HasTraits):
                        width=0.2)
 
 class Network(HasTraits):
+    app = Any
     net = Any
     filename = Str
-    creator = Instance(NetworkCreator, ())
+    # creator = Instance(NetworkCreator, ())
 
     def create(self, logger=None):
-        #nc = NetworkCreator()
-        self.creator.edit_traits(kind='livemodal')
-        net = self.creator.net
+        creator = NetworkCreator()
+        creator.app = self.app
+        creator.edit_traits(kind='livemodal')
+        net = creator.net
         if net:
             self.close(logger=logger)
             self.net = net

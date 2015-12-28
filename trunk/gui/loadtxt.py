@@ -99,6 +99,9 @@ class LoadTxt(HasTraits):
             display_error("No data loaded! Empty file?")
         return data
 
+    def clear(self):
+        self.data = []
+
     def _openfile(self):
         """
         Opens file and performs decimal mark check

@@ -74,6 +74,7 @@ class FFnetApp(HasTraits):
 
     def __init__(self, **traits):
         super(FFnetApp, self).__init__(**traits)
+        self.network.app = self
         self.data.app = self
         self.data.input_loader.app = self
         self.data.target_loader.app = self

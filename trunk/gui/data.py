@@ -153,6 +153,10 @@ class TrainingData(HasTraits):
         if net and self.status == 2:
             self.input_n, self.target_n = net._setnorm(self.input, self.target)
 
+    def clear(self):
+        self.input_loader.clear()
+        self.target_loader.clear()
+
     @on_trait_change('input, target')
     def _set_status(self):
         ni = len(self.input)
