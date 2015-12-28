@@ -90,6 +90,7 @@ class Trainer(HasTraits):
         if self.iteration == 0:  # we just started
             self._save_iteration()
         ## RUN 
+        self.app.data._normalize_data()  # Be sure network and data are normalized
         self.running = True
         self.setup()
         process = self.training_process()

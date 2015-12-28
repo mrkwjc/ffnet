@@ -81,6 +81,8 @@ class TOAnimation(MPLAnimator):
         return self.tline, self.vline, self.rline
 
     def plot_data(self):
+        if self.app.network.net is None or self.app.data.status != 2:
+            return
         i = self.app.data.input
         t = self.app.data.target
         vmask = self.app.data.vmask
@@ -102,6 +104,8 @@ class TOAnimation(MPLAnimator):
             yield self.plot_data()
 
     def plot(self, data=None):
+        if data is None:
+            return
         tt, ot, tv, ov, x, y = data #if data is not None else self.plot_data()
         ax = self.figure.axes
         self.tline.set_data(tt, ot)
@@ -138,17 +142,13 @@ class GraphAnimation(MPLAnimator):
         self.figure.axes.set_position([0, 0, 1, 1])
 
     def plot_data(self):
-        if self.app is None or self.app.network.net is None:
-            return
-        # Set graph 
         if self.graph is None:
-            self.graph = self.app.network.net.graph.copy()
             return
         # Get some input and units values
+        inp = [0.]*len(self.app.network.net.inno)
         if self.app.data.status > 0:
-            inp = self.app.data.input[self.input_pattern-1]
-        else:
-            inp = [0.]*len(self.app.network.net.inno)
+            if self.app.data.input.shape[1] == len(self.app.network.net.inno): # test in data?
+                inp = self.app.data.input[self.input_pattern-1]
         self.app.network.net(inp)
         units = self.app.network.net.units.tolist()
         # Get colors numbers
@@ -229,11 +229,22 @@ class GraphAnimation(MPLAnimator):
         self.pos_no_biases = self._calculate_pos(self.graph_no_biases)
         self.replot()
 
-    def _graph_changed(self):
-        self.graph_no_biases = self.graph.copy()
-        if 0 in self.graph:
-            self.graph_no_biases.remove_node(0)
-        self._layout_changed()
+    @on_trait_change('app.network.net')
+    def _assign_graph(self):
+        if self.app is not None and self.app.network.net is not None:
+            graph = self.app.network.net.graph.copy()
+            self.graph = graph
+            if 0 in graph:
+                graph = graph.copy()
+                graph.remove_node(0)
+            self.graph_no_biases = graph
+            self._layout_changed()
+        else:
+            self.graph = None
+            self.graph_no_biases = None
+            self.pos = {}
+            self.pos_no_biases = {}
+            self.replot()
 
     def _get_ninp(self):
         if self.app is not None and self.app.data.status > 0:
