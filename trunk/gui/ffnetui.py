@@ -83,8 +83,6 @@ class FFnetApp(HasTraits):
             p.app = self
             p.interval=500
         self.selected = self.plist[0]
-        #self.plots.app = self
-        #self.plots.selected = self.plots.plist[0]
         self.shell = {'app':self}
 
     def _new(self):

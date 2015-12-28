@@ -116,10 +116,10 @@ class TOAnimation(MPLAnimator):
 
 class GraphAnimation(MPLAnimator):
     app = Any
-    graph = Property(transient=True)
-    _graph = Instance(nx.DiGraph)
-    pos = Dict(live = True)
-    #pos_no_biases = Dict(live = True)
+    graph = Instance(nx.Graph)
+    graph_no_biases = Instance(nx.Graph)
+    pos = Dict
+    pos_no_biases = Dict
     show_biases = Bool(False, live = True)
     node_labels = Bool(True, live = True)
     node_size = Range(1, 20, 5, live = True)
@@ -138,15 +138,21 @@ class GraphAnimation(MPLAnimator):
         self.figure.axes.set_position([0, 0, 1, 1])
 
     def plot_data(self):
+        if self.app is None or self.app.network.net is None:
+            return
+        # Set graph 
         if self.graph is None:
             self.graph = self.app.network.net.graph.copy()
-        if len(self.app.data.input):
+            return
+        # Get some input and units values
+        if self.app.data.status > 0:
             inp = self.app.data.input[self.input_pattern-1]
-            self.app.network.net(inp)
-            units = self.app.network.net.units.tolist()
         else:
-            units = [0.5]*len(self.graph)
-        if self.show_biases:
+            inp = [0.]*len(self.app.network.net.inno)
+        self.app.network.net(inp)
+        units = self.app.network.net.units.tolist()
+        # Get colors numbers
+        if self.show_biases and 0 in self.graph:
             node_color = [1.] + units
             nodelist = range(0, len(units)+1)
             edge_color = self.app.network.net.weights
@@ -167,16 +173,23 @@ class GraphAnimation(MPLAnimator):
         self.colorize_edges = True  # To see something
         self.colorize_nodes = True  # To see something
         while self.running:
-            self.figure.axes.clear()  # Always clear before next step
+            self.figure.axes.clear()  # Always clear before next step (we do not update in plot!)
             self.app.network.net.weights[:] = self.app.shared.wlist[-1]
             yield self.plot_data()
 
     def plot(self, data=None):
+        if data is None:
+            return
         nodelist, node_color, edgelist, edge_color = data
-        print 'ccc'
+        if self.show_biases:
+            graph = self.graph 
+            pos = self.pos
+        else:
+            graph = self.graph_no_biases
+            pos = self.pos_no_biases
         matplotlib.rcParams['interactive'] = False
-        nx.draw_networkx(self.graph.to_undirected(),
-                         pos         = self.pos,
+        nx.draw_networkx(graph.to_undirected(),
+                         pos         = pos,
                          ax          = self.figure.axes,
                          nodelist    = nodelist,
                          edgelist    = edgelist,
@@ -194,27 +207,7 @@ class GraphAnimation(MPLAnimator):
                          )
         matplotlib.rcParams['interactive'] = True
 
-    def _get_ninp(self):
-        if self.app is not None and self.app.data.status > 0:
-            return max(1, len(self.app.data.input))
-        else:
-            return 0
-
-    def _get_graph(self):
-        return self._graph
-
-    def _set_graph(self, graph):
-        if not self.show_biases:
-            graph.remove_node(0)
-        self._graph = graph
-        self._layout_changed()
-
-    def _show_biases_changed(self):
-        print 'aaa'
-        self.graph = self.app.network.net.graph.copy()
-
-    def _layout_changed(self):
-        graph = self.graph
+    def _calculate_pos(self, graph):
         if self.layout == 'layered':  # only DAGs
             try:
                 pos = layered_layout(graph)
@@ -229,9 +222,24 @@ class GraphAnimation(MPLAnimator):
             pos = nx.random_layout(graph)
         else:
             pos = None  # which gives 'spring' layout...
-        self.pos = pos
-        print 'bbb'
+        return pos
 
+    def _layout_changed(self):
+        self.pos = self._calculate_pos(self.graph)
+        self.pos_no_biases = self._calculate_pos(self.graph_no_biases)
+        self.replot()
+
+    def _graph_changed(self):
+        self.graph_no_biases = self.graph.copy()
+        if 0 in self.graph:
+            self.graph_no_biases.remove_node(0)
+        self._layout_changed()
+
+    def _get_ninp(self):
+        if self.app is not None and self.app.data.status > 0:
+            return max(1, len(self.app.data.input))
+        else:
+            return 0
 
     traits_view = View(Item('show_biases'),
                 Item('node_labels'),
@@ -245,47 +253,6 @@ class GraphAnimation(MPLAnimator):
                 resizable = True)
 
 
-class Plots(HasTraits):
-    app = Any
-    plist = List([ErrorAnimation(), TOAnimation(), GraphAnimation()])
-    selected = Any
-
-    def _app_changed(self):
-        for p in self.plist:
-            p.app = self.app
-
-    def _selected_changed(self, old, new):
-        if self.app is not None:
-            if self.app.trainer.running:
-                try:
-                    # Assume we have animation
-                    old.stop()
-                except:
-                    # But simple plot can be also
-                    pass
-                try:
-                    # Assume we have animation
-                    new.start()
-                except:
-                    # But simple plot can be also
-                    new.replot()
-            else:
-                new.replot()
-
-    traits_view = View(Item('plist',
-                            style='custom',
-                            show_label=False,
-                            editor=ListEditor(use_notebook=True,
-                                              deletable=False,
-                                              dock_style='tab',
-                                              selected='selected',
-                                              view = 'figure_view',
-                                              page_name = '.name')),
-                       resizable = True,
-                       width = 1024,
-                       height = 640)
-
-
 if __name__ == "__main__":
-    p = Plots()
-    p.configure_traits()
+    p = GraphAnimation()
+    p.configure_traits(view='figure_view')
