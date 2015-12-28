@@ -64,14 +64,6 @@ class FFnetApp(HasTraits):
     #def _get__progress(self):
         #return self.plots.training_in_progress._progress
 
-    #def __getstate__(self):
-        ## managers, loggers and figures are not picklable
-        #self.shared.manager = None
-        #state = self.__dict__.copy()
-        #del state['logs']
-        #del state['plots']
-        #return state
-
     def __init__(self, **traits):
         super(FFnetApp, self).__init__(**traits)
         self.network.app = self
@@ -86,21 +78,21 @@ class FFnetApp(HasTraits):
         self.shell = {'app':self}
 
     def _new(self):
-        self.network.create(logger=self.logs.logger)
-        self.normalize = self.net.renormalize
+        self.network.create()
+        # self.normalize = self.net.renormalize
 
     def _load(self):
-        self.network.load(logger=self.logs.logger)
-        self.normalize = self.net.renormalize
+        self.network.load()
+        # self.normalize = self.net.renormalize
 
     def _save_as(self):
-        self.network.save_as(logger=self.logs.logger)
+        self.network.save_as()
 
     def _export(self):
         raise NotImplementedError
 
     def _close(self):
-        self.network.close(logger=self.logs.logger)
+        self.network.close()
         self._reset()
 
     def _load_data(self):
@@ -120,10 +112,9 @@ class FFnetApp(HasTraits):
     def _reset(self):
         if self.net:
             self.net.randomweights()
-            self.logger.info('Weights has been randomized!')
-        self.trainer.__init__()
-        self.plots.plot_init()
-        self.plots.figure.draw()
+            self.logs.logger.info('Weights has been randomized!')
+        self.shared.populate() 
+        self.selected.replot()
 
     def _normalize_changed(self):
         self.net.renormalize = self.normalize
@@ -131,17 +122,13 @@ class FFnetApp(HasTraits):
     def _selected_changed(self, old, new):
         if self.trainer.running:
             try:
-                # Assume we have animation
-                old.stop()
+                old.stop()  # Assume we have animation
             except:
-                # But simple plot can be also
-                pass
+                pass  # But simple plot can be also
             try:
-                # Assume we have animation
-                new.start()
+                new.start()  # Assume we have animation
             except:
-                # But simple plot can be also
-                new.replot()
+                new.replot()  # But simple plot can be also
         else:
             new.replot()
 
