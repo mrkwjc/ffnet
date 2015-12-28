@@ -119,6 +119,7 @@ class GraphAnimation(MPLAnimator):
     graph = Property(transient=True)
     _graph = Instance(nx.DiGraph)
     pos = Dict(live = True)
+    #pos_no_biases = Dict(live = True)
     show_biases = Bool(False, live = True)
     node_labels = Bool(True, live = True)
     node_size = Range(1, 20, 5, live = True)
@@ -143,6 +144,8 @@ class GraphAnimation(MPLAnimator):
             inp = self.app.data.input[self.input_pattern-1]
             self.app.network.net(inp)
             units = self.app.network.net.units.tolist()
+        else:
+            units = [0.5]*len(self.graph)
         if self.show_biases:
             node_color = [1.] + units
             nodelist = range(0, len(units)+1)
@@ -170,6 +173,7 @@ class GraphAnimation(MPLAnimator):
 
     def plot(self, data=None):
         nodelist, node_color, edgelist, edge_color = data
+        print 'ccc'
         matplotlib.rcParams['interactive'] = False
         nx.draw_networkx(self.graph.to_undirected(),
                          pos         = self.pos,
@@ -193,6 +197,8 @@ class GraphAnimation(MPLAnimator):
     def _get_ninp(self):
         if self.app is not None and self.app.data.status > 0:
             return max(1, len(self.app.data.input))
+        else:
+            return 0
 
     def _get_graph(self):
         return self._graph
@@ -204,6 +210,7 @@ class GraphAnimation(MPLAnimator):
         self._layout_changed()
 
     def _show_biases_changed(self):
+        print 'aaa'
         self.graph = self.app.network.net.graph.copy()
 
     def _layout_changed(self):
@@ -223,6 +230,7 @@ class GraphAnimation(MPLAnimator):
         else:
             pos = None  # which gives 'spring' layout...
         self.pos = pos
+        print 'bbb'
 
 
     traits_view = View(Item('show_biases'),
@@ -232,7 +240,7 @@ class GraphAnimation(MPLAnimator):
                 Item('layout'),
                 Item('colorize_edges'),
                 Item('colorize_nodes'),
-                Item('input_pattern', visible_when='colorize_nodes',
+                Item('input_pattern', visible_when='colorize_nodes and ninp',
                      editor = RangeEditor(low=0, high_name='ninp')),
                 resizable = True)
 
