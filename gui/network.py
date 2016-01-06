@@ -16,7 +16,6 @@ from ffnet_import import *
 from messages import display_error
 from animations import GraphAnimation
 
-
 class CreateHandler(Handler):
     def close(self, info, is_ok):
         if is_ok:
@@ -28,7 +27,6 @@ class CreateHandler(Handler):
 
 
 class NetworkCreator(HasTraits):
-    app = Any
     architecture = Str
     connectivity_type = Enum('mlgraph', 'tmlgraph', 'imlgraph')
     biases = Bool(True)
@@ -52,11 +50,10 @@ class NetworkCreator(HasTraits):
     def _preview_button_fired(self):
         net = self.create()
         if net is not None:
-            fig = GraphAnimation()
             app2 = copy.deepcopy(self.app)  # Use copy
             app2.net = net
             app2.data.clear()
-            fig.app = app2
+            fig = GraphAnimation(app = app2)
             fig.replot()
             fig.configure_traits(kind='livemodal', view='figure_view')
 
@@ -72,13 +69,11 @@ class NetworkCreator(HasTraits):
 
 
 class Network(HasTraits):
-    app = Any
     net = Any
     filename = Str
 
     def create(self):
-        creator = NetworkCreator()
-        creator.app = self.app
+        creator = NetworkCreator(app=self.app)
         creator.edit_traits(kind='livemodal')
         net = creator.net
         if net:

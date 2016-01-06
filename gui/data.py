@@ -114,6 +114,7 @@ class TrainingData(HasTraits):
     target_v_n = Property(CArray)
     validation_patterns = Range(0, 50, 10)
     validation_type = Enum('random', 'last')
+    normalize = Bool(True)
     status = Int(0)  # 1 - input loaded, 2 - input and target loaded
     status_info = Str('No data loaded.')
 
@@ -148,14 +149,16 @@ class TrainingData(HasTraits):
     def _get_target_v_n(self):
         return self.target_n[self.vmask]
 
-    def _normalize_data(self):
-        net = self.app.network.net
-        if net and self.status == 2:
-            self.input_n, self.target_n = net._setnorm(self.input, self.target)
-
     def clear(self):
         self.input_loader.clear()
         self.target_loader.clear()
+
+    @on_trait_change('normalize')
+    def _normalize_data(self):
+        net = self.app.network.net
+        if net and self.status == 2:
+            net.renormalize = self.normalize
+            self.input_n, self.target_n = net._setnorm(self.input, self.target)
 
     @on_trait_change('input, target')
     def _set_status(self):

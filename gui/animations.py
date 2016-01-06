@@ -12,10 +12,8 @@ from plots.mplfigure import MPLAnimator
 from messages import display_error
 from graph_layout import layered_layout
 
-
 class ErrorAnimation(MPLAnimator):
     name = Str('Training error')
-    app = Any
     relative_error = Bool(False, live=True)
 
     def plot_init(self):
@@ -59,7 +57,7 @@ class ErrorAnimation(MPLAnimator):
 
 class TOAnimation(MPLAnimator):
     name = Str('Target vs. Output')
-    app = Any
+    app = Any  # nedede by below Property
     outputs = Property(List, depends_on='app.network.net', transient=True)
     output = Enum(values='outputs', live=True, transient=True)
 
@@ -119,7 +117,7 @@ class TOAnimation(MPLAnimator):
 
 
 class GraphAnimation(MPLAnimator):
-    app = Any
+    name = "Network architecture"
     graph = Instance(nx.Graph)
     graph_no_biases = Instance(nx.Graph)
     pos = Dict
@@ -132,6 +130,7 @@ class GraphAnimation(MPLAnimator):
     colorize_edges = Bool(False, live = True)
     colorize_nodes = Bool(False, live = True)
     input_pattern = Int(1, live = True)
+    app = Any  # necessary for below property...
     ninp = Property(Int(1), depends_on='app.data.input')
 
     def setup(self):
@@ -265,5 +264,5 @@ class GraphAnimation(MPLAnimator):
 
 
 if __name__ == "__main__":
-    p = GraphAnimation()
+    p = TOAnimation(app = None)
     p.configure_traits(view='figure_view')
