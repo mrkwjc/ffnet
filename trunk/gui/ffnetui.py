@@ -7,7 +7,7 @@ from traitsui.api import *
 from pyface.api import GUI
 from data import TrainingData
 from network import Network
-from training import TncTrainer
+from training import *
 import sys
 import time
 import uuid
@@ -15,8 +15,6 @@ import uuid
 import thread
 from logger import Logger
 from actions import toolbar, menubar
-#from plots.error_animation import ErrorAnimation
-#from plots.to_animation import TOAnimation
 from animations import *
 from plots.mplfigure import MPLPlotter
 
@@ -24,37 +22,19 @@ import multiprocessing as mp
 from shared import Shared
 import numpy as np
 
-class TrainingSettings(HasTraits):
-    training_algorithm = Enum('tnc')
-    # tnc options
-    maxfun = Int(0)
-    nproc = Int(mp.cpu_count())
-    # other
-    validation_patterns = Range(0, 50, 10)  # %
-    validation_type = Enum('random', 'last')
-    normalize = Bool(True)
-
-    traits_view = View(Item('training_algorithm'),
-                       Item('maxfun', visible_when='training_algorithm == "tnc"'),
-                       Item('nproc', visible_when='training_algorithm == "tnc"'),
-                       Item('validation_patterns', label = 'Validation patterns [%]'),
-                       Item('validation_type'),
-                       Item('normalize'),
-                       buttons = ['OK', 'Cancel'],
-                       title = 'Training settings',
-                       resizable = True,
-                       width = 0.2)
 
 class FFnetApp(HasTraits):
-    network = Instance(Network, ())
-    data = Instance(TrainingData, ())
+    network = Instance(Network)
+    data = Instance(TrainingData)
+    trainer = Instance(Trainer)
     shared = Instance(Shared, ())
-    trainer = Instance(TncTrainer, ())
-    settings = Instance(TrainingSettings, ())
     logs = Instance(Logger, ())
     plist = List([ErrorAnimation(), TOAnimation(), GraphAnimation()], value=MPLPlotter, transient=True) 
     selected = Instance(MPLPlotter, transient=True)  # Cannot be pickled when animation runs
     shell = PythonValue(Dict)
+    mode = Enum('train', 'test', 'recall')
+    algorithm = Enum('tnc', 'bfgs', 'cg')
+
     running = DelegatesTo('trainer')
     net = DelegatesTo('network')
     data_status = DelegatesTo('data',  prefix='status')
@@ -66,11 +46,9 @@ class FFnetApp(HasTraits):
 
     def __init__(self, **traits):
         super(FFnetApp, self).__init__(**traits)
-        self.network.app = self
-        self.data.app = self
-        self.data.input_loader.app = self
-        self.data.target_loader.app = self
-        self.trainer.app = self
+        self.network = Network(app = self)
+        self.data = TrainingData(app = self)
+        self.trainer = TncTrainer(app = self) # default trainer
         for p in self.plist:
             p.app = self
             p.interval=500
@@ -100,7 +78,7 @@ class FFnetApp(HasTraits):
 
     def _train_settings(self):
         #self.edit_traits(view='settings_view', kind='modal')
-        self.settings.edit_traits(kind='livemodal')
+        self.edit_traits(view='settings_view', kind='livemodal')
 
     def _train_start(self):
         self.logs.logger.info('Training network: %s' %self.network.filename)
@@ -116,8 +94,13 @@ class FFnetApp(HasTraits):
         self.shared.populate() 
         self.selected.replot()
 
-    def _normalize_changed(self):
-        self.net.renormalize = self.normalize
+    def _algorithm_changed(self, new):
+        if new == 'tnc':
+            self.trainer = TncTrainer(app=self)
+        if new == 'cg':
+            self.trainer = CgTrainer(app=self)
+        if new == 'bfgs':
+            self.trainer = BfgsTrainer(app=self)
 
     def _selected_changed(self, old, new):
         if self.trainer.running:
@@ -165,6 +148,43 @@ class FFnetApp(HasTraits):
                        #statusbar = [StatusItem(name = '_progress', width=200)]
                        )
 
+    settings_view = View(Item('mode', emphasized=True), 
+                         Tabbed(
+                         Group(Item('object.data.input_loader',
+                                     style='custom',
+                                     label='Input file',),
+                                 Item('object.data.target_loader',
+                                     style='custom',
+                                     label='Target file'),
+                                 Item('object.data.validation_patterns',
+                                     label = 'Validation patterns [%]'),
+                                 Item('object.data.validation_type'),
+                                 Item('object.data.normalize'),
+                                 visible_when = 'mode == "train"',
+                                 label = 'Data'),
+                         Group(Item('object.data.input_loader',
+                                     style='custom',
+                                     label='Input',),
+                                 Item('object.data.target_loader',
+                                     style='custom',
+                                     label='Target'),
+                                 visible_when = 'mode == "test"',
+                                 label = 'Data'),
+                         Group(Item('object.data.input_loader',
+                                     style='custom',
+                                     label='Input',),
+                                 visible_when = 'mode == "recall"',
+                                 label = 'Data'),
+                         Group(Item('algorithm'), 
+                                 UItem('object.trainer', style='custom'),
+                                 visible_when='mode == "train"',
+                                 label = 'Training')
+                         ),
+                         buttons = ['OK', 'Cancel'],
+                         title = 'Settings...',
+                         resizable = True,
+                         width = 0.4)
+
     training_view = View(UItem('stop_training'),
                          title = 'Training network...',
                          width = 0.2)
@@ -186,9 +206,9 @@ if __name__=="__main__":
     #t.network = n
     # Add test data
     t.data.input_loader.filename = 'data/black-scholes-input.dat'
-    t.data.input_loader.load()
+    #t.data.input_loader.load()
     t.data.target_loader.filename = 'data/black-scholes-target.dat'
-    t.data.target_loader.load()
+    #t.data.target_loader.load()
 
     # Run
     t.configure_traits()

@@ -133,17 +133,30 @@ class Trainer(HasTraits):
 
 class TncTrainer(Trainer):
     name = Str('tnc')
-    maxfun = Int(0)
-    nproc =  Int(mp.cpu_count())
+    maxfun = Range(low=0)
+    nproc =  Range(low=1, high=mp.cpu_count(), value=mp.cpu_count())
     messages = Int(1)
+
+    def __init__(self, **traits):
+        super(TncTrainer, self).__init__(**traits)
+        import sys
+        if sys.platform.startswith('win'):  # Set default nproc to 1 on windows
+            self.nproc = 1
+
+    #@on_trait_change('app.network.net')
+    #def estimate_maxfun(self):
+        #if self.app is not None and self.app.network.net is not None:
+            #self.maxfun = max(100, 10*len(self.app.network.net.weights))  # Set default value
+
+    #@on trait_change('app.data.status'):
+    #def check_nproc(self):
+        #if self.app is not None and self.app.data.status in [1,2]:
+            #self.nproc = min(self.nproc, len(self.app.data.input_t))
 
     def setup(self):
         if self.maxfun == 0:
-            self.maxfun = max(100, 10*len(self.app.network.net.weights))  # should be in ffnet ?!
-        self.nproc = min(self.nproc, len(self.app.data.input_t))  # should be in ffnet ?!
-        import sys
-        if sys.platform.startswith('win'):
-            self.nproc = 1  # TODO, why nproc > 1 is so memory hungry?
+            self.maxfun = max(100, 10*len(self.app.network.net.weights))
+        self.nproc = min(self.nproc, len(self.app.data.input_t))
 
     def stopper(self):
         if self.app.shared.running.value == 0:
@@ -162,6 +175,61 @@ class TncTrainer(Trainer):
                                   'callback': self.callback})
         return process
 
+    traits_view = View(Item('maxfun', tooltip='Set 0 for automatic estimation...'),
+                       Item('nproc'),
+                       resizable=True)
+
+
+class BfgsTrainer(Trainer):
+    name = Str('bfgs')
+    maxfun = Range(low=0)
+    disp = Int(0)
+
+    def setup(self):
+        if self.maxfun == 0:
+            self.maxfun = max(100, 10*len(self.app.network.net.weights))
+
+    def stopper(self):
+        if self.app.shared.running.value == 0:
+            raise AssertionError
+
+    def training_process(self):
+        process = Process(target=self.app.network.net.train_bfgs,
+                          args=(self.app.data.input_t, self.app.data.target_t),
+                          kwargs={'maxfun': self.maxfun,
+                                  'disp': self.disp,
+                                  'callback': self.callback})
+        return process
+
+    traits_view = View(Item('maxfun', tooltip='Set 0 for automatic estimation...'),
+                       Item('disp'),
+                       resizable=True)
+
+
+class CgTrainer(Trainer):
+    name = Str('cg')
+    maxiter = Range(low=0)
+    disp = Int(0)
+
+    def setup(self):
+        if self.maxiter == 0:
+            self.maxiter = max(100, 10*len(self.app.network.net.weights))
+
+    def stopper(self):
+        if self.app.shared.running.value == 0:
+            raise AssertionError
+
+    def training_process(self):
+        process = Process(target=self.app.network.net.train_cg,
+                          args=(self.app.data.input_t, self.app.data.target_t),
+                          kwargs={'maxiter': self.maxiter,
+                                  'disp': self.disp,
+                                  'callback': self.callback})
+        return process
+
+    traits_view = View(Item('maxiter', tooltip='Set 0 for automatic estimation...'),
+                       Item('disp'),
+                       resizable=True)
 
 
 if __name__ == "__main__":
@@ -171,4 +239,5 @@ if __name__ == "__main__":
     trg = [[1], [1], [0], [0]]
     
     tnc = TncTrainer()
+    tnc.configure_traits()
     #tnc.train(net, inp, trg, Logs())

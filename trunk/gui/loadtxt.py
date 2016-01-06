@@ -65,6 +65,12 @@ class LoadTxt(HasTraits):
     converters = Dict(Int, Callable)
     data = CArray()
 
+    @on_trait_change('filename, skiprows, dtype, decimal, delimiter, columns, rows, comments')
+    def _reload(self):
+        self.load(err = True,
+                  errmsg = 'Error occured during file reading!',
+                  traceback = False)
+
     def _load(self):
         """
         Loads text file to numpy array
@@ -141,21 +147,21 @@ class LoadTxt(HasTraits):
 
     def _options_fired(self):
         #self.show_options_status = not self.show_options_status
-        self.edit_traits(view = 'options_view') 
+        self.edit_traits(view = 'options_view', kind='livemodal')
 
     def _show_options_fired(self):
         self.show_options_status = not self.show_options_status
 
     def _preview_fired(self):
-        data = self.load(err=True)
-        if len(data):
+        #data = self.load(err=True)
+        if len(self.data):
             self.edit_traits(view = 'array_view', kind='livemodal') 
 
-    #traits_view = View(HGroup(UItem('filename', resizable=True, springy=True),
-                              #UItem('options'),
-                              #UItem('preview')),
-                       ##title = 'Loading text file...',
-                       #width = 0.4)
+    traits_view = View(HGroup(UItem('filename', resizable=True, springy=True),
+                              UItem('options'),
+                              UItem('preview')),
+                       #title = 'Loading text file...',
+                       width = 0.4)
 
     options_view = View(Item('dtype',     label='Data type'),
                         Item('decimal',   label='Decimal'),
@@ -179,26 +185,26 @@ class LoadTxt(HasTraits):
                       buttons = [OKButton, CancelButton],
                       resizable = True)
 
-    title = 'Load array...'
-    def default_traits_view(self):
-        traits_view = View(Item('filename', label="  File name", style='simple'),
-                        UItem('show_options', label = 'Show/Hide options...'),
-                        Item('skiprows',  label='Skip rows', visible_when='show_options_status'),
-                        Item('columns',   label='Columns', visible_when='show_options_status'),
-                        Item('rows',      label='Rows', visible_when='show_options_status'),
-                        Item('delimiter', label='Delimiter', visible_when='show_options_status'),
-                        Item('comments',  label='Comments', visible_when='show_options_status'),
-                        Item('dtype',     label='Data type', visible_when='show_options_status'),
-                        Item('decimal',   label='Decimal', visible_when='show_options_status and dtype=="float"'),
-                        UItem('preview', label='Load && Preview'),
-                        title = self.title,
-                        buttons = [OKButton, CancelButton],
-                        handler = LoadTxtHandler(),
-                        width = 0.25,
-                        height = 0.3,
-                        resizable=True,
-                        scrollable=True)
-        return traits_view
+    #title = 'Load array...'
+    #def default_traits_view(self):
+        #traits_view = View(Item('filename', label="  File name", style='simple'),
+                        #UItem('show_options', label = 'Show/Hide options...'),
+                        #Item('skiprows',  label='Skip rows', visible_when='show_options_status'),
+                        #Item('columns',   label='Columns', visible_when='show_options_status'),
+                        #Item('rows',      label='Rows', visible_when='show_options_status'),
+                        #Item('delimiter', label='Delimiter', visible_when='show_options_status'),
+                        #Item('comments',  label='Comments', visible_when='show_options_status'),
+                        #Item('dtype',     label='Data type', visible_when='show_options_status'),
+                        #Item('decimal',   label='Decimal', visible_when='show_options_status and dtype=="float"'),
+                        #UItem('preview', label='Load && Preview'),
+                        #title = self.title,
+                        #buttons = [OKButton, CancelButton],
+                        #handler = LoadTxtHandler(),
+                        #width = 0.25,
+                        #height = 0.3,
+                        #resizable=True,
+                        #scrollable=True)
+        #return traits_view
 
 
 # Do tests
