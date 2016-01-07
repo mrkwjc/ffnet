@@ -50,11 +50,10 @@ class NetworkCreator(HasTraits):
     def _preview_button_fired(self):
         net = self.create()
         if net is not None:
-            app2 = copy.deepcopy(self.app)  # Use copy
-            app2.net = net
-            app2.data.clear()
-            fig = GraphAnimation(app = app2)
-            fig.replot()
+            from ffnetui import FFnetApp
+            app = FFnetApp()  # copy.deepcopy(self.app)  # Use copy
+            app.net = net
+            fig = GraphAnimation(app = app)
             fig.configure_traits(kind='livemodal', view='figure_view')
 
     traits_view = View(Item('architecture', has_focus=True),
@@ -126,10 +125,10 @@ class Network(HasTraits):
 
     def close(self):
         if self.net:
+            self.app.reset()
             self.app.logs.logger.info('Network closed: %s' %self.filename)
             self.net = None
             self.filename = ''
-
 
 # Do tests
 if __name__ == "__main__":

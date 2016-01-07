@@ -27,12 +27,12 @@ class FFnetApp(HasTraits):
     network = Instance(Network)
     data = Instance(TrainingData)
     trainer = Instance(Trainer)
-    shared = Instance(Shared, ())
+    shared = Instance(Shared)
     logs = Instance(Logger, ())
-    plist = List([ErrorAnimation(), TOAnimation(), GraphAnimation()], value=MPLPlotter, transient=True) 
+    plist = List([], value=MPLPlotter, transient=True) 
     selected = Instance(MPLPlotter, transient=True)  # Cannot be pickled when animation runs
     shell = PythonValue(Dict)
-    mode = Enum('train', 'test', 'recall')
+    mode = Enum('train', 'test', 'recall') #, comparison_mode=0)
     algorithm = Enum('tnc', 'bfgs', 'cg')
 
     running = DelegatesTo('trainer')
@@ -49,50 +49,72 @@ class FFnetApp(HasTraits):
         self.network = Network(app = self)
         self.data = TrainingData(app = self)
         self.trainer = TncTrainer(app = self) # default trainer
-        for p in self.plist:
-            p.app = self
-            p.interval=500
-        self.selected = self.plist[0]
+        self.shared = Shared()
         self.shell = {'app':self}
 
-    def _new(self):
+    def new(self):
         self.network.create()
-        # self.normalize = self.net.renormalize
+        self.mode = 'train'
+        self.settings()
 
-    def _load(self):
+    def load(self):
         self.network.load()
-        # self.normalize = self.net.renormalize
+        self.mode = 'recall'
+        self.settings()
 
-    def _save_as(self):
+    def save_as(self):
         self.network.save_as()
 
-    def _export(self):
+    def export(self):
         raise NotImplementedError
 
-    def _close(self):
-        self.network.close()
-        self._reset()
-
-    def _load_data(self):
-        self.data.edit_traits(kind='livemodal')
-
-    def _train_settings(self):
-        #self.edit_traits(view='settings_view', kind='modal')
+    def settings(self):
+        mode = self.mode
         self.edit_traits(view='settings_view', kind='livemodal')
+        if mode != self.mode or len(self.plist) == 0:
+            self.arrange_plots()
+        else:
+            self.selected.replot()
 
-    def _train_start(self):
+    def train_start(self):
         self.logs.logger.info('Training network: %s' %self.network.filename)
         self.trainer.train()
 
-    def _train_stop(self):
+    def train_stop(self):
         self.trainer.running = False
 
-    def _reset(self):
+    def reset(self):
         if self.net:
             self.net.randomweights()
             self.logs.logger.info('Weights has been randomized!')
         self.shared.populate() 
         self.selected.replot()
+
+    def add_plot(self, cls):
+        if any(isinstance(p, cls) for p in self.plist):  # plot is just opened
+            for p in self.plist:
+                if isinstance(p, cls):
+                    if self.selected == p:
+                        self.selected.replot()
+                    else:
+                        self.selected = p  # will be replotted automatically
+                    break
+        else:
+            p = cls(app = self, interval=500)
+            self.plist = self.plist + [p]
+            self.selected = p
+
+    def arrange_plots(self):
+        self.plist = []
+        if self.mode == 'train':
+            plots = [ErrorAnimation, TOAnimation, GraphAnimation]
+        elif self.mode == 'test':
+            plots = [TOAnimation, GraphAnimation]
+        else:
+            plots = [GraphAnimation]
+        for p in plots:
+            self.add_plot(p)
+        self.selected = self.plist[0]
 
     def _algorithm_changed(self, new):
         if new == 'tnc':
@@ -148,8 +170,8 @@ class FFnetApp(HasTraits):
                        #statusbar = [StatusItem(name = '_progress', width=200)]
                        )
 
-    settings_view = View(Item('mode', emphasized=True), 
-                         Tabbed(
+    settings_view = View(Item('mode', emphasized=True),
+                         '_',
                          Group(Item('object.data.input_loader',
                                      style='custom',
                                      label='Input file',),
@@ -160,34 +182,30 @@ class FFnetApp(HasTraits):
                                      label = 'Validation patterns [%]'),
                                  Item('object.data.validation_type'),
                                  Item('object.data.normalize'),
-                                 visible_when = 'mode == "train"',
-                                 label = 'Data'),
+                                 visible_when = 'mode == "train"'),
                          Group(Item('object.data.input_loader',
                                      style='custom',
                                      label='Input',),
                                  Item('object.data.target_loader',
                                      style='custom',
                                      label='Target'),
-                                 visible_when = 'mode == "test"',
-                                 label = 'Data'),
+                                 visible_when = 'mode == "test"'),
                          Group(Item('object.data.input_loader',
                                      style='custom',
                                      label='Input',),
-                                 visible_when = 'mode == "recall"',
-                                 label = 'Data'),
-                         Group(Item('algorithm'), 
+                                 visible_when = 'mode == "recall"'),
+                         '_',
+                         Group(Item('algorithm', label = 'Training algorithm'), 
                                  UItem('object.trainer', style='custom'),
-                                 visible_when='mode == "train"',
-                                 label = 'Training')
-                         ),
+                                 visible_when='mode == "train"'),
                          buttons = ['OK', 'Cancel'],
                          title = 'Settings...',
                          resizable = True,
-                         width = 0.4)
+                         width = 0.5)
 
     training_view = View(UItem('stop_training'),
                          title = 'Training network...',
-                         width = 0.2)
+                         width = 0.25)
 
 if __name__=="__main__":
     from ffnet import loadnet, version
@@ -196,19 +214,13 @@ if __name__=="__main__":
     t = FFnetApp()
     t.logs.logger.info('Welcome! You are using ffnet-%s.' %version)
     # Add test network
-    n = t.network
-    path = 'data/testnet.net'
-    n.net = loadnet(path)
-    #n.preview_figure.net = n.net
-    n.filename = path
-    #n.name = os.path.splitext(os.path.basename(path))[0]
-    #t.netlist.append(n)
-    #t.network = n
-    # Add test data
-    t.data.input_loader.filename = 'data/black-scholes-input.dat'
-    #t.data.input_loader.load()
-    t.data.target_loader.filename = 'data/black-scholes-target.dat'
-    #t.data.target_loader.load()
+    #n = t.network
+    #path = 'data/testnet.net'
+    #n.net = loadnet(path)
+    #n.filename = path
+    ## Add test data
+    #t.data.input_loader.filename = 'data/black-scholes-input.dat'
+    #t.data.target_loader.filename = 'data/black-scholes-target.dat'
 
     # Run
     t.configure_traits()

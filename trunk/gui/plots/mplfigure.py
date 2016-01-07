@@ -119,9 +119,9 @@ class MPLPlotter(HasTraits):
     figure = Instance(MPLFigure)
 
     def __init__(self, **traits):
-        super(MPLPlotter, self).__init__(**traits)
-        self.figure = MPLFigureWithPlotter()
+        self.figure = MPLFigureWithPlotter()  # First create figure
         self.figure.plotter = self
+        super(MPLPlotter, self).__init__(**traits)  # Then initialize
 
     @on_trait_change('+live', post_init=True)
     def _replot(self, name, value):
