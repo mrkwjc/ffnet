@@ -28,21 +28,15 @@ class FFnetApp(HasTraits):
     data = Instance(TrainingData)
     trainer = Instance(Trainer)
     shared = Instance(Shared)
-    logs = Instance(Logger, ())
+    logs = Instance(Logger)
     plist = List([], value=MPLPlotter, transient=True) 
     selected = Instance(MPLPlotter, transient=True)  # Cannot be pickled when animation runs
     shell = PythonValue(Dict)
-    mode = Enum('train', 'test', 'recall') #, comparison_mode=0)
+    mode = Enum('train', 'test', 'recall')
     algorithm = Enum('tnc', 'bfgs', 'cg')
-
     running = DelegatesTo('trainer')
     net = DelegatesTo('network')
     data_status = DelegatesTo('data',  prefix='status')
-
-    #_progress = Property(depends_on='plots.training_in_progress._progress')
-
-    #def _get__progress(self):
-        #return self.plots.training_in_progress._progress
 
     def __init__(self, **traits):
         super(FFnetApp, self).__init__(**traits)
@@ -50,6 +44,7 @@ class FFnetApp(HasTraits):
         self.data = TrainingData(app = self)
         self.trainer = TncTrainer(app = self) # default trainer
         self.shared = Shared()
+        self.logs = Logger()
         self.shell = {'app':self}
 
     def new(self):
@@ -69,12 +64,13 @@ class FFnetApp(HasTraits):
         raise NotImplementedError
 
     def settings(self):
-        mode = self.mode
-        self.edit_traits(view='settings_view', kind='livemodal')
-        if mode != self.mode or len(self.plist) == 0:
-            self.arrange_plots()
-        else:
-            self.selected.replot()
+        if self.net:
+            mode = self.mode
+            self.edit_traits(view='settings_view', kind='livemodal')
+            if mode != self.mode or len(self.plist) == 0:
+                self.arrange_plots()
+            else:
+                self.selected.replot()
 
     def train_start(self):
         self.logs.logger.info('Training network: %s' %self.network.filename)
@@ -209,7 +205,6 @@ class FFnetApp(HasTraits):
 
 if __name__=="__main__":
     from ffnet import loadnet, version
-    import os
     mp.freeze_support()
     t = FFnetApp()
     t.logs.logger.info('Welcome! You are using ffnet-%s.' %version)
