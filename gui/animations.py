@@ -69,8 +69,8 @@ class TOAnimation(MPLAnimator):
     def plot_init(self):
         self.figure.axes.clear()
         ax = self.figure.axes
-        self.tline, = ax.plot([], [], 'og', label='Training data')
-        self.vline, = ax.plot([], [], 'or', label='Validation data')
+        self.tline, = ax.plot([], [], 'ro', label='Training data')
+        self.vline, = ax.plot([], [], 'gv', label='Validation data')
         self.rline, = ax.plot([], [], 'k', lw=2, label='Regression line')
         ax.grid(True)
         ax.set_xlabel('Targets')

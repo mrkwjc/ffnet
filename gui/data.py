@@ -11,10 +11,7 @@ import numpy as np
 
 
 class LoadInput(LoadTxt):
-    def __init__(self, app=None, **traits):
-        super(LoadInput, self).__init__(**traits)
-        self.app = app
-        self.title = ''
+    title = ''
 
     def validate(self, data):
         if not len(data):
@@ -45,10 +42,7 @@ class LoadInput(LoadTxt):
 
 
 class LoadTarget(LoadTxt):
-    def __init__(self, app=None, **traits):
-        super(LoadTarget, self).__init__(**traits)
-        self.app = app
-        self.title = ''
+    title = ''
 
     def validate(self, data):
         if not len(data):
@@ -118,11 +112,10 @@ class TrainingData(HasTraits):
     status = Int(0)  # 1 - input loaded, 2 - input and target loaded
     status_info = Str('No data loaded.')
 
-    def __init__(self, app = None, **traits):
-        super(TrainingData, self).__init__(**traits)
-        # App is not a trait?
-        self.input_loader.app = app
-        self.target_loader.app = app
+    def __init__(self, app=None, **traits):
+        super(TrainingData, self).__init__(app=app, **traits)
+        self.input_loader = LoadInput(app=app)  #.app = app
+        self.target_loader = LoadTarget(app=app)  #.app = app
         self.app = app
 
     def _get_input_t(self):
