@@ -52,7 +52,7 @@ class ErrorAnimation(MPLAnimator):
         return self.tline, self.vline
 
     traits_view = View(Item('relative_error'),
-                            resizable = True)
+                       resizable = True)
 
 
 class TOAnimation(MPLAnimator):

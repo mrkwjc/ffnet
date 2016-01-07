@@ -10,6 +10,8 @@
     3   network, input wrong
     4   network, target wrong
     5   network, input and target wrong
+7. Shared is only needed for training
+8. Always replot when animation is finished?
 ###########
 
 On Windows:
