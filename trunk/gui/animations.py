@@ -55,6 +55,79 @@ class ErrorAnimation(MPLAnimator):
                        resizable = True)
 
 
+class IOAnimation(MPLAnimator):
+    name = Str('Input vs. Output')
+    app = Any
+    inputs = Property(List, depends_on='app.network.net', transient=True)
+    outputs = Property(List, depends_on='app.network.net', transient=True)
+    i = Enum(values='inputs', live=True, transient=True)
+    o = Enum(values='outputs', live=True, transient=True)
+
+    def _get_inputs(self):
+        if self.app is not None and self.app.network.net is not None:
+            return range(1, len(self.app.network.net.inno)+1)
+        return []
+
+    def _get_outputs(self):
+        if self.app is not None and self.app.network.net is not None:
+            return range(1, len(self.app.network.net.outno)+1)
+        return []
+
+    def plot_init(self):
+        self.figure.axes.clear()
+        ax = self.figure.axes
+        self.oline, = ax.plot([], [], 'ko-', ms=7, mfc='w', mew=1.2, lw=1.2, label='Input - Output')
+        self.tline, = ax.plot([], [], 'ro--', ms=4, lw=1, label='Input - Training Target')
+        self.vline, = ax.plot([], [], 'gv', ms=4, label='Input - Validation Target')
+        ax.grid(True)
+        ax.set_xlabel('Input %i' %self.i)
+        ax.set_ylabel('Output %i' %self.o)
+        ax.legend(loc='best')
+        self.setlim()
+        return self.oline, self.tline, self.vline
+
+    def plot_data(self):
+        if self.app.network.net is None or self.app.data.status != 2:
+            return
+        inp = self.app.data.input[:, self.i-1]
+        out = self.app.network.net(self.app.data.input)[:, self.o-1]
+        trg = self.app.data.target[:, self.o-1]
+        vmask = self.app.data.vmask
+        argsort = inp.argsort()
+        return inp[argsort], out[argsort], trg[argsort], vmask[argsort]
+
+    def animation_data(self):
+        while self.running:
+            self.app.network.net.weights[:] = self.app.shared.wlist[-1]
+            yield self.plot_data()
+
+    def plot(self, data=None):
+        if data is None:
+            return
+        inp, out, trg, vmask = data
+        self.oline.set_data(inp, out)
+        self.tline.set_data(inp, trg)
+        self.vline.set_data(inp[vmask], trg[vmask])
+        return self.oline, self.tline, self.vline
+
+    def setlim(self):
+        ax = self.figure.axes
+        if self.app.data.status > 0:
+            inp = self.app.data.input[:, self.i-1]
+            xl = min(inp) - (max(inp)-min(inp))*0.1
+            xr = max(inp) + (max(inp)-min(inp))*0.1
+            ax.set_xlim(xl, xr)
+        if self.app.data.status > 1:
+            trg = self.app.data.target[:, self.o-1]
+            yl = min(trg) - (max(trg)-min(trg))*0.1
+            yr = max(trg) + (max(trg)-min(trg))*0.1
+            ax.set_ylim(yl, yr)
+
+    traits_view = View(Item('i', label='Input'),
+                       Item('o', label='Output'),
+                       resizable = True)
+
+
 class TOAnimation(MPLAnimator):
     name = Str('Target vs. Output')
     app = Any  # nedede by below Property
@@ -71,7 +144,7 @@ class TOAnimation(MPLAnimator):
         ax = self.figure.axes
         self.tline, = ax.plot([], [], 'ro', label='Training data')
         self.vline, = ax.plot([], [], 'gv', label='Validation data')
-        self.rline, = ax.plot([], [], 'k', lw=2, label='Regression line')
+        self.rline, = ax.plot([], [], 'k', lw=1.2, label='Regression line')
         ax.grid(True)
         ax.set_xlabel('Targets')
         ax.set_ylabel('Outputs')
@@ -264,5 +337,5 @@ class GraphAnimation(MPLAnimator):
 
 
 if __name__ == "__main__":
-    p = TOAnimation(app = None)
+    p = IOAnimation(app = None)
     p.configure_traits(view='figure_view')
