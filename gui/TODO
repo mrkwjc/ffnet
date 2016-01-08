@@ -12,6 +12,8 @@
     5   network, input and target wrong
 7. Shared is only needed for training
 8. Always replot when animation is finished?
+9. Plots for testing should have another labels.
+10. Show regression info when training and testing
 ###########
 
 On Windows:

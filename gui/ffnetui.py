@@ -1,26 +1,30 @@
 #-*- coding: utf-8 -*-
-## from traits.etsconfig.api import ETSConfig
-## ETSConfig.toolkit = 'qt4'
+#from traits.etsconfig.api import ETSConfig
+#ETSConfig.toolkit = 'qt4'
 
 from traits.api import *
 from traitsui.api import *
-from pyface.api import GUI
-from data import TrainingData
-from network import Network
-from training import *
-import sys
-import time
-import uuid
 
-import thread
+from network import Network
+from data import TrainingData
+from training import *
+from shared import Shared
 from logger import Logger
-from actions import toolbar, menubar
 from animations import *
 from plots.mplfigure import MPLPlotter
+from actions import toolbar
 
-import multiprocessing as mp
-from shared import Shared
-import numpy as np
+
+class SettingsHandler(Handler):
+    def close(self, info, is_ok):
+        if is_ok:
+            obj = info.object
+            if obj._pmode != obj.mode or len(obj.plist) == 0:
+                obj.arrange_plots()
+            else:
+                obj.selected.replot()
+        #return True
+        return Handler.close(self, info, is_ok)
 
 
 class FFnetApp(HasTraits):
@@ -45,6 +49,8 @@ class FFnetApp(HasTraits):
         self.trainer = TncTrainer(app = self) # default trainer
         self.shared = Shared()
         self.logs = Logger()
+        from ffnet import version
+        self.logs.logger.info('Welcome! You are using ffnet-%s.' %version)
         self.shell = {'app':self}
 
     def new(self):
@@ -65,12 +71,12 @@ class FFnetApp(HasTraits):
 
     def settings(self):
         if self.net:
-            mode = self.mode
+            self._pmode = self.mode
             self.edit_traits(view='settings_view', kind='livemodal')
-            if mode != self.mode or len(self.plist) == 0:
-                self.arrange_plots()
-            else:
-                self.selected.replot()
+            #if mode != self.mode or len(self.plist) == 0:
+                #self.arrange_plots()
+            #else:
+                #self.selected.replot()
 
     def train_start(self):
         self.logs.logger.info('Training network: %s' %self.network.filename)
@@ -96,14 +102,14 @@ class FFnetApp(HasTraits):
                         self.selected = p  # will be replotted automatically
                     break
         else:
-            p = cls(app = self, interval=500)
+            p = cls(app = self, interval=250)
             self.plist = self.plist + [p]
             self.selected = p
 
     def arrange_plots(self):
         self.plist = []
         if self.mode == 'train':
-            plots = [ErrorAnimation, TOAnimation, GraphAnimation]
+            plots = [ErrorAnimation, TOAnimation, IOAnimation, GraphAnimation]
         elif self.mode == 'test':
             plots = [TOAnimation, GraphAnimation]
         else:
@@ -195,6 +201,7 @@ class FFnetApp(HasTraits):
                                  UItem('object.trainer', style='custom'),
                                  visible_when='mode == "train"'),
                          buttons = ['OK', 'Cancel'],
+                         handler = SettingsHandler(),
                          title = 'Settings...',
                          resizable = True,
                          width = 0.5)
@@ -203,20 +210,28 @@ class FFnetApp(HasTraits):
                          title = 'Training network...',
                          width = 0.25)
 
-if __name__=="__main__":
-    from ffnet import loadnet, version
-    mp.freeze_support()
-    t = FFnetApp()
-    t.logs.logger.info('Welcome! You are using ffnet-%s.' %version)
+
+def main():
+    app = FFnetApp()
+    app.configure_traits()
+
+def test():
+    app = FFnetApp()
     # Add test network
-    #n = t.network
-    #path = 'data/testnet.net'
-    #n.net = loadnet(path)
-    #n.filename = path
+    from ffnet import loadnet
+    n = app.network
+    path = 'data/testnet.net'
+    n.net = loadnet(path)
+    n.filename = path
     ## Add test data
-    #t.data.input_loader.filename = 'data/black-scholes-input.dat'
-    #t.data.target_loader.filename = 'data/black-scholes-target.dat'
-
+    app.data.input_loader.filename = 'data/black-scholes-input.dat'
+    app.data.target_loader.filename = 'data/black-scholes-target.dat'
+    app.arrange_plots()
     # Run
-    t.configure_traits()
+    app.configure_traits()
 
+if __name__=="__main__":
+    import multiprocessing as mp
+    mp.freeze_support()
+    #main()
+    test()
