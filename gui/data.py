@@ -14,6 +14,8 @@ class LoadInput(LoadTxt):
     title = ''
 
     def validate(self, data):
+        if self.app is None or self.app.data is None:
+            return []
         if not len(data):
             display_error("No data loaded! Empty file?")
             return data
@@ -45,6 +47,8 @@ class LoadTarget(LoadTxt):
     title = ''
 
     def validate(self, data):
+        if self.app is None or self.app.data is None:
+            return []
         if not len(data):
             display_error("No data loaded! Empty file?")
             return data
@@ -89,7 +93,6 @@ class TrainingDataHandler(Handler):
         else:
             return True
 
-
 class TrainingData(HasTraits):
     input_loader = Instance(LoadInput, ())
     target_loader = Instance(LoadTarget, ())
@@ -116,7 +119,7 @@ class TrainingData(HasTraits):
         super(TrainingData, self).__init__(app=app, **traits)
         self.input_loader = LoadInput(app=app)  #.app = app
         self.target_loader = LoadTarget(app=app)  #.app = app
-        self.app = app
+        #self.app = app
 
     def _get_input_t(self):
         return self.input[~self.vmask]
