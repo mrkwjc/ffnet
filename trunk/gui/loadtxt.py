@@ -65,11 +65,11 @@ class LoadTxt(HasTraits):
     converters = Dict(Int, Callable)
     data = CArray()
 
-    @on_trait_change('filename, skiprows, dtype, decimal, delimiter, columns, rows, comments')
-    def _reload(self):
-        self.load(err = True,
-                  errmsg = 'Error occured during file reading!',
-                  traceback = False)
+##     @on_trait_change('filename, skiprows, dtype, decimal, delimiter, columns, rows, comments')
+##     def _reload(self):
+##         self.load(err = True,
+##                   errmsg = 'Error occured during file reading!',
+##                   traceback = False)
 
     def _load(self):
         """
@@ -153,7 +153,7 @@ class LoadTxt(HasTraits):
         self.show_options_status = not self.show_options_status
 
     def _preview_fired(self):
-        #data = self.load(err=True)
+        data = self.load(err=True)
         if len(self.data):
             self.edit_traits(view = 'array_view', kind='livemodal') 
 

@@ -14,11 +14,13 @@ from animations import *
 from plots.mplfigure import MPLPlotter
 from actions import toolbar
 
-
 class SettingsHandler(Handler):
     def close(self, info, is_ok):
         if is_ok:
             obj = info.object
+            obj.data.input_loader.load()
+            if obj.mode in ['train', 'test']:
+                obj.data.target_loader.load()
             if obj._pmode != obj.mode or len(obj.plist) == 0:
                 obj.arrange_plots()
             else:
@@ -225,7 +227,9 @@ def test():
     n.filename = path
     ## Add test data
     app.data.input_loader.filename = 'data/black-scholes-input.dat'
+    app.data.input_loader.load()
     app.data.target_loader.filename = 'data/black-scholes-target.dat'
+    app.data.target_loader.load()
     app.arrange_plots()
     # Run
     app.configure_traits()
