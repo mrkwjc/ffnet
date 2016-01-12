@@ -80,6 +80,7 @@ class Network(HasTraits):
             self.net = net
             self.filename = net.name
             self.app.logs.logger.info('Network created: %s' %self.filename)
+            return net
 
     def load(self):
         wildcard = 'Network file (*.net)|*.net|Any file (*.*)|*.*'
@@ -100,6 +101,7 @@ class Network(HasTraits):
                 self.net = net
                 self.filename = path
                 self.app.logs.logger.info('Network loaded: %s' %self.filename)
+                return net
             except:
                 display_error("Wrong network file.")
                 return

@@ -56,14 +56,16 @@ class FFnetApp(HasTraits):
         self.shell = {'app':self}
 
     def new(self):
-        self.network.create()
-        self.mode = 'train'
-        self.settings()
+        net = self.network.create()
+        if net is not None:
+            self.mode = 'train'
+            self.settings()
 
     def load(self):
-        self.network.load()
-        self.mode = 'recall'
-        self.settings()
+        net = self.network.load()
+        if net is not None:
+            self.mode = 'recall'
+            self.settings()
 
     def save_as(self):
         self.network.save_as()
@@ -74,7 +76,7 @@ class FFnetApp(HasTraits):
     def settings(self):
         if self.net:
             self._pmode = self.mode
-            self.edit_traits(view='settings_view', kind='livemodal')
+            self.edit_traits(view='settings_view', kind='modal')
             #if mode != self.mode or len(self.plist) == 0:
                 #self.arrange_plots()
             #else:
@@ -237,5 +239,5 @@ def test():
 if __name__=="__main__":
     import multiprocessing as mp
     mp.freeze_support()
-    #main()
-    test()
+    main()
+    #test()
