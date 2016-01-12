@@ -147,7 +147,7 @@ class LoadTxt(HasTraits):
 
     def _options_fired(self):
         #self.show_options_status = not self.show_options_status
-        self.edit_traits(view = 'options_view', kind='livemodal')
+        self.edit_traits(view = 'options_view', kind='modal')
 
     def _show_options_fired(self):
         self.show_options_status = not self.show_options_status
@@ -155,7 +155,7 @@ class LoadTxt(HasTraits):
     def _preview_fired(self):
         data = self.load(err=True)
         if len(self.data):
-            self.edit_traits(view = 'array_view', kind='livemodal') 
+            self.edit_traits(view = 'array_view', kind='modal') 
 
     traits_view = View(HGroup(UItem('filename', resizable=True, springy=True),
                               UItem('options'),
