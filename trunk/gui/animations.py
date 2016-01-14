@@ -51,7 +51,11 @@ class ErrorAnimation(MPLAnimator):
         self.relim()
         return self.tline, self.vline
 
-    traits_view = View(Item('relative_error'),
+    traits_view = View(#Group(Item('object.app.algorithm', label = 'Training algorithm'), 
+                       #      UItem('object.app.trainer', style='custom'),
+                       #      visible_when='object.app.mode == "train"'),
+                       # '_',
+                       Item('relative_error'),
                        resizable = True)
 
 
