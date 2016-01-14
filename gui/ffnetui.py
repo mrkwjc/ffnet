@@ -14,20 +14,20 @@ from animations import *
 from plots.mplfigure import MPLPlotter
 from actions import toolbar
 
+
 class SettingsHandler(Handler):
     def close(self, info, is_ok):
         if is_ok:
             obj = info.object
-            obj.data.input_loader.load()
-            if obj.mode in ['train', 'test']:
-                obj.data.target_loader.load()
+            status = obj.data.load()
+            if not status:
+                return False
             if obj._pmode != obj.mode or len(obj.plist) == 0:
                 obj.arrange_plots()
             else:
                 obj.selected.replot()
-        #return True
-        return Handler.close(self, info, is_ok)
-
+        return True
+        #return Handler.close(self, info, is_ok)
 
 class FFnetApp(HasTraits):
     network = Instance(Network)
@@ -59,13 +59,26 @@ class FFnetApp(HasTraits):
         net = self.network.create()
         if net is not None:
             self.mode = 'train'
-            self.settings()
+            self.data.normalize = True
+            data_status = False
+            if self.data.status == 2:
+                data_status = self.data.load()  # here we test data
+            if not data_status:
+                self.settings()
+            else:
+                self.logs.logger.info('Using previously loaded data.')
 
     def load(self):
         net = self.network.load()
         if net is not None:
             self.mode = 'recall'
-            self.settings()
+            data_status = False
+            if self.data.status > 0:
+                data_status = self.data.load()  # here we test data
+            if not data_status:
+                self.settings()
+            else:
+                self.logs.logger.info('Using previously loaded data.')
 
     def save_as(self):
         self.network.save_as()
@@ -76,7 +89,7 @@ class FFnetApp(HasTraits):
     def settings(self):
         if self.net:
             self._pmode = self.mode
-            self.edit_traits(view='settings_view', kind='modal')
+            self.edit_traits(view='settings_view', kind='livemodal')
             #if mode != self.mode or len(self.plist) == 0:
                 #self.arrange_plots()
             #else:
@@ -144,10 +157,12 @@ class FFnetApp(HasTraits):
             new.replot()
 
     traits_view = View(VSplit(Item('plist',
+                            visible_when = 'len(plist) > 0',
                             style='custom',
                             show_label=False,
                             height = 0.75,
                             editor=ListEditor(use_notebook=True,
+                                              show_notebook_menu = False,
                                               deletable=False,
                                               dock_style='tab',
                                               selected='selected',
@@ -178,28 +193,28 @@ class FFnetApp(HasTraits):
 
     settings_view = View(Item('mode', emphasized=True),
                          '_',
-                         Group(Item('object.data.input_loader',
-                                     style='custom',
-                                     label='Input file',),
-                                 Item('object.data.target_loader',
-                                     style='custom',
-                                     label='Target file'),
-                                 Item('object.data.validation_patterns',
-                                     label = 'Validation patterns [%]'),
-                                 Item('object.data.validation_type'),
-                                 Item('object.data.normalize'),
-                                 visible_when = 'mode == "train"'),
-                         Group(Item('object.data.input_loader',
-                                     style='custom',
-                                     label='Input',),
-                                 Item('object.data.target_loader',
-                                     style='custom',
-                                     label='Target'),
-                                 visible_when = 'mode == "test"'),
-                         Group(Item('object.data.input_loader',
-                                     style='custom',
-                                     label='Input',),
-                                 visible_when = 'mode == "recall"'),
+                        Group(Item('object.data.input_loader',
+                                   style='custom',
+                                   label='Input file',),
+                             Item('object.data.target_loader',
+                                   style='custom',
+                                   label='Target file'),
+                             Group(Item('object.data.validation_patterns',
+                                        label = 'Validation patterns [%]'),
+                                   Item('object.data.validation_type'),
+                                   Item('object.data.normalize')),
+                             visible_when = 'mode == "train"'),
+                       Group(Item('object.data.input_loader',
+                                   style='custom',
+                                   label='Input',),
+                             Item('object.data.target_loader',
+                                   style='custom',
+                                   label='Target'),
+                             visible_when = 'mode == "test"'),
+                       Group(Item('object.data.input_loader',
+                                   style='custom',
+                                   label='Input',),
+                             visible_when = 'mode == "recall"'),
                          '_',
                          Group(Item('algorithm', label = 'Training algorithm'), 
                                  UItem('object.trainer', style='custom'),
@@ -218,6 +233,7 @@ class FFnetApp(HasTraits):
 def main():
     app = FFnetApp()
     app.configure_traits()
+    return app
 
 def test():
     app = FFnetApp()
@@ -239,5 +255,5 @@ def test():
 if __name__=="__main__":
     import multiprocessing as mp
     mp.freeze_support()
-    main()
+    app = main()
     #test()
