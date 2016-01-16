@@ -173,7 +173,7 @@ class TrainingData(HasTraits):
             self.status_info = 'No data loaded.'
         self.app.logs.logger.info(self.status_info)
 
-    #@on_trait_change('validation_patterns, validation_type')
+    @on_trait_change('validation_patterns, validation_type')
     def _set_validation_mask(self):
         if self.status == 2:  # input and target are not empty and of the same length
             npat = len(self.input)

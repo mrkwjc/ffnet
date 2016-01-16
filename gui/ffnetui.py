@@ -1,6 +1,6 @@
 #-*- coding: utf-8 -*-
-from traits.etsconfig.api import ETSConfig
-ETSConfig.toolkit = 'qt4'
+#from traits.etsconfig.api import ETSConfig
+#ETSConfig.toolkit = 'qt4'
 
 from traits.api import *
 from traitsui.api import *
@@ -130,7 +130,7 @@ class FFnetApp(HasTraits):
     def arrange_plots(self):
         self.plist = []
         if self.mode == 'train':
-            plots = [ErrorAnimation, TOAnimation, IOAnimation, GraphAnimation]
+            plots = [ErrorAnimation, RegressionAnimation, TOAnimation, IOAnimation, DIOAnimation, GraphAnimation]
         elif self.mode == 'test':
             plots = [TOAnimation, GraphAnimation]
         else:
@@ -247,9 +247,8 @@ def test():
     n.filename = path
     ## Add test data
     app.data.input_loader.filename = 'data/black-scholes-input.dat'
-    app.data.input_loader.load()
     app.data.target_loader.filename = 'data/black-scholes-target.dat'
-    app.data.target_loader.load()
+    app.data.load()
     app.arrange_plots()
     # Run
     app.configure_traits()
@@ -257,5 +256,5 @@ def test():
 if __name__=="__main__":
     import multiprocessing as mp
     mp.freeze_support()
-    main()
-    #test()
+    #main()
+    test()
