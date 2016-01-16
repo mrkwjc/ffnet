@@ -1,6 +1,6 @@
 #-*- coding: utf-8 -*-
-#from traits.etsconfig.api import ETSConfig
-#ETSConfig.toolkit = 'qt4'
+from traits.etsconfig.api import ETSConfig
+ETSConfig.toolkit = 'qt4'
 
 from traits.api import *
 from traitsui.api import *
@@ -35,7 +35,7 @@ class FFnetApp(HasTraits):
     trainer = Instance(Trainer)
     shared = Instance(Shared)
     logs = Instance(Logger)
-    plist = List([], value=MPLPlotter, transient=True) 
+    plist = List([], value=MPLPlotter, transient=True)
     selected = Instance(MPLPlotter, transient=True)  # Cannot be pickled when animation runs
     shell = PythonValue(Dict)
     mode = Enum('train', 'test', 'recall')
@@ -43,6 +43,8 @@ class FFnetApp(HasTraits):
     running = DelegatesTo('trainer')
     net = DelegatesTo('network')
     data_status = DelegatesTo('data',  prefix='status')
+    #data_info = DelegatesTo('data',  prefix='status_info')
+    #net_info = DelegatesTo('network', 'filename')
 
     def __init__(self, **traits):
         super(FFnetApp, self).__init__(**traits)
@@ -64,6 +66,7 @@ class FFnetApp(HasTraits):
             if self.data.status == 2:
                 data_status = self.data.load()  # here we test data
             if not data_status:
+                self.data = TrainingData(app=self) 
                 self.settings()
             else:
                 self.logs.logger.info('Using previously loaded data.')
@@ -76,6 +79,7 @@ class FFnetApp(HasTraits):
             if self.data.status > 0:
                 data_status = self.data.load()  # here we test data
             if not data_status:
+                self.data = TrainingData(app=self) 
                 self.settings()
             else:
                 self.logs.logger.info('Using previously loaded data.')
@@ -90,10 +94,6 @@ class FFnetApp(HasTraits):
         if self.net:
             self._pmode = self.mode
             self.edit_traits(view='settings_view', kind='livemodal')
-            #if mode != self.mode or len(self.plist) == 0:
-                #self.arrange_plots()
-            #else:
-                #self.selected.replot()
 
     def train_start(self):
         self.logs.logger.info('Training network: %s' %self.network.filename)
@@ -106,8 +106,12 @@ class FFnetApp(HasTraits):
         if self.net:
             self.net.randomweights()
             self.logs.logger.info('Weights has been randomized!')
+        self.clear()
+
+    def clear(self):
         self.shared.populate() 
-        self.selected.replot()
+        if self.selected is not None:
+            self.selected.replot()
 
     def add_plot(self, cls):
         if any(isinstance(p, cls) for p in self.plist):  # plot is just opened
@@ -186,9 +190,10 @@ class FFnetApp(HasTraits):
                        width = 0.6,
                        height = 0.8,
                        resizable = True,
-                       #menubar = menubar,
                        toolbar = toolbar,
-                       #statusbar = [StatusItem(name = '_progress', width=200)]
+                       #menubar = menubar,
+                       #statusbar = [StatusItem(name = 'net_info', width=0.5),
+                                    #StatusItem(name = 'data_info', width=0.5)]
                        )
 
     settings_view = View(Item('mode', emphasized=True),
@@ -223,17 +228,14 @@ class FFnetApp(HasTraits):
                          handler = SettingsHandler(),
                          title = 'Settings...',
                          resizable = True,
-                         width = 0.5)
+                         #scrollable = True,
+                         width = 0.4)
 
-    training_view = View(UItem('stop_training'),
-                         title = 'Training network...',
-                         width = 0.25)
 
 
 def main():
     app = FFnetApp()
     app.configure_traits()
-    return app
 
 def test():
     app = FFnetApp()
@@ -255,5 +257,5 @@ def test():
 if __name__=="__main__":
     import multiprocessing as mp
     mp.freeze_support()
-    app = main()
+    main()
     #test()

@@ -127,7 +127,7 @@ class Network(HasTraits):
 
     def close(self):
         if self.net:
-            self.app.reset()
+            self.app.clear()
             self.app.logs.logger.info('Network closed: %s' %self.filename)
             self.net = None
             self.filename = ''

@@ -64,12 +64,11 @@ class TrainingData(HasTraits):
     def _get_target_v_n(self):
         return self.target_n[self.vmask]
 
-    def clear(self):
-        self.input_loader.clear()
-        self.target_loader.clear()
+    #def clear(self):
+        #self.input_loader = LoadTxt()
+        #self.target_loader = LoadTxt()
 
     def load(self):
-        print self.app.net
         inp0 = self.input
         trg0 = self.target
         if self.app.mode in ['train', 'test']:
