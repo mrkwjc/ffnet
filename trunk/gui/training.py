@@ -23,6 +23,7 @@ class Trainer(HasTraits):
     running = Bool(False)
     iteration = Property(Int(0), transient=True)  # transient for non-pickling
     step = 1
+    best_weights = Enum('last iteration', 'minimum training error', 'minimum validation error')
 
     def __repr__(self):
         return self.name
@@ -51,6 +52,7 @@ class Trainer(HasTraits):
             if v is not None:
                 self.app.shared.vlist.append(v)
             self.app.shared.ilist.append(i)
+        self.assign_best_weights()
         self.iteration += 1
 
     def sqerror(self, inp, trg):
@@ -77,8 +79,16 @@ class Trainer(HasTraits):
         self._save_iteration()
         self.stopper()  # This is actually the only way to stop C based optimizer
 
+    @on_trait_change('best_weights')
     def assign_best_weights(self):
-        self.app.network.net.weights[:] = self.app.shared.wlist[-1]
+        if self.best_weights == 'last iteration':
+            idx = len(self.app.shared.tlist) - 1
+        if self.best_weights == 'minimum training error' or len(self.app.shared.vlist) == 0:
+            idx = np.argmin(self.app.shared.tlist)
+        if self.best_weights == 'minimum validation error' and len(self.app.shared.vlist) > 0:
+            idx = np.argmin(self.app.shared.vlist)
+        self.app.shared.bwidx.value = idx
+        self.app.network.net.weights[:] = self.app.shared.wlist[idx]
 
     def _train(self):
         logger = self.app.logs.logger
@@ -103,6 +113,7 @@ class Trainer(HasTraits):
         t1 = time.time()
         #output = r.stop()
         self.app.selected.stop()  # This is inside training thread
+        self.app.selected.replot()        
         ##
         # Log things
         #ogger.info(output.strip())
@@ -177,6 +188,7 @@ class TncTrainer(Trainer):
 
     traits_view = View(Item('maxfun', tooltip='Set 0 for automatic estimation...'),
                        Item('nproc'),
+                       Item('best_weights'),
                        resizable=True)
 
 
@@ -203,6 +215,7 @@ class BfgsTrainer(Trainer):
 
     traits_view = View(Item('maxfun', tooltip='Set 0 for automatic estimation...'),
                        Item('disp'),
+                       Item('best_weights'),
                        resizable=True)
 
 
@@ -229,6 +242,7 @@ class CgTrainer(Trainer):
 
     traits_view = View(Item('maxiter', tooltip='Set 0 for automatic estimation...'),
                        Item('disp'),
+                       Item('best_weights'),
                        resizable=True)
 
 

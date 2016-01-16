@@ -14,10 +14,14 @@ class Shared(HasTraits):
     def populate(self):
         self.running = self.manager.Value('i', 0)
         self.iteration = self.manager.Value('i', 0)
+        self.bwidx = self.manager.Value('i', 0)
         self.wlist = self.manager.list([])
         self.tlist = self.manager.list([])
         self.vlist = self.manager.list([])
         self.ilist = self.manager.list([])
+
+    def bweights(self):
+        return self.wlist[self.bwidx.value]
 
 
 if __name__ == "__main__":
