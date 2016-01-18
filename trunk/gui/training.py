@@ -81,12 +81,23 @@ class Trainer(HasTraits):
 
     @on_trait_change('best_weights')
     def assign_best_weights(self):
+        if self.iteration == 0:  # nothing to assign
+            return
+        idx = self.app.shared.bwidx.value
         if self.best_weights == 'last iteration':
             idx = len(self.app.shared.tlist) - 1
         if self.best_weights == 'minimum training error' or len(self.app.shared.vlist) == 0:
-            idx = np.argmin(self.app.shared.tlist)
+            if self.running:  # speed up things (argmin costs time)
+                if self.app.shared.tlist[idx] > self.app.shared.tlist[-1]:
+                    idx = len(self.app.shared.tlist) - 1
+            else:
+                idx = np.argmin(self.app.shared.tlist)
         if self.best_weights == 'minimum validation error' and len(self.app.shared.vlist) > 0:
-            idx = np.argmin(self.app.shared.vlist)
+            if self.running:  # speed up things (argmin costs time)
+                if self.app.shared.vlist[idx] > self.app.shared.vlist[-1]:
+                    idx = len(self.app.shared.vlist) - 1
+            else:
+                idx = np.argmin(self.app.shared.vlist)
         self.app.shared.bwidx.value = idx
         self.app.network.net.weights[:] = self.app.shared.wlist[idx]
 
@@ -113,7 +124,7 @@ class Trainer(HasTraits):
         t1 = time.time()
         #output = r.stop()
         self.app.selected.stop()  # This is inside training thread
-        self.app.selected.replot()        
+        self.app.selected.replot()
         ##
         # Log things
         #ogger.info(output.strip())
@@ -188,7 +199,6 @@ class TncTrainer(Trainer):
 
     traits_view = View(Item('maxfun', tooltip='Set 0 for automatic estimation...'),
                        Item('nproc'),
-                       Item('best_weights'),
                        resizable=True)
 
 
@@ -215,7 +225,6 @@ class BfgsTrainer(Trainer):
 
     traits_view = View(Item('maxfun', tooltip='Set 0 for automatic estimation...'),
                        Item('disp'),
-                       Item('best_weights'),
                        resizable=True)
 
 
@@ -242,7 +251,6 @@ class CgTrainer(Trainer):
 
     traits_view = View(Item('maxiter', tooltip='Set 0 for automatic estimation...'),
                        Item('disp'),
-                       Item('best_weights'),
                        resizable=True)
 
 
