@@ -24,6 +24,7 @@ class Trainer(HasTraits):
     iteration = Property(Int(0), transient=True)  # transient for non-pickling
     step = 1
     best_weights = Enum('last iteration', 'minimum training error', 'minimum validation error')
+    maxfun = Range(low=0)
 
     def __repr__(self):
         return self.name
@@ -79,28 +80,6 @@ class Trainer(HasTraits):
         self._save_iteration()
         self.stopper()  # This is actually the only way to stop C based optimizer
 
-    @on_trait_change('best_weights')
-    def assign_best_weights(self):
-        if self.iteration == 0:  # nothing to assign
-            return
-        idx = self.app.shared.bwidx.value
-        if self.best_weights == 'last iteration':
-            idx = len(self.app.shared.tlist) - 1
-        if self.best_weights == 'minimum training error' or len(self.app.shared.vlist) == 0:
-            if self.running:  # speed up things (argmin costs time)
-                if self.app.shared.tlist[idx] > self.app.shared.tlist[-1]:
-                    idx = len(self.app.shared.tlist) - 1
-            else:
-                idx = np.argmin(self.app.shared.tlist)
-        if self.best_weights == 'minimum validation error' and len(self.app.shared.vlist) > 0:
-            if self.running:  # speed up things (argmin costs time)
-                if self.app.shared.vlist[idx] > self.app.shared.vlist[-1]:
-                    idx = len(self.app.shared.vlist) - 1
-            else:
-                idx = np.argmin(self.app.shared.vlist)
-        self.app.shared.bwidx.value = idx
-        self.app.network.net.weights[:] = self.app.shared.wlist[idx]
-
     def _train(self):
         logger = self.app.logs.logger
         logger.info('Using "%s" trainig algorithm.' %self.name)
@@ -144,7 +123,7 @@ class Trainer(HasTraits):
         thread.start_new_thread(self._train, ())
 
     def setup(self):
-        raise NotImplementedError
+        pass
 
     def training_process(self):
         raise NotImplementedError
@@ -152,12 +131,37 @@ class Trainer(HasTraits):
     def stopper(self):
         raise NotImplementedError
 
+    @on_trait_change('app.network.net')
+    def estimate_maxfun(self):
+        if self.app is not None and self.app.network.net is not None:
+            self.maxfun = max(100, 10*len(self.app.network.net.weights))  # Set default value
+
+    @on_trait_change('best_weights')
+    def assign_best_weights(self):
+        if self.iteration == 0:  # nothing to assign
+            return
+        idx = self.app.shared.bwidx.value
+        if self.best_weights == 'last iteration':
+            idx = len(self.app.shared.tlist) - 1
+        if self.best_weights == 'minimum training error' or len(self.app.shared.vlist) == 0:
+            if self.running:  # speed up things (argmin costs time)
+                if self.app.shared.tlist[idx] > self.app.shared.tlist[-1]:
+                    idx = len(self.app.shared.tlist) - 1
+            else:
+                idx = np.argmin(self.app.shared.tlist)
+        if self.best_weights == 'minimum validation error' and len(self.app.shared.vlist) > 0:
+            if self.running:  # speed up things (argmin costs time)
+                if self.app.shared.vlist[idx] > self.app.shared.vlist[-1]:
+                    idx = len(self.app.shared.vlist) - 1
+            else:
+                idx = np.argmin(self.app.shared.vlist)
+        self.app.shared.bwidx.value = idx
+        self.app.network.net.weights[:] = self.app.shared.wlist[idx]
+
 
 class TncTrainer(Trainer):
     name = Str('tnc')
-    maxfun = Range(low=0)
-    nproc =  Range(low=1, high=mp.cpu_count(), value=mp.cpu_count())
-    messages = Int(1)
+    nproc =  Enum(range(mp.cpu_count(), 0, -1))  #(low=1, high=mp.cpu_count(), value=mp.cpu_count())
 
     def __init__(self, **traits):
         super(TncTrainer, self).__init__(**traits)
@@ -165,20 +169,15 @@ class TncTrainer(Trainer):
         if sys.platform.startswith('win'):  # Set default nproc to 1 on windows
             self.nproc = 1
 
-    #@on_trait_change('app.network.net')
-    #def estimate_maxfun(self):
-        #if self.app is not None and self.app.network.net is not None:
-            #self.maxfun = max(100, 10*len(self.app.network.net.weights))  # Set default value
+    @on_trait_change('app.data.status')
+    def check_nproc(self):
+        if self.app is not None and self.app.data.status in [1,2] and len(self.app.data.input_t) > 0:
+            self.nproc = min(self.nproc, len(self.app.data.input_t))
 
-    #@on trait_change('app.data.status'):
-    #def check_nproc(self):
-        #if self.app is not None and self.app.data.status in [1,2]:
-            #self.nproc = min(self.nproc, len(self.app.data.input_t))
-
-    def setup(self):
-        if self.maxfun == 0:
-            self.maxfun = max(100, 10*len(self.app.network.net.weights))
-        self.nproc = min(self.nproc, len(self.app.data.input_t))
+    #def setup(self):
+        #if self.maxfun == 0:
+            #self.maxfun = max(100, 10*len(self.app.network.net.weights))
+        #self.nproc = min(self.nproc, len(self.app.data.input_t))
 
     def stopper(self):
         if self.app.shared.running.value == 0:
@@ -193,23 +192,21 @@ class TncTrainer(Trainer):
                           args=(self.app.data.input_t, self.app.data.target_t),
                           kwargs={'nproc':self.nproc,
                                   'maxfun': self.maxfun,
-                                  'disp': self.messages,
+                                  'disp': 0,
                                   'callback': self.callback})
         return process
 
-    traits_view = View(Item('maxfun', tooltip='Set 0 for automatic estimation...'),
+    traits_view = View(Item('maxfun'),
                        Item('nproc'),
                        resizable=True)
 
 
 class BfgsTrainer(Trainer):
     name = Str('bfgs')
-    maxfun = Range(low=0)
-    disp = Int(0)
 
-    def setup(self):
-        if self.maxfun == 0:
-            self.maxfun = max(100, 10*len(self.app.network.net.weights))
+    #def setup(self):
+        #if self.maxfun == 0:
+            #self.maxfun = max(100, 10*len(self.app.network.net.weights))
 
     def stopper(self):
         if self.app.shared.running.value == 0:
@@ -219,23 +216,20 @@ class BfgsTrainer(Trainer):
         process = Process(target=self.app.network.net.train_bfgs,
                           args=(self.app.data.input_t, self.app.data.target_t),
                           kwargs={'maxfun': self.maxfun,
-                                  'disp': self.disp,
+                                  'disp': 0,
                                   'callback': self.callback})
         return process
 
-    traits_view = View(Item('maxfun', tooltip='Set 0 for automatic estimation...'),
-                       Item('disp'),
+    traits_view = View(Item('maxfun'),
                        resizable=True)
 
 
 class CgTrainer(Trainer):
     name = Str('cg')
-    maxiter = Range(low=0)
-    disp = Int(0)
 
-    def setup(self):
-        if self.maxiter == 0:
-            self.maxiter = max(100, 10*len(self.app.network.net.weights))
+    #def setup(self):
+        #if self.maxiter == 0:
+            #self.maxiter = max(100, 10*len(self.app.network.net.weights))
 
     def stopper(self):
         if self.app.shared.running.value == 0:
@@ -244,13 +238,12 @@ class CgTrainer(Trainer):
     def training_process(self):
         process = Process(target=self.app.network.net.train_cg,
                           args=(self.app.data.input_t, self.app.data.target_t),
-                          kwargs={'maxiter': self.maxiter,
-                                  'disp': self.disp,
+                          kwargs={'maxiter': self.maxfun,
+                                  'disp': 0,
                                   'callback': self.callback})
         return process
 
-    traits_view = View(Item('maxiter', tooltip='Set 0 for automatic estimation...'),
-                       Item('disp'),
+    traits_view = View(Item('maxfun', label='Maxiter'),
                        resizable=True)
 
 
