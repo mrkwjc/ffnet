@@ -4,13 +4,12 @@
 
 from traits.api import *
 from traitsui.api import *
-from traitsui.file_dialog import open_file, save_file
 from traitsui.ui_editors.array_view_editor import ArrayViewEditor
 import pyface.api as pyface
 import matplotlib
+import numpy as np
 import networkx as nx
 import os
-import copy
 
 from ffnet_import import *
 from messages import display_error
