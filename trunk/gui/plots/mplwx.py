@@ -57,6 +57,7 @@ class _MPLFigureEditor(Editor):
         mpl_control = FigureCanvas(panel, -1, self.value)
         sizer.Add(mpl_control, 1, wx.LEFT | wx.TOP | wx.GROW)
         toolbar = NavigationToolbar(mpl_control)
+        toolbar.Realize()
         sizer.Add(toolbar, 0, wx.EXPAND)
         self.value.canvas.SetMinSize((10,10))
         return panel
