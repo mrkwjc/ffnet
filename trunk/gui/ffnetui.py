@@ -4,6 +4,7 @@
 
 from traits.api import *
 from traitsui.api import *
+from pyface.image_resource import ImageResource
 
 from network import Network
 from data import TrainingData
@@ -13,6 +14,10 @@ from logger import Logger
 from animations import *
 from plots.mplfigure import MPLPlotter
 from actions import toolbar
+
+
+class View(View):
+    icon = ImageResource('ffnetui22x22.ico')
 
 
 class SettingsHandler(Handler):
@@ -186,7 +191,7 @@ class FFnetApp(HasTraits):
                                     )
                               ),
                              #),
-                       title = 'ffnet - neural network trainer',
+                       title = 'Feed-forward neural network trainer',
                        width = 0.6,
                        height = 0.8,
                        resizable = True,
@@ -229,7 +234,7 @@ class FFnetApp(HasTraits):
                          handler = SettingsHandler(),
                          title = 'Settings...',
                          resizable = True,
-                         #scrollable = True,
+                         scrollable = True,
                          width = 0.4)
 
 

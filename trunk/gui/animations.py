@@ -262,8 +262,8 @@ class GraphAnimation(MPLAnimator):
     pos_no_biases = Dict
     show_biases = Bool(False, live = True)
     node_labels = Bool(True, live = True)
-    node_size = Range(1, 20, 5, live = True)
-    edge_width = Range(0.1, 2., 1., live = True)
+    node_size = Range(1, 100, 5, live = True)
+    edge_width = Range(0.1, 20., 1., live = True)
     layout = Enum('layered', 'spring', 'circular', 'random', live = True)
     colorize_edges = Bool(False, live = True)
     colorize_nodes = Bool(False, live = True)
