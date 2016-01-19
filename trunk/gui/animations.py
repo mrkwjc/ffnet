@@ -71,12 +71,36 @@ class ErrorAnimation(MPLAnimator):
                        Item('relative_error'),
                        resizable = True)
 
+class RegressionInfo(HasTraits):
+    slope = Float(1.)
+    intercept = Float(0.)
+    rvalue = Float(1.)
+    pvalue = Float(0.)
+    slope_stderr = Float(0.)
+    estimate_stderr = Float(0.)
+
+    def assign_values(self, ri):
+        self.slope = ri[0]
+        self.intercept = ri[1]
+        self.rvalue = ri[2]
+        self.pvalue = ri[3]
+        self.slope_stderr = ri[4]
+        self.estimate_stderr = ri[5]
+
+    traits_view = View(Item('estimate_stderr', label='Stderr', style = 'readonly', format_str='% 15.8f'),
+                       Item('rvalue', label = 'R-value', style = 'readonly', format_str='% 15.8f'),
+                       Item('slope', style = 'readonly', format_str='% 15.8f'),
+                       Item('intercept', style = 'readonly', format_str='% 15.8f'),
+                       Item('slope_stderr', style = 'readonly', format_str='% 15.8f'),
+                       resizable = True,
+                       width = 0.2)
 
 class RegressionAnimation(MPLAnimator):
     name = Str('Regression')
     app = Any  # needed by below Property
     outputs = Property(List, depends_on='app.network.net', transient=True)
     o = Enum(values='outputs', live=True, transient=True)
+    regress = Instance(RegressionInfo, ())
 
     def _get_outputs(self):
         if self.app is not None and self.app.network.net is not None:
@@ -98,19 +122,21 @@ class RegressionAnimation(MPLAnimator):
     def plot_data(self):
         if self.app.network.net is None or self.app.data.status != 2:
             return
-        i = self.app.data.input
-        t = self.app.data.target
+        o = self.o - 1
+        inp = self.app.data.input
+        trg = self.app.data.target
         vmask = self.app.data.vmask
-        o, r = self.app.network.net.test(i, t, iprint = 0)
-        slope = r[0][0]
-        intercept = r[0][1]
-        offset = (t.max() - t.min())*0.05
-        x = np.linspace(t.min()-offset, t.max()+offset)
+        out, rgr = self.app.network.net.test(inp, trg, iprint = 0)
+        self.regress.assign_values(rgr[o])
+        slope = rgr[o][0]
+        intercept = rgr[o][1]
+        offset = (trg.max() - trg.min())*0.05
+        x = np.linspace(trg.min()-offset, trg.max()+offset)
         y = slope * x + intercept
-        tt = t[~vmask][:, self.o-1]
-        tv = t[vmask][:, self.o-1]
-        ot = o[~vmask][:, self.o-1]
-        ov = o[vmask][:, self.o-1]
+        tt = trg[~vmask][:, o]
+        tv = trg[vmask][:, o]
+        ot = out[~vmask][:, o]
+        ov = out[vmask][:, o]
         return tt, ot, tv, ov, x, y
 
     def animation_data(self):
@@ -130,7 +156,10 @@ class RegressionAnimation(MPLAnimator):
         return self.tline, self.vline, self.rline
 
     traits_view = View(Item('o', label = 'Network output'),
-                            resizable = True)
+                       '_',
+                       Group(UItem('regress', style='custom'), label='Regression line'),
+                       #Group(UItem('regress', style='custom'), label='Validation data regression line'),
+                       resizable = True)
 
 
 class TOAnimation(RegressionAnimation):
@@ -164,6 +193,9 @@ class TOAnimation(RegressionAnimation):
         self.vline.set_data(inp[vmask], trg[vmask])
         self.relim()
         return self.oline, self.tline, self.vline
+
+    traits_view = View(Item('o', label = 'Network output'),
+                       resizable = True)
 
 
 class IOAnimation(TOAnimation):
@@ -402,5 +434,5 @@ class GraphAnimation(MPLAnimator):
 
 
 if __name__ == "__main__":
-    p = IOAnimation(app = None)
+    p = RegressionAnimation(app = None)
     p.configure_traits(view='figure_view')
