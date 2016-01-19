@@ -8,6 +8,7 @@ from pyface.image_resource import ImageResource
 
 from network import Network
 from data import TrainingData
+from dumper import Dumper
 from training import *
 from shared import Shared
 from logger import Logger
@@ -37,6 +38,7 @@ class SettingsHandler(Handler):
 class FFnetApp(HasTraits):
     network = Instance(Network)
     data = Instance(TrainingData)
+    dumper = Instance(Dumper)
     trainer = Instance(Trainer)
     shared = Instance(Shared)
     logs = Instance(Logger)
@@ -55,6 +57,7 @@ class FFnetApp(HasTraits):
         super(FFnetApp, self).__init__(**traits)
         self.network = Network(app = self)
         self.data = TrainingData(app = self)
+        self.dumper = Dumper(app=self)
         self.trainer = TncTrainer(app = self) # default trainer
         self.shared = Shared()
         self.logs = Logger()
@@ -94,6 +97,9 @@ class FFnetApp(HasTraits):
 
     def export(self):
         raise NotImplementedError
+
+    def dump(self):
+        self.dumper.configure_traits(kind='modal')
 
     def settings(self):
         if self.net:

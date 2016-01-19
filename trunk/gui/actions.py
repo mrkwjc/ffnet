@@ -29,6 +29,12 @@ export_network_action = Action(
     image  = ImageResource('text-x-generic-template'),
     enabled_when = 'net and not running')
 
+dump_action = Action(
+    name   = 'Dump', 
+    action = 'dump',
+    image  = ImageResource('text-x-generic-template'),
+    enabled_when = 'net and data.status>0 and not running')
+
 #close_network_action = Action(
     #name   = 'Close', 
     #action = 'close',
@@ -80,6 +86,7 @@ network_actions = ActionGroup(
     load_network_action,
     save_as_network_action,
     export_network_action,
+    dump_action
     #close_network_action,
     )
 
