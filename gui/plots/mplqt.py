@@ -9,7 +9,11 @@ http://enthought-dev.117412.n3.nabble.com/traitsui-matplotlib-editor-with-toolba
 """
 import matplotlib
 import matplotlib as mpl
-#mpl.rcParams['backend.qt4']='PyQt4'
+try:
+    import PySide
+    mpl.rcParams['backend.qt4']='PySide'
+except:
+    mpl.rcParams['backend.qt4']='PyQt4'
 mpl.use('Qt4Agg')
 
 from pyface.qt import QtGui, QtCore
