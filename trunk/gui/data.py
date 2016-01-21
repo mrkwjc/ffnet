@@ -19,6 +19,7 @@ class TrainingDataHandler(Handler):
             return True
 
 class TrainingData(HasTraits):
+    app = None
     input_loader = Instance(LoadTxt, ())
     target_loader = Instance(LoadTxt, ())
     input = DelegatesTo('input_loader', prefix='data')
@@ -189,7 +190,8 @@ class TrainingData(HasTraits):
                 mask = np.ones(npat, np.bool)
                 mask[:npat-npat_v] = False
                 self.vmask = mask
-            self.app.logs.logger.info('%i training patterns has been chosen for validation (%s)' %(npat_v, type_))
+            if self.app:
+                self.app.logs.logger.info('%i training patterns has been chosen for validation (%s)' %(npat_v, type_))
 
     #traits_view = View(Tabbed(UItem('input_loader', style='custom', label='Input data', dock='tab',
                               #height = 0.5),
