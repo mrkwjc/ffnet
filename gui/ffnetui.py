@@ -18,7 +18,7 @@ from actions import toolbar
 
 
 class View(View):
-    icon = ImageResource('ffnetui22x22.ico')
+    icon = ImageResource('ffnetui128x128.ico')
 
 
 class SettingsHandler(Handler):
