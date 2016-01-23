@@ -20,8 +20,8 @@ class ErrorAnimation(MPLAnimator):
     def plot_init(self):
         self.figure.axes.clear()
         ax = self.figure.axes
-        self.tline, = ax.plot([], [], 'ro-', lw=2, label='Training error')
-        self.vline, = ax.plot([], [], 'gv-', lw=2, label='Validation error')
+        self.tline, = ax.plot([], [], 'ro-', lw=1.2, label='Training error')
+        self.vline, = ax.plot([], [], 'gv-', lw=1.2, label='Validation error')
         self.bline, = ax.plot([], [], 'ws',  ms=6, mfc='w', mew=1.2, alpha=0.75)
         ax.set_yscale("log")
         ax.grid(True)
@@ -101,6 +101,7 @@ class RegressionAnimation(MPLAnimator):
     outputs = Property(List, depends_on='app.network.net', transient=True)
     o = Enum(values='outputs', live=True, transient=True)
     regress = Instance(RegressionInfo, ())
+    data_set = Enum("Training data", "Validation data", live=True)
 
     def _get_outputs(self):
         if self.app is not None and self.app.network.net is not None:
@@ -110,8 +111,8 @@ class RegressionAnimation(MPLAnimator):
     def plot_init(self):
         self.figure.axes.clear()
         ax = self.figure.axes
-        self.tline, = ax.plot([], [], 'ro', label='Training data')
-        self.vline, = ax.plot([], [], 'gv', label='Validation data')
+        self.tline, = ax.plot([], [], 'ro', label=self.data_set if self.data_set == 'Training data' else None)
+        self.vline, = ax.plot([], [], 'gv', label=self.data_set if self.data_set == 'Validation data' else None)
         self.rline, = ax.plot([], [], 'k', lw=1.2, label='Regression line')
         ax.grid(True)
         ax.set_xlabel('Targets')
@@ -126,17 +127,24 @@ class RegressionAnimation(MPLAnimator):
         inp = self.app.data.input
         trg = self.app.data.target
         vmask = self.app.data.vmask
-        out, rgr = self.app.network.net.test(inp, trg, iprint = 0)
-        self.regress.assign_values(rgr[o])
+        if self.data_set == "Training data":
+            out, rgr = self.app.network.net.test(inp[~vmask], trg[~vmask], iprint = 0)
+            tt = trg[~vmask][:, o]
+            ot = out[:, o]
+            tv = []
+            ov = []
+        else:
+            out, rgr = self.app.network.net.test(inp[vmask], trg[vmask], iprint = 0)
+            tv = trg[vmask][:, o]
+            ov = out[:, o]
+            tt = []
+            ot = []
+        self.regress.assign_values(rgr[o])  ###
         slope = rgr[o][0]
         intercept = rgr[o][1]
         offset = (trg.max() - trg.min())*0.05
         x = np.linspace(trg.min()-offset, trg.max()+offset)
         y = slope * x + intercept
-        tt = trg[~vmask][:, o]
-        tv = trg[vmask][:, o]
-        ot = out[~vmask][:, o]
-        ov = out[vmask][:, o]
         return tt, ot, tv, ov, x, y
 
     def animation_data(self):
@@ -156,9 +164,8 @@ class RegressionAnimation(MPLAnimator):
         return self.tline, self.vline, self.rline
 
     traits_view = View(Item('o', label = 'Network output'),
-                       '_',
-                       Group(UItem('regress', style='custom'), label='Regression line'),
-                       #Group(UItem('regress', style='custom'), label='Validation data regression line'),
+                       Item('data_set'),
+                       UItem('regress', style='custom', label='Regression line'),
                        resizable = True)
 
 
@@ -170,7 +177,7 @@ class TOAnimation(RegressionAnimation):
         ax = self.figure.axes
         self.tline, = ax.plot([], [], 'ro', label='Training target')
         self.vline, = ax.plot([], [], 'gv', label='Validation target')
-        self.oline, = ax.plot([], [], 'ks-', ms=6, mfc='w', mew=1.2, lw=1.2, alpha=0.75, label='Output')
+        self.oline, = ax.plot([], [], 'ks-', ms=6, mfc='w', mew=1.2, lw=1.2, alpha=0.65, label='Output')
         ax.grid(True)
         ax.set_xlabel('Pattern')
         ax.set_ylabel('Output')
@@ -212,10 +219,9 @@ class IOAnimation(TOAnimation):
     def plot_init(self):
         self.figure.axes.clear()
         ax = self.figure.axes
-        self.oline, = ax.plot([], [], 'ks-', ms=6, mfc='w', mew=1.2, lw=1.2, label='Output')
         self.tline, = ax.plot([], [], 'ro', label='Training Target')
         self.vline, = ax.plot([], [], 'gv', label='Validation Target')
-        self.oline, = ax.plot([], [], 'ks-', ms=6, mfc='w', mew=1.2, lw=1.2, alpha=0.75, label='Output')
+        self.oline, = ax.plot([], [], 'ks-', ms=6, mfc='w', mew=1.2, lw=1.2, alpha=0.65, label='Output')
         ax.grid(True)
         ax.set_xlabel('Input $i_{%i}$' %self.i)
         ax.set_ylabel('Output $o_{%i}$' %self.o)
@@ -266,7 +272,7 @@ class DIOAnimation(IOAnimation):
     def plot_init(self):
         self.figure.axes.clear()
         ax = self.figure.axes
-        self.oline, = ax.plot([], [], 'ks-', ms=6, mfc='w', mew=1.2, lw=1.2, alpha=0.75)
+        self.oline, = ax.plot([], [], 'ks-', ms=6, mfc='w', mew=1.2, lw=1.2, alpha=0.65)
         ax.grid(True)
         ax.set_xlabel('Input $i_{%i}$' %self.i)
         ax.set_ylabel('Derivative $\partial o_{%i} / \partial i_{%i}$' %(self.o, self.i))
