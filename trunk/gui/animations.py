@@ -22,7 +22,7 @@ class ErrorAnimation(MPLAnimator):
         ax = self.figure.axes
         self.tline, = ax.plot([], [], 'ro-', lw=2, label='Training error')
         self.vline, = ax.plot([], [], 'gv-', lw=2, label='Validation error')
-        self.bline, = ax.plot([], [], 'ws',  ms=6, mfc='w', mew=1.2)
+        self.bline, = ax.plot([], [], 'ws',  ms=6, mfc='w', mew=1.2, alpha=0.75)
         ax.set_yscale("log")
         ax.grid(True)
         ax.set_xlabel('Iteration')
@@ -168,9 +168,9 @@ class TOAnimation(RegressionAnimation):
     def plot_init(self):
         self.figure.axes.clear()
         ax = self.figure.axes
-        self.oline, = ax.plot([], [], 'ks-', ms=6, mfc='w', mew=1.2, lw=1.2, label='Output')
         self.tline, = ax.plot([], [], 'ro', label='Training target')
         self.vline, = ax.plot([], [], 'gv', label='Validation target')
+        self.oline, = ax.plot([], [], 'ks-', ms=6, mfc='w', mew=1.2, lw=1.2, alpha=0.75, label='Output')
         ax.grid(True)
         ax.set_xlabel('Pattern')
         ax.set_ylabel('Output')
@@ -215,6 +215,7 @@ class IOAnimation(TOAnimation):
         self.oline, = ax.plot([], [], 'ks-', ms=6, mfc='w', mew=1.2, lw=1.2, label='Output')
         self.tline, = ax.plot([], [], 'ro', label='Training Target')
         self.vline, = ax.plot([], [], 'gv', label='Validation Target')
+        self.oline, = ax.plot([], [], 'ks-', ms=6, mfc='w', mew=1.2, lw=1.2, alpha=0.75, label='Output')
         ax.grid(True)
         ax.set_xlabel('Input $i_{%i}$' %self.i)
         ax.set_ylabel('Output $o_{%i}$' %self.o)
@@ -265,7 +266,7 @@ class DIOAnimation(IOAnimation):
     def plot_init(self):
         self.figure.axes.clear()
         ax = self.figure.axes
-        self.oline, = ax.plot([], [], 'ks-', ms=6, mfc='w', mew=1.2, lw=1.2)
+        self.oline, = ax.plot([], [], 'ks-', ms=6, mfc='w', mew=1.2, lw=1.2, alpha=0.75)
         ax.grid(True)
         ax.set_xlabel('Input $i_{%i}$' %self.i)
         ax.set_ylabel('Derivative $\partial o_{%i} / \partial i_{%i}$' %(self.o, self.i))
