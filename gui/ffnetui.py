@@ -141,11 +141,11 @@ class FFnetApp(HasTraits):
     def arrange_plots(self):
         self.plist = []
         if self.mode == 'train':
-            plots = [ErrorAnimation, RegressionAnimation, TOAnimation, IOAnimation, DIOAnimation, GraphAnimation]
+            plots = [ErrorAnimation, RegressionAnimation, TOAnimation, ITOAnimation, DIOAnimation, GraphAnimation]
         elif self.mode == 'test':
-            plots = [TOAnimation, GraphAnimation]
+            plots = [RegressionPlot, TOPlot, ITOPlot, DIOAnimation, GraphAnimation]
         else:
-            plots = [GraphAnimation]
+            plots = [IOPlot, DIOAnimation, GraphAnimation]
         for p in plots:
             self.add_plot(p)
         self.selected = self.plist[0]
@@ -222,14 +222,14 @@ class FFnetApp(HasTraits):
                              visible_when = 'mode == "train"'),
                        Group(Item('object.data.input_loader',
                                    style='custom',
-                                   label='Input',),
+                                   label='Input file',),
                              Item('object.data.target_loader',
                                    style='custom',
-                                   label='Target'),
+                                   label='Target file'),
                              visible_when = 'mode == "test"'),
                        Group(Item('object.data.input_loader',
                                    style='custom',
-                                   label='Input',),
+                                   label='Input file',),
                              visible_when = 'mode == "recall"'),
                          '_',
                          Group(Item('algorithm', label = 'Training algorithm'), 
@@ -261,6 +261,7 @@ def test():
     app.data.input_loader.filename = 'data/black-scholes-input.dat'
     app.data.target_loader.filename = 'data/black-scholes-target.dat'
     app.data.load()
+    app.mode = 'recall'
     app.arrange_plots()
     # Run
     app.configure_traits()

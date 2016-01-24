@@ -8,7 +8,7 @@ import numpy as np
 import networkx as nx
 import matplotlib
 
-from plots.mplfigure import MPLAnimator
+from plots.mplfigure import MPLPlotter, MPLAnimator
 from messages import display_error
 from graph_layout import layered_layout
 
@@ -165,7 +165,7 @@ class RegressionAnimation(MPLAnimator):
 
     traits_view = View(Item('o', label = 'Network output'),
                        Item('data_set'),
-                       UItem('regress', style='custom', label='Regression line'),
+                       UItem('regress', style='custom'),
                        resizable = True)
 
 
@@ -205,7 +205,7 @@ class TOAnimation(RegressionAnimation):
                        resizable = True)
 
 
-class IOAnimation(TOAnimation):
+class ITOAnimation(TOAnimation):
     name = Str('Output vs. Input')
     app = Any
     inputs = Property(List, depends_on='app.network.net', transient=True)
@@ -266,7 +266,7 @@ class IOAnimation(TOAnimation):
                        resizable = True)
 
 
-class DIOAnimation(IOAnimation):
+class DIOAnimation(ITOAnimation):
     name = Str('Output vs. Input (derivatives)')
 
     def plot_init(self):
@@ -438,6 +438,214 @@ class GraphAnimation(MPLAnimator):
                 Item('input_pattern', visible_when='colorize_nodes and ninp',
                      editor = RangeEditor(low=1, high_name='ninp')),
                 resizable = True)
+
+###
+### PLOTS dedicated to 'test' and 'recall' modes
+###
+class RegressionPlot(MPLPlotter):
+    name = Str('Regression')
+    app = Any  # needed by below Property
+    outputs = Property(List, depends_on='app.network.net', transient=True)
+    o = Enum(values='outputs', live=True, transient=True)
+    regress = Instance(RegressionInfo, ())
+
+    def _get_outputs(self):
+        if self.app is not None and self.app.network.net is not None:
+            return range(1, len(self.app.network.net.outno)+1)
+        return []
+
+    def plot_init(self):
+        self.figure.axes.clear()
+        ax = self.figure.axes
+        self.tline, = ax.plot([], [], 'yp', label='Testing data')
+        self.rline, = ax.plot([], [], 'k', lw=1.2, label='Regression line')
+        ax.grid(True)
+        ax.set_xlabel('Targets')
+        ax.set_ylabel('Outputs')
+        ax.legend(loc='best')
+        return self.tline, self.rline
+
+    def plot_data(self):
+        if self.app.network.net is None or self.app.data.status != 2:
+            return
+        o = self.o - 1
+        inp = self.app.data.input
+        trg = self.app.data.target
+        out, rgr = self.app.network.net.test(inp, trg, iprint = 0)
+        tt = trg[:, o]
+        ot = out[:, o]
+        self.regress.assign_values(rgr[o])  ###
+        slope = rgr[o][0]
+        intercept = rgr[o][1]
+        offset = (trg.max() - trg.min())*0.05
+        x = np.linspace(trg.min()-offset, trg.max()+offset)
+        y = slope * x + intercept
+        return tt, ot, x, y
+
+    def plot(self, data=None):
+        tt, ot, x, y = data
+        ax = self.figure.axes
+        self.tline.set_data(tt, ot)
+        self.rline.set_data(x, y)
+        self.relim()
+        return self.tline, self.rline
+
+    traits_view = View(Item('o', label = 'Network output'),
+                       UItem('regress', style='custom'),
+                       resizable = True)
+
+
+class TOPlot(RegressionPlot):
+    name = 'Outputs'
+
+    def plot_init(self):
+        self.figure.axes.clear()
+        ax = self.figure.axes
+        self.tline, = ax.plot([], [], 'yp', label='Testing data')
+        self.oline, = ax.plot([], [], 'ks-', ms=6, mfc='w', mew=1.2, lw=1.2, alpha=0.65, label='Output')
+        ax.grid(True)
+        ax.set_xlabel('Pattern')
+        ax.set_ylabel('Output')
+        ax.legend(loc='best')
+        return self.oline, self.tline
+
+    def plot_data(self):
+        if self.app.network.net is None or self.app.data.status != 2:
+            return
+        out = self.app.network.net(self.app.data.input)[:, self.o-1]
+        trg = self.app.data.target[:, self.o-1]
+        return out, trg
+
+    def plot(self, data=None):
+        out, trg = data
+        inp = np.arange(len(out))
+        self.oline.set_data(inp, out)
+        self.tline.set_data(inp, trg)
+        self.relim()
+        return self.oline, self.tline
+
+    traits_view = View(Item('o', label = 'Network output'),
+                       resizable = True)
+
+
+class ITOPlot(TOPlot):
+    name = Str('Output vs. Input')
+    app = Any
+    inputs = Property(List, depends_on='app.network.net', transient=True)
+    i = Enum(values='inputs', live=True, transient=True)
+
+    def _get_inputs(self):
+        if self.app is not None and self.app.network.net is not None:
+            return range(1, len(self.app.network.net.inno)+1)
+        return []
+
+    def plot_init(self):
+        self.figure.axes.clear()
+        ax = self.figure.axes
+        self.tline, = ax.plot([], [], 'yp', label='Testing data')
+        self.oline, = ax.plot([], [], 'ks-', ms=6, mfc='w', mew=1.2, lw=1.2, alpha=0.65, label='Output')
+        ax.grid(True)
+        ax.set_xlabel('Input $i_{%i}$' %self.i)
+        ax.set_ylabel('Output $o_{%i}$' %self.o)
+        ax.legend(loc='best')
+        return self.oline, self.tline
+
+    def plot_data(self):
+        if self.app.network.net is None or self.app.data.status != 2:
+            return
+        inp = self.app.data.input[:, self.i-1]
+        out = self.app.network.net(self.app.data.input)[:, self.o-1]
+        trg = self.app.data.target[:, self.o-1]
+        argsort = inp.argsort()
+        return inp[argsort], out[argsort], trg[argsort]
+
+    def plot(self, data=None):
+        if data is None:
+            return
+        inp, out, trg = data
+        self.oline.set_data(inp, out)
+        self.tline.set_data(inp, trg)
+        self.setlim(inp, trg)
+        return self.oline, self.tline
+
+    def setlim(self, inp, trg):
+        ax = self.figure.axes
+        if self.app.data.status > 0:
+            #inp = self.app.data.input[:, self.i-1]
+            xl = min(inp) - (max(inp)-min(inp))*0.1
+            xr = max(inp) + (max(inp)-min(inp))*0.1
+            ax.set_xlim(xl, xr)
+        if self.app.data.status > 1:
+            #trg = self.app.data.target[:, self.o-1]
+            yl = min(trg) - (max(trg)-min(trg))*0.1
+            yr = max(trg) + (max(trg)-min(trg))*0.1
+            ax.set_ylim(yl, yr)
+
+    traits_view = View(Item('i', label='Input'),
+                       Item('o', label='Output'),
+                       resizable = True)
+
+
+class IOPlot(MPLPlotter):
+    name = Str('Output vs. Input')
+    app = Any
+    inputs = Property(List, depends_on='app.network.net', transient=True)
+    i = Enum(values='inputs', live=True, transient=True)
+    outputs = Property(List, depends_on='app.network.net', transient=True)
+    o = Enum(values='outputs', live=True, transient=True)
+
+    def _get_inputs(self):
+        if self.app is not None and self.app.network.net is not None:
+            return range(1, len(self.app.network.net.inno)+1)
+        return []
+
+    def _get_outputs(self):
+        if self.app is not None and self.app.network.net is not None:
+            return range(1, len(self.app.network.net.outno)+1)
+        return []
+
+    def plot_init(self):
+        self.figure.axes.clear()
+        ax = self.figure.axes
+        self.oline, = ax.plot([], [], 'ks-', ms=6, mfc='w', mew=1.2, lw=1.2, alpha=0.65) #, label='Output')
+        ax.grid(True)
+        ax.set_xlabel('Input $i_{%i}$' %self.i)
+        ax.set_ylabel('Output $o_{%i}$' %self.o)
+        #ax.legend(loc='best')
+        return self.oline
+
+    def plot_data(self):
+        if self.app.network.net is None or self.app.data.status != 2:
+            return
+        inp = self.app.data.input[:, self.i-1]
+        out = self.app.network.net(self.app.data.input)[:, self.o-1]
+        argsort = inp.argsort()
+        return inp[argsort], out[argsort]
+
+    def plot(self, data=None):
+        if data is None:
+            return
+        inp, out = data
+        self.oline.set_data(inp, out)
+        self.setlim(inp, out)
+        return self.oline
+
+    def setlim(self, inp, trg):
+        ax = self.figure.axes
+        if self.app.data.status > 0:
+            #inp = self.app.data.input[:, self.i-1]
+            xl = min(inp) - (max(inp)-min(inp))*0.1
+            xr = max(inp) + (max(inp)-min(inp))*0.1
+            ax.set_xlim(xl, xr)
+        if self.app.data.status > 1:
+            #trg = self.app.data.target[:, self.o-1]
+            yl = min(trg) - (max(trg)-min(trg))*0.1
+            yr = max(trg) + (max(trg)-min(trg))*0.1
+            ax.set_ylim(yl, yr)
+
+    traits_view = View(Item('i', label='Input'),
+                       Item('o', label='Output'),
+                       resizable = True)
 
 
 if __name__ == "__main__":
