@@ -135,6 +135,11 @@ class MPLPlotter(HasTraits):
         self.plot(self.plot_data())
         self.figure.draw()
 
+    def relim(self):
+        ax = self.figure.axes
+        ax.relim()
+        ax.autoscale_view()
+
     def setup(self):
         pass
 
@@ -185,11 +190,6 @@ class MPLAnimator(MPLPlotter):
         self.running = False
         self.animator._stop()
         self.figure.figure.canvas.toolbar.update()
-
-    def relim(self):
-        ax = self.figure.axes
-        ax.relim()
-        ax.autoscale_view()
 
     def _startstop_fired(self):
         if not self.running:
