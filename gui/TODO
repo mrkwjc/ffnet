@@ -1,19 +1,8 @@
 ###########
-4. Needed tool for dumping network output
 5. Start and stop animations outside training thread.
-6. Input status should be moved to application status:
-   -2   no network, no data
-   -1   no network, data
-    0   network, no data
-    1   network, input data ok
-    2   network, input and target data ok
-    3   network, input wrong
-    4   network, target wrong
-    5   network, input and target wrong
 7. Shared is only needed for training
-8. Always replot when animation is finished?
-9. Plots for testing should have another labels.
-10. Show regression info when training and testing
+8. Needed separate data sets for training and testing and recalling
+9. On Windows use threading instead of processing unless Pool will be created once at start!
 ###########
 
 On Windows:
