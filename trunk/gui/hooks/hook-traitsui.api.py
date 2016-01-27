@@ -11,6 +11,6 @@ datas += collect_data_files('traitsui.wx')
 datas += collect_data_files('pyface', subdir='images')
 datas += collect_data_files('pyface.ui.wx')
 datas += collect_data_files('pyface.dock')
-datas += [('.\\images\\*.*',  'images')]
-datas += [('.\\plots\\images\\*.*',  'plots\\images')]
-datas += [('.\\data\\*',  'data')]
+datas += [('./images/*.*',  'images')]
+datas += [('./plots/images/*.*',  'plots/images')]
+datas += [('./data/*',  'data')]
