@@ -175,21 +175,25 @@ class MPLAnimator(MPLPlotter):
         if self.running:
             return  # Do not start again!
         self.running = True
-        self.animator = animation.FuncAnimation(self.figure.figure,
-                                                self.plot,
-                                                frames = self.animation_data,
-                                                init_func = self.plot_init,
-                                                interval = self.interval,
-                                                blit = self.blit,
-                                                repeat = self.repeat)
-        self.animator._start()
+        def tocall():
+            self.animator = animation.FuncAnimation(self.figure.figure,
+                                                    self.plot,
+                                                    frames = self.animation_data,
+                                                    init_func = self.plot_init,
+                                                    interval = self.interval,
+                                                    blit = self.blit,
+                                                    repeat = self.repeat)
+            self.animator._start()
+        GUI.invoke_later(tocall)
 
     def stop(self):
         if not self.running:
             return  # Do not stop when we are not running
         self.running = False
-        self.animator._stop()
-        self.figure.figure.canvas.toolbar.update()
+        def tocall():
+            self.animator._stop()
+            self.figure.figure.canvas.toolbar.update()
+        GUI.invoke_later(tocall)
 
     def _startstop_fired(self):
         if not self.running:
