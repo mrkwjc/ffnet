@@ -232,6 +232,58 @@ class MPLFigureWithPlotter(MPLFigure):
                     )
 
 
+class MPLPlots(HasTraits):
+    classes = List([])
+    names = Property(ListStr, depends_on='classes')
+    selected_name = Enum(values='names')
+    selected = Instance(MPLPlotter)
+    plots = List([], value=MPLPlotter)
+
+    #def __init__(self, **traits):
+        #super(MPLPlots, self).__init__(**traits)
+        #self.__plot_traits = traits
+
+    def _get_names(self):
+        names = []
+        for i, c in enumerate(self.classes):
+            if hasattr(c, 'name'):
+                name = c.name
+            else:
+                name = 'Plot %i' %i
+            names.append(name)
+        return names
+
+    def _classes_changed(self):
+        self.plots = []
+        names = self._get_names()
+        if len(names) > 0:
+            self.selected_name = names[0]
+            self.load_plot(names[0])  # Force plot loading
+
+    @on_trait_change('selected_name')
+    def load_plot(self, name):
+        idx = self.names.index(name)
+        cls = self.classes[idx]
+        if any(isinstance(p, cls) for p in self.plots):  # plot is just opened
+            for p in self.plots:
+                if isinstance(p, cls):
+                    self.selected = p
+                    break
+        else:
+            p = cls()
+            self.plots.append(p)
+            self.selected = p
+        self.selected.replot()
+
+
+    traits_view = View(UItem('selected_name'),
+                       UItem('object.selected.figure',
+                             style='custom',
+                             visible_when='len(plots)>0'),
+                       resizable = True)
+
+
 if __name__=="__main__":
-    p = MPLAnimator()
-    p.configure_traits(view='figure_view')
+    p = MPLPlots()
+    p.classes = [MPLPlotter, MPLAnimator]
+    p.configure_traits(view='traits_view')
