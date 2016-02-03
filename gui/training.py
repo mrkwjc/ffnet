@@ -91,14 +91,14 @@ class Trainer(HasTraits):
         #r = Redirector(fd=2)  # Redirect stderr
         #r.start()
         t0 = time.time()
-        if self.iteration == 0:  # we just started
-            self._save_iteration()
         ## RUN 
         self.app.data._normalize_data()  # Be sure network and data are normalized
         self.running = True
         self.setup()
         process = self.training_process()
         process.start()
+        if self.iteration == 0:  # we just started, save initial state
+            self._save_iteration()
         process.join()
         if isinstance(process, Process):
             process.terminate()
@@ -191,8 +191,8 @@ class TncTrainer(Trainer):
 
     def training_process(self):
         # self.app.trait('plist').transient = True  #Why this not works on 'selected'?
-        if sys.platform.startswith('win') and self.nproc == 1:
-            from threading import Thread as Process
+        # if sys.platform.startswith('win') and self.nproc == 1:
+        #     from threading import Thread as Process
         process = Process(target=self.app.network.net.train_tnc,
                           args=(self.app.data.input_t, self.app.data.target_t),
                           kwargs={'nproc':self.nproc,
@@ -218,8 +218,6 @@ class BfgsTrainer(Trainer):
             raise AssertionError
 
     def training_process(self):
-        if sys.platform.startswith('win'):
-            from threading import Thread as Process
         process = Process(target=self.app.network.net.train_bfgs,
                           args=(self.app.data.input_t, self.app.data.target_t),
                           kwargs={'maxfun': self.maxfun,
@@ -243,8 +241,6 @@ class CgTrainer(Trainer):
             raise AssertionError
 
     def training_process(self):
-        if sys.platform.startswith('win'):
-            from threading import Thread as Process
         process = Process(target=self.app.network.net.train_cg,
                           args=(self.app.data.input_t, self.app.data.target_t),
                           kwargs={'maxiter': self.maxfun,
