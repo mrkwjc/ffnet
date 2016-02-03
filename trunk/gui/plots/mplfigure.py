@@ -284,10 +284,12 @@ class MPLPlots(HasTraits):
         # Show new plot
         if self.running:
             self.stop()
-        self.selected = plot
-        self.selected.replot()
-        if self.running:
+            self.selected = plot
+            self.selected.replot()
             self.start()
+        else:
+            self.selected = plot
+            self.selected.replot()
 
     def start(self):
         if self.selected:
