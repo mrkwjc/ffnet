@@ -120,7 +120,7 @@ class FFnetApp(HasTraits):
 
     def clear(self):
         self.shared.populate() 
-        self.plots.replot()
+        self.plots.selected.replot()
 
     def arrange_plots(self):
         if self.mode == 'train':
