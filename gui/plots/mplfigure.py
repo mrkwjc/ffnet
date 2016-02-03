@@ -298,7 +298,6 @@ class MPLPlots(HasTraits):
             t1 = time.time()
             if isinstance(self.selected, MPLAnimator):
                 self.selected.interval = int(max(250, 10*1000*(t1-t0)))
-                print int(max(250, 10*1000*(t1-t0)))
                 self.selected.start()
             self.running = True
 
