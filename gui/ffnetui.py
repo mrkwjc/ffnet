@@ -13,7 +13,7 @@ from training import *
 from shared import Shared
 from logger import Logger
 from animations import *
-from plots.mplfigure import MPLPlotter
+from plots.mplfigure import MPLPlots
 from actions import toolbar
 
 
@@ -28,10 +28,10 @@ class SettingsHandler(Handler):
             status = obj.data.load()
             if not status:
                 return False
-            if obj._pmode != obj.mode or len(obj.plist) == 0:
+            if obj._pmode != obj.mode or len(obj.plots.plots) == 0:
                 obj.arrange_plots()
             else:
-                obj.selected.replot()
+                obj.plots.replot()
         return True
         #return Handler.close(self, info, is_ok)
 
@@ -42,16 +42,14 @@ class FFnetApp(HasTraits):
     trainer = Instance(Trainer)
     shared = Instance(Shared)
     logs = Instance(Logger)
-    plist = List([], value=MPLPlotter, transient=True)
-    selected = Instance(MPLPlotter, transient=True)  # Cannot be pickled when animation runs
+    plots = Instance(MPLPlots)
     shell = PythonValue(Dict)
     mode = Enum('train', 'test', 'recall')
     algorithm = Enum('tnc', 'bfgs', 'cg')
     running = DelegatesTo('trainer')
     net = DelegatesTo('network')
     data_status = DelegatesTo('data',  prefix='status')
-    #data_info = DelegatesTo('data',  prefix='status_info')
-    #net_info = DelegatesTo('network', 'filename')
+    selected = DelegatesTo('plots')
 
     def __init__(self, **traits):
         super(FFnetApp, self).__init__(**traits)
@@ -61,6 +59,7 @@ class FFnetApp(HasTraits):
         self.trainer = TncTrainer(app = self) # default trainer
         self.shared = Shared()
         self.logs = Logger()
+        self.plots = MPLPlots()
         from ffnet import version
         self.logs.logger.info('Welcome! You are using ffnet-%s.' %version)
         self.shell = {'app':self}
@@ -121,34 +120,27 @@ class FFnetApp(HasTraits):
 
     def clear(self):
         self.shared.populate() 
-        if self.selected is not None:
-            self.selected.replot()
-
-    def add_plot(self, cls):
-        if any(isinstance(p, cls) for p in self.plist):  # plot is just opened
-            for p in self.plist:
-                if isinstance(p, cls):
-                    if self.selected == p:
-                        self.selected.replot()
-                    else:
-                        self.selected = p  # will be replotted automatically
-                    break
-        else:
-            p = cls(app = self, interval=250)
-            self.plist = self.plist + [p]
-            self.selected = p
+        self.plots.replot()
 
     def arrange_plots(self):
-        self.plist = []
         if self.mode == 'train':
-            plots = [ErrorAnimation, RegressionAnimation, TOAnimation, ITOAnimation, DIOAnimation, GraphAnimation]
+            plots = [ErrorAnimation,
+                     RegressionAnimation,
+                     TOAnimation,
+                     ITOAnimation,
+                     DIOAnimation,
+                     GraphAnimation]
         elif self.mode == 'test':
-            plots = [RegressionPlot, TOPlot, ITOPlot, DIOAnimation, GraphAnimation]
+            plots = [RegressionPlot,
+                     TOPlot,
+                     ITOPlot,
+                     DIOAnimation,
+                     GraphAnimation]
         else:
-            plots = [IOPlot, DIOAnimation, GraphAnimation]
-        for p in plots:
-            self.add_plot(p)
-        self.selected = self.plist[0]
+            plots = [IOPlot,
+                     DIOAnimation,
+                     GraphAnimation]
+        self.plots.classes = plots
 
     def _algorithm_changed(self, new):
         if new == 'tnc':
@@ -159,30 +151,9 @@ class FFnetApp(HasTraits):
             self.trainer = BfgsTrainer(app=self)
 
     def _selected_changed(self, old, new):
-        if self.trainer.running:
-            try:
-                old.stop()  # Assume we have animation
-            except:
-                pass  # But simple plot can be also
-            try:
-                new.start()  # Assume we have animation
-            except:
-                new.replot()  # But simple plot can be also
-        else:
-            new.replot()
+        new.app = self  # TODO: Plots should be initialized with 'app=self' ?
 
-    traits_view = View(VSplit(Item('plist',
-                            visible_when = 'len(plist) > 0',
-                            style='custom',
-                            show_label=False,
-                            height = 0.75,
-                            editor=ListEditor(use_notebook=True,
-                                              show_notebook_menu = False,
-                                              deletable=False,
-                                              dock_style='tab',
-                                              selected='selected',
-                                              view = 'figure_view',
-                                              page_name = '.name')),
+    traits_view = View(VSplit(UItem('plots', style = 'custom', height=0.75, visible_when=('len(object.plots.plots) > 0')),
                               Tabbed(UItem('logs',
                                            style='custom',
                                            dock = 'tab',
@@ -193,10 +164,8 @@ class FFnetApp(HasTraits):
                                            dock   = 'tab',
                                            export = 'DockWindowShell'
                                            ),
-                                     #show_labels = False
                                     )
                               ),
-                             #),
                        title = 'Feed-forward neural network trainer',
                        width = 0.6,
                        height = 0.8,
@@ -261,13 +230,14 @@ def test():
     app.data.input_loader.filename = 'data/black-scholes-input.dat'
     app.data.target_loader.filename = 'data/black-scholes-target.dat'
     app.data.load()
-    app.mode = 'recall'
+    app.mode = 'train'
     app.arrange_plots()
     # Run
     app.configure_traits()
+    return app
 
 if __name__=="__main__":
     import multiprocessing as mp
     mp.freeze_support()
     #main()
-    test()
+    app = test()
