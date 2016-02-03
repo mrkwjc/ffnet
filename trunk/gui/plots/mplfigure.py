@@ -9,6 +9,7 @@ import matplotlib.animation as animation
 from pyface.api import GUI
 import collections
 import sys
+import time
 import pyface.api as pyface
 
 if ETSConfig.toolkit == 'wx':
@@ -151,6 +152,9 @@ class MPLPlotter(HasTraits):
 
     def plot(self, data = None):
         pass
+    
+    def plot2(self):
+        self.plot(self.plot_data())
 
     traits_view = View(resizable = True)
 
@@ -175,25 +179,27 @@ class MPLAnimator(MPLPlotter):
         if self.running:
             return  # Do not start again!
         self.running = True
-        def tocall():
-            self.animator = animation.FuncAnimation(self.figure.figure,
-                                                    self.plot,
-                                                    frames = self.animation_data,
-                                                    init_func = self.plot_init,
-                                                    interval = self.interval,
-                                                    blit = self.blit,
-                                                    repeat = self.repeat)
+        self.animator = animation.FuncAnimation(self.figure.figure,
+                                                self.plot,
+                                                frames = self.animation_data,
+                                                init_func = self.plot_init,
+                                                interval = self.interval,
+                                                blit = self.blit,
+                                                repeat = self.repeat)
+        try:
             self.animator._start()
-        GUI.invoke_later(tocall)
+        except:
+            pass
 
     def stop(self):
         if not self.running:
             return  # Do not stop when we are not running
         self.running = False
-        def tocall():
+        try:
             self.animator._stop()
-            self.figure.figure.canvas.toolbar.update()
-        GUI.invoke_later(tocall)
+        except:
+            pass
+        self.figure.figure.canvas.toolbar.update()
 
     def _startstop_fired(self):
         if not self.running:
@@ -238,16 +244,21 @@ class MPLPlots(HasTraits):
     selected_name = Enum(values='names')
     selected = Instance(MPLPlotter)
     plots = List([], value=MPLPlotter)
+    running = Bool(False)
 
-    #def __init__(self, **traits):
-        #super(MPLPlots, self).__init__(**traits)
-        #self.__plot_traits = traits
+    def __init__(self, **traits):
+        super(MPLPlots, self).__init__(**traits)
+         # Hack for displaying initial state with configure_traits
+        self.classes = [MPLPlotter]
+        self.classes = []
 
     def _get_names(self):
         names = []
         for i, c in enumerate(self.classes):
-            if hasattr(c, 'name'):
+            if hasattr(c, 'name'):  # in case name is just python type
                 name = c.name
+            elif 'name' in c.class_traits():
+                name = c.class_traits()['name'].default  # in case 'name' is a trait
             else:
                 name = 'Plot %i' %i
             names.append(name)
@@ -264,17 +275,36 @@ class MPLPlots(HasTraits):
     def load_plot(self, name):
         idx = self.names.index(name)
         cls = self.classes[idx]
-        if any(isinstance(p, cls) for p in self.plots):  # plot is just opened
-            for p in self.plots:
-                if isinstance(p, cls):
-                    self.selected = p
-                    break
+        for plot in self.plots:
+            if plot.__class__ == cls:
+                break
         else:
-            p = cls()
-            self.plots.append(p)
-            self.selected = p
+            plot = cls()
+            self.plots.append(plot)
+        # Show new plot
+        if self.running:
+            self.stop()
+        self.selected = plot
         self.selected.replot()
+        if self.running:
+            self.start()
 
+    def start(self):
+        if self.selected:
+            t0 = time.time()
+            self.selected.plot2()
+            t1 = time.time()
+            if isinstance(self.selected, MPLAnimator):
+                self.selected.interval = int(max(100, 2*1000*(t1-t0)))
+                self.selected.start()
+            self.running = True
+
+    def stop(self):
+        if self.selected:
+            if isinstance(self.selected, MPLAnimator):
+                self.selected.stop()
+            self.selected.plot2()
+            self.running = False
 
     traits_view = View(UItem('selected_name'),
                        UItem('object.selected.figure',
@@ -285,5 +315,4 @@ class MPLPlots(HasTraits):
 
 if __name__=="__main__":
     p = MPLPlots()
-    p.classes = [MPLPlotter, MPLAnimator]
     p.configure_traits(view='traits_view')

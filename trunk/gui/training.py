@@ -7,7 +7,7 @@ import time
 import numpy as np
 from ffnet import ffnet, ffnetmodule
 import logging
-import thread
+from threading import Thread
 
 
 def parse_tnc_output(output):
@@ -33,8 +33,10 @@ class Trainer(HasTraits):
         super(Trainer, self).__init__(**traits)
         self.app = app
 
-    def _running_changed(self):
-        self.app.shared.running.value = int(self.running)
+    def _running_changed(self, old, new):
+        self.app.shared.running.value = int(new)
+        #if new and not old: # we are starting training
+        #if old and not new:  # we finished training
 
     def _get_iteration(self):
         return self.app.shared.iteration.value
@@ -102,8 +104,7 @@ class Trainer(HasTraits):
         self.running = False
         t1 = time.time()
         #output = r.stop()
-        self.app.selected.stop()  # This is inside training thread
-        self.app.selected.replot()
+        self.app.plots.stop()  # This is inside training thread
         ##
         # Log things
         #ogger.info(output.strip())
@@ -119,8 +120,9 @@ class Trainer(HasTraits):
         logger.info('Execution time: %3.3f seconds.' %(t1-t0))
 
     def train(self):
-        self.app.selected.start()  # for Qt this must be outside thread
-        thread.start_new_thread(self._train, ())
+        self.app.plots.start()  # for Qt this must be outside thread
+        self.training_thread = Thread(target = self._train)
+        self.training_thread.start()
 
     def setup(self):
         pass

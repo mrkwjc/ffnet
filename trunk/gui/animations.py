@@ -170,7 +170,7 @@ class RegressionAnimation(MPLAnimator):
 
 
 class TOAnimation(RegressionAnimation):
-    name = 'Outputs'
+    name = Str('Outputs')
 
     def plot_init(self):
         self.figure.axes.clear()
@@ -496,7 +496,7 @@ class RegressionPlot(MPLPlotter):
 
 
 class TOPlot(RegressionPlot):
-    name = 'Outputs'
+    name = Str('Outputs')
 
     def plot_init(self):
         self.figure.axes.clear()
