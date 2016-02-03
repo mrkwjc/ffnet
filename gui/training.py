@@ -8,6 +8,7 @@ import numpy as np
 from ffnet import ffnet, ffnetmodule
 import logging
 from threading import Thread
+import sys
 
 
 def parse_tnc_output(output):
@@ -99,7 +100,8 @@ class Trainer(HasTraits):
         process = self.training_process()
         process.start()
         process.join()
-        process.terminate()
+        if isinstance(process, Process):
+            process.terminate()
         self.assign_best_weights()
         running_status = self.running  # Keep for logging
         self.running = False
@@ -168,7 +170,6 @@ class TncTrainer(Trainer):
 
     def __init__(self, **traits):
         super(TncTrainer, self).__init__(**traits)
-        import sys
         if sys.platform.startswith('win'):  # Set default nproc to 1 on windows
             self.nproc = 1
 
@@ -190,7 +191,8 @@ class TncTrainer(Trainer):
 
     def training_process(self):
         # self.app.trait('plist').transient = True  #Why this not works on 'selected'?
-        #from threading import Thread as Process
+        if sys.platform.startswith('win') and self.nproc == 1:
+            from threading import Thread as Process
         process = Process(target=self.app.network.net.train_tnc,
                           args=(self.app.data.input_t, self.app.data.target_t),
                           kwargs={'nproc':self.nproc,
@@ -216,6 +218,8 @@ class BfgsTrainer(Trainer):
             raise AssertionError
 
     def training_process(self):
+        if sys.platform.startswith('win'):
+            from threading import Thread as Process
         process = Process(target=self.app.network.net.train_bfgs,
                           args=(self.app.data.input_t, self.app.data.target_t),
                           kwargs={'maxfun': self.maxfun,
@@ -239,6 +243,8 @@ class CgTrainer(Trainer):
             raise AssertionError
 
     def training_process(self):
+        if sys.platform.startswith('win'):
+            from threading import Thread as Process
         process = Process(target=self.app.network.net.train_cg,
                           args=(self.app.data.input_t, self.app.data.target_t),
                           kwargs={'maxiter': self.maxfun,

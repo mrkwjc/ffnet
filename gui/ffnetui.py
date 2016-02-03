@@ -31,7 +31,7 @@ class SettingsHandler(Handler):
             if obj._pmode != obj.mode or len(obj.plots.plots) == 0:
                 obj.arrange_plots()
             else:
-                obj.plots.replot()
+                obj.plots.selected.replot()
         return True
         #return Handler.close(self, info, is_ok)
 
@@ -45,7 +45,7 @@ class FFnetApp(HasTraits):
     plots = Instance(MPLPlots, transient=True)
     shell = PythonValue(Dict)
     mode = Enum('train', 'test', 'recall')
-    algorithm = Enum('tnc', 'bfgs', 'cg')
+    algorithm = Enum('tnc') #, 'bfgs', 'cg')
     running = DelegatesTo('trainer')
     net = DelegatesTo('network')
     data_status = DelegatesTo('data',  prefix='status')
