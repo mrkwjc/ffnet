@@ -23,6 +23,7 @@ class Trainer(HasTraits):
     running = Bool(False)
     iteration = Property(Int(0), transient=True)  # transient for non-pickling
     step = 1
+    training_thread = Instance(Thread, transient=True)
     best_weights = Enum('last iteration', 'minimum training error', 'minimum validation error')
     maxfun = Range(low=0)
 

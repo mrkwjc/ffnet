@@ -42,7 +42,7 @@ class FFnetApp(HasTraits):
     trainer = Instance(Trainer)
     shared = Instance(Shared)
     logs = Instance(Logger)
-    plots = Instance(MPLPlots)
+    plots = Instance(MPLPlots, transient=True)
     shell = PythonValue(Dict)
     mode = Enum('train', 'test', 'recall')
     algorithm = Enum('tnc', 'bfgs', 'cg')

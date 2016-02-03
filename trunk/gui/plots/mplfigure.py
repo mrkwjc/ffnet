@@ -240,8 +240,8 @@ class MPLFigureWithPlotter(MPLFigure):
 
 class MPLPlots(HasTraits):
     classes = List([])
-    names = Property(ListStr, depends_on='classes')
-    selected_name = Enum(values='names')
+    names = Property(ListStr, depends_on='classes', transient=True)
+    selected_name = Enum(values='names', transient=True)
     selected = Instance(MPLPlotter)
     plots = List([], value=MPLPlotter)
     running = Bool(False)
