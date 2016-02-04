@@ -255,7 +255,7 @@ class ITOAnimation(TOAnimation):
             xl = min(inp) - (max(inp)-min(inp))*0.1
             xr = max(inp) + (max(inp)-min(inp))*0.1
             ax.set_xlim(xl, xr)
-        if self.app.data.status > 1:
+        # if self.app.data.status > 1:
             #trg = self.app.data.target[:, self.o-1]
             yl = min(trg) - (max(trg)-min(trg))*0.1
             yr = max(trg) + (max(trg)-min(trg))*0.1
@@ -615,7 +615,7 @@ class IOPlot(MPLPlotter):
         return self.oline
 
     def plot_data(self):
-        if self.app.network.net is None or self.app.data.status != 2:
+        if self.app.network.net is None or self.app.data.status == 0:
             return
         inp = self.app.data.input[:, self.i-1]
         out = self.app.network.net(self.app.data.input)[:, self.o-1]
@@ -637,7 +637,7 @@ class IOPlot(MPLPlotter):
             xl = min(inp) - (max(inp)-min(inp))*0.1
             xr = max(inp) + (max(inp)-min(inp))*0.1
             ax.set_xlim(xl, xr)
-        if self.app.data.status > 1:
+        #if self.app.data.status > 1:
             #trg = self.app.data.target[:, self.o-1]
             yl = min(trg) - (max(trg)-min(trg))*0.1
             yr = max(trg) + (max(trg)-min(trg))*0.1
