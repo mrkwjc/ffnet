@@ -125,6 +125,10 @@ class FFnetApp(HasTraits):
             self.net.randomweights()
             self.logs.logger.info('Weights has been randomized!')
         self.clear()
+    
+    def about(self):
+        from about import about
+        about.open()
 
     def clear(self):
         self.shared.populate() 
@@ -199,7 +203,7 @@ class FFnetApp(HasTraits):
                                     )
                               ),
                        handler = FFnetAppHandler(),
-                       title = 'Feed-forward neural network trainer',
+                       title = 'Feed-forward neural network',
                        width = 0.6,
                        height = 0.8,
                        resizable = True,
