@@ -92,6 +92,7 @@ class Trainer(HasTraits):
         #r.start()
         t0 = time.time()
         ## RUN 
+        self.app.data.normalize = self.app.network.net.renormalize
         self.app.data._normalize_data()  # Be sure network and data are normalized
         self.running = True
         self.setup()
