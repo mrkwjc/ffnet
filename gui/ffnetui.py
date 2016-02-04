@@ -15,6 +15,7 @@ from logger import Logger
 from animations import *
 from plots.mplfigure import MPLPlots
 from actions import toolbar
+from messages import display_confirm
 
 
 class View(View):
@@ -34,6 +35,21 @@ class SettingsHandler(Handler):
                 obj.plots.selected.replot()
         return True
         #return Handler.close(self, info, is_ok)
+
+
+class FFnetAppHandler(Handler):
+    def close(self, info, is_ok):
+        if is_ok:
+            obj = info.object
+            ok = display_confirm("Exiting. Are you sure?")
+            if not ok:
+                return False
+            if obj.trainer.running:
+                obj.train_stop()
+                obj.trainer.training_thread.join() # Wait for finishing
+        return True
+        #return Handler.close(self, info, is_ok)
+
 
 class FFnetApp(HasTraits):
     network = Instance(Network)
@@ -182,6 +198,7 @@ class FFnetApp(HasTraits):
                                            ),
                                     )
                               ),
+                       handler = FFnetAppHandler(),
                        title = 'Feed-forward neural network trainer',
                        width = 0.6,
                        height = 0.8,

@@ -457,7 +457,7 @@ class RegressionPlot(MPLPlotter):
     def plot_init(self):
         self.figure.axes.clear()
         ax = self.figure.axes
-        self.tline, = ax.plot([], [], 'yp', label='Testing data')
+        self.tline, = ax.plot([], [], 'bp', label='Testing data')
         self.rline, = ax.plot([], [], 'k', lw=1.2, label='Regression line')
         ax.grid(True)
         ax.set_xlabel('Targets')
@@ -501,7 +501,7 @@ class TOPlot(RegressionPlot):
     def plot_init(self):
         self.figure.axes.clear()
         ax = self.figure.axes
-        self.tline, = ax.plot([], [], 'yp', label='Testing data')
+        self.tline, = ax.plot([], [], 'bp', label='Testing data')
         self.oline, = ax.plot([], [], 'ks-', ms=6, mfc='w', mew=1.2, lw=1.2, alpha=0.65, label='Output')
         ax.grid(True)
         ax.set_xlabel('Pattern')
@@ -542,7 +542,7 @@ class ITOPlot(TOPlot):
     def plot_init(self):
         self.figure.axes.clear()
         ax = self.figure.axes
-        self.tline, = ax.plot([], [], 'yp', label='Testing data')
+        self.tline, = ax.plot([], [], 'bp', label='Testing data')
         self.oline, = ax.plot([], [], 'ks-', ms=6, mfc='w', mew=1.2, lw=1.2, alpha=0.65, label='Output')
         ax.grid(True)
         ax.set_xlabel('Input $i_{%i}$' %self.i)
