@@ -29,7 +29,7 @@ class SettingsHandler(Handler):
             if not status:
                 return False
             if obj._pmode != obj.mode or len(obj.plots.plots) == 0:
-                obj.arrange_plots()
+                obj._arrange_plots()
             else:
                 obj.plots.selected.replot()
         return True
@@ -38,6 +38,9 @@ class SettingsHandler(Handler):
 class FFnetApp(HasTraits):
     network = Instance(Network)
     data = Instance(TrainingData)
+    training_data = Instance(TrainingData)
+    testing_data = Instance(TrainingData)
+    recall_data = Instance(TrainingData)
     dumper = Instance(Dumper)
     trainer = Instance(Trainer)
     shared = Instance(Shared)
@@ -54,7 +57,10 @@ class FFnetApp(HasTraits):
     def __init__(self, **traits):
         super(FFnetApp, self).__init__(**traits)
         self.network = Network(app = self)
-        self.data = TrainingData(app = self)
+        self.training_data = TrainingData(app = self)
+        self.testing_data = TrainingData(app = self)
+        self.recall_data = TrainingData(app = self)
+        self.data = self.training_data  # by default
         self.dumper = Dumper(app=self)
         self.trainer = TncTrainer(app = self) # default trainer
         self.shared = Shared()
@@ -69,27 +75,13 @@ class FFnetApp(HasTraits):
         if net is not None:
             self.mode = 'train'
             self.data.normalize = True
-            data_status = False
-            if self.data.status == 2:
-                data_status = self.data.load()  # here we test data
-            if not data_status:
-                self.data = TrainingData(app=self) 
-                self.settings()
-            else:
-                self.logs.logger.info('Using previously loaded data.')
+            self._new_net_setup()
 
     def load(self):
         net = self.network.load()
         if net is not None:
             self.mode = 'recall'
-            data_status = False
-            if self.data.status > 0:
-                data_status = self.data.load()  # here we test data
-            if not data_status:
-                self.data = TrainingData(app=self) 
-                self.settings()
-            else:
-                self.logs.logger.info('Using previously loaded data.')
+            self._new_net_setup()
 
     def save_as(self):
         self.network.save_as()
@@ -122,7 +114,7 @@ class FFnetApp(HasTraits):
         self.shared.populate() 
         self.plots.selected.replot()
 
-    def arrange_plots(self):
+    def _arrange_plots(self):
         if self.mode == 'train':
             plots = [ErrorAnimation,
                      RegressionAnimation,
@@ -141,6 +133,27 @@ class FFnetApp(HasTraits):
                      DIOAnimation,
                      GraphAnimation]
         self.plots.classes = plots
+        self.plots.selected.replot()
+
+    def _new_net_setup(self):
+        self.shared.populate()  # Clears all data from previous training
+        data_status = False
+        if self.data.status == 2:
+            data_status = self.data.load()  # here we test data
+        if not data_status:
+            self.data.status = 0
+            self.settings()
+        else:
+            self._arrange_plots()
+            self.logs.logger.info('Using previously loaded data.')
+
+    def _mode_changed(self):
+        if self.mode  == 'train':
+            self.data = self.training_data
+        elif self.mode == 'test':
+            self.data = self.testing_data
+        else:
+            self.data = self.recall_data
 
     def _algorithm_changed(self, new):
         if new == 'tnc':
@@ -153,7 +166,10 @@ class FFnetApp(HasTraits):
     def _selected_changed(self, old, new):
         new.app = self  # TODO: Plots should be initialized with 'app=self' ?
 
-    traits_view = View(VSplit(UItem('plots', style = 'custom', height=0.75, visible_when=('len(object.plots.plots) > 0')),
+    traits_view = View(VSplit(UItem('plots', style = 'custom', height=0.75,
+                                    visible_when='len(object.plots.plots) > 0 and '
+                                                 '((mode in ["train", "test"] and data_status == 2) or '
+                                                 '(mode in ["recall"] and data_status == 1))'),
                               Tabbed(UItem('logs',
                                            style='custom',
                                            dock = 'tab',
@@ -217,6 +233,7 @@ class FFnetApp(HasTraits):
 def main():
     app = FFnetApp()
     app.configure_traits()
+    return app
 
 def test():
     app = FFnetApp()
@@ -239,5 +256,5 @@ def test():
 if __name__=="__main__":
     import multiprocessing as mp
     mp.freeze_support()
-    #main()
-    app = test()
+    app = main()
+    #app = test()

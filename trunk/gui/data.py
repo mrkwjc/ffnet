@@ -93,7 +93,8 @@ class TrainingData(HasTraits):
                     return True
             self._set_status()
             self._normalize_data()
-            self._set_validation_mask()
+            if self.app.mode == 'train':
+                self._set_validation_mask()
             return True
         else:
             inp = self.input_loader.load(errmsg='Error occured during reading input file!')
@@ -164,14 +165,14 @@ class TrainingData(HasTraits):
             self.input_n = []
             self.target_n = []
             self.status = 1
-            self.status_info = '%i input patterns has been loaded(%i inputs).'\
+            self.status_info = '%i input patterns has been loaded (%i inputs).'\
                                 %(ni, self.input.shape[1])
         else:
             self.vmask = []
             self.input_n = []
             self.target_n = []
             self.status = 0
-            self.status_info = 'No data loaded.'
+            self.status_info = 'No usefull data loaded.'
         self.app.logs.logger.info(self.status_info)
 
     @on_trait_change('validation_patterns, validation_type')

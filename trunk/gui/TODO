@@ -1,11 +1,16 @@
-###########
-5. Start and stop animations outside training thread.
-7. Shared is only needed for training
-8. Needed separate data sets for training and testing and recalling
-9. On Windows use threading instead of processing unless Pool will be created once at start!
-###########
-
 On Windows:
+* all working processes should be created once at start, not at every training run, starting training is slow, training is memory hungry
 * redirecting of output do not work
-* Starting training is slow, training is memory hungry, especially for nproc>1, to much pickling i think.
-* Autoscroll not working also in wx
+* autoscroll in logger not working on wx and qt
+
+Major issues
+* Correct plots in recall mode where data.status = 1
+* Stop training before exiting for clean exit, make a Handler for ffnetui
+* Make export working
+* Make icons for output and export
+* Make about dialog
+* Make copyright notices in files and in statusbar
+
+Minor issues
+* start and stop animations outside training thread. 
+* Shared is only needed for training
