@@ -7,77 +7,72 @@ new_network_action = Action(
     name   = 'New...', 
     action = 'new',
     image  = ImageResource('document-new'),
-    enabled_when = 'not object.trainer.running'
+    enabled_when = 'not object.trainer.running',
+    tooltip = 'Create new network'
     )
 
 load_network_action = Action(
     name   = 'Load...', 
     action = 'load',
     image  = ImageResource('document-open'),
-    enabled_when = 'not running'
+    enabled_when = 'not running',
+    tooltip = 'Load previously saved network'
     )
 
 save_as_network_action = Action(
     name   = 'Save...', 
     action = 'save_as',
     image  = ImageResource('document-save-as'),
-    enabled_when = 'net and not running')
+    enabled_when = 'net and not running',
+    tooltip = 'Save network for later load')
 
 export_network_action = Action(
     name   = 'Export', 
     action = 'export',
-    image  = ImageResource('text-x-generic-template'),
-    enabled_when = 'net and not running')
+    image  = ImageResource('text-x-fortran'),
+    enabled_when = 'net and not running',
+    tooltip = 'Export network to Fortran source file')
 
 dump_action = Action(
     name   = 'Dump', 
     action = 'dump',
-    image  = ImageResource('text-x-generic-template'),
-    enabled_when = 'net and data.status>0 and not running')
-
-#close_network_action = Action(
-    #name   = 'Close', 
-    #action = 'close',
-    #image  = ImageResource('process-stop'),
-    #enabled_when = 'net and not running')
-
-#load_data_action = Action(
-    #name   = 'Data', 
-    #action = 'load_data',
-    #image  = ImageResource('text-x-generic'),
-    #enabled_when = 'net and not running')
+    image  = ImageResource('text-x-generic'),
+    enabled_when = 'net and data.status>0 and not running',
+    tooltip = 'Dump output (or input, or target) data to text file')
 
 settings_action = Action(
     name   = 'Setup', 
     action = 'settings',
     image  = ImageResource('preferences-system'),
-    enabled_when = 'net and not running')
-    #enabled_when = 'net and  object.trg.shape[1] == len(object.net.outno) and ' + \
-                   #'len(object.inp) == len(object.trg) and not running')
+    enabled_when = 'net and not running',
+    tooltip = 'Settings')
 
 train_start_action = Action(
     name   = 'Train!', 
     action = 'train_start',
     image  = ImageResource('go-next'),
-    enabled_when = 'net and mode == "train" and data_status == 2 and not running')
+    enabled_when = 'net and mode == "train" and data_status == 2 and not running',
+    tooltip = 'Start training')
 
 train_stop_action = Action(
     name   = 'Stop!', 
     action = 'train_stop',
     image  = ImageResource('media-record'),
-    enabled_when = 'running')
+    enabled_when = 'running',
+    tooltip = 'Stop training')
 
 train_reset_action = Action(
     name   = 'Reset', 
     action = 'reset',
     image  = ImageResource('edit-clear'),
-    enabled_when = 'net and mode == "train" and data_status == 2 and not running')
+    enabled_when = 'net and mode == "train" and data_status == 2 and not running',
+    tooltip = 'Reset weights and training results')
 
-#plots_select_action = Action(
-    #name   = 'Plots',
-    #action = 'object.plots.plots_select',
-    #image  = ImageResource('matplotlib'),
-    #enabled_when = 'True')
+about_action = Action(
+    name   = 'About', 
+    action = 'about',
+    image  = ImageResource('help-browser'),
+    tooltip = 'Show about dialog')
 
 
 # Groups of actions
@@ -87,29 +82,29 @@ network_actions = ActionGroup(
     save_as_network_action,
     export_network_action,
     dump_action
-    #close_network_action,
     )
-
-#data_actions = ActionGroup(
-    #load_data_action)
 
 train_actions = ActionGroup(
     settings_action,
     train_start_action,
     train_stop_action,
     train_reset_action,
-    #plots_select_action
+    )
+
+help_actions = ActionGroup(
+    about_action
     )
 
 # File menu
 file_menu = Menu(network_actions,
-                 #data_actions,
                  name = 'File')
 train_menu = Menu(train_actions,
                   name = 'Train')
+help_menu = Menu(help_actions,
+                 name = 'Help')
 
-menubar = MenuBar(file_menu, train_menu)
+menubar = MenuBar(file_menu, train_menu, help_menu)
 toolbar = ToolBar(network_actions,
-                  # data_actions,
                   train_actions,
+                  help_actions,
                   image_size=(22, 22))
