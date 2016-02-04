@@ -103,7 +103,7 @@ class FFnetApp(HasTraits):
         self.network.save_as()
 
     def export(self):
-        raise NotImplementedError
+        self.network.export()
 
     def dump(self):
         self.dumper.configure_traits(kind='modal')

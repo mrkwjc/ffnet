@@ -4,9 +4,6 @@ On Windows:
 * autoscroll in logger not working on wx and qt
 
 Major issues
-* Correct plots in recall mode where data.status = 1
-* Stop training before exiting for clean exit, make a Handler for ffnetui
-* Make export working
 * Make icons for output and export
 * Make about dialog
 * Make copyright notices in files and in statusbar

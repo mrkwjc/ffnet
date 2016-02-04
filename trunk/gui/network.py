@@ -124,6 +124,25 @@ class Network(HasTraits):
             self.filename = path
             self.app.logs.logger.info('Network saved as: %s' %self.filename)
 
+    def export(self):
+        if self.net is None:
+           display_error("Network neither created nor loaded!")
+           return
+        wildcard = 'Fortran file (*.f)|*.f|Any file (*.*)|*.*'
+        outfile = os.path.splitext(self.filename)[0] + '.f'
+        dialog = pyface.FileDialog(parent=None,
+                                   title='Export as',
+                                   action='save as',
+                                   wildcard=wildcard,
+                                   default_path=outfile
+                                   )
+        if dialog.open() == pyface.OK:  # path is given
+            path = dialog.path
+            if not os.path.basename(path).endswith('.f'):
+                path += '.f'
+            exportnet(self.net, path)
+            self.app.logs.logger.info('Network exported as: %s' %path)
+
     def close(self):
         if self.net:
             # self.app.clear()
