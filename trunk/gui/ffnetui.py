@@ -26,6 +26,7 @@ class SettingsHandler(Handler):
     def close(self, info, is_ok):
         if is_ok:
             obj = info.object
+            obj.logs.logger.info('Current mode is: "%s"' %obj.mode)
             status = obj.data.load()
             if not status:
                 return False
@@ -48,7 +49,6 @@ class FFnetAppHandler(Handler):
                 obj.train_stop()
                 obj.trainer.training_thread.join() # Wait for finishing
         return True
-        #return Handler.close(self, info, is_ok)
 
 
 class FFnetApp(HasTraits):
@@ -125,7 +125,7 @@ class FFnetApp(HasTraits):
             self.net.randomweights()
             self.logs.logger.info('Weights has been randomized!')
         self.clear()
-    
+
     def about(self):
         from about import about
         about.open()

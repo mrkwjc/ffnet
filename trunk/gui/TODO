@@ -4,7 +4,10 @@ On Windows:
 * autoscroll in logger not working on wx and qt
 
 Major issues
-* Make copyright notices in files and in statusbar
+* Wrong layred graph for imlgraph
+* Make copyright and license notices in files and about dialog
+* Make plots for outputs in recall and derivatives
+
 
 Minor issues
 * start and stop animations outside training thread. 
