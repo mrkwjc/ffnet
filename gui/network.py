@@ -55,7 +55,7 @@ class NetworkCreator(HasTraits):
             fig = GraphAnimation(app = app)
             fig.configure_traits(kind='livemodal', view='figure_view')
 
-    traits_view = View(Item('architecture', has_focus=True),
+    traits_view = View(Item('architecture', has_focus=True, tooltip='Layered architecture string, e.g: 3-10-5-1'),
                        Item('connectivity_type'),
                        Item('biases'),
                        UItem('preview_button', label = 'Preview'),

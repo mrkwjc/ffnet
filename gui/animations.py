@@ -142,8 +142,10 @@ class RegressionAnimation(MPLAnimator):
         self.regress.assign_values(rgr[o])  ###
         slope = rgr[o][0]
         intercept = rgr[o][1]
-        offset = (trg.max() - trg.min())*0.05
-        x = np.linspace(trg.min()-offset, trg.max()+offset)
+        tmin = min(tt) if len(tt) > 0 else min(tv)
+        tmax = max(tt) if len(tt) > 0 else max(tv)
+        offset = (tmax - tmin)*0.05
+        x = np.linspace(tmin-offset, tmax+offset)
         y = slope * x + intercept
         return tt, ot, tv, ov, x, y
 

@@ -111,7 +111,7 @@ class Trainer(HasTraits):
         self.app.plots.stop()  # This is inside training thread
         ##
         # Log things
-        #ogger.info(output.strip())
+        #logger.info(output.strip())
         if not running_status:
             logger.info('Training stopped by user.')
         else:

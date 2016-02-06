@@ -92,9 +92,9 @@ class TrainingData(HasTraits):
                 if np.allclose(inp - inp0, 0) and np.allclose(trg-trg0, 0):  # nothing new is loaded
                     return True
             self._set_status()
-            self._normalize_data()
             if self.app.mode == 'train':
                 self._set_validation_mask()
+                self._normalize_data()
             return True
         else:
             inp = self.input_loader.load(errmsg='Error occured during reading input file!')
@@ -103,6 +103,9 @@ class TrainingData(HasTraits):
             test1 = self.test_input()
             if not test1:
                 return False
+            if inp.shape == inp0.shape:
+                if np.allclose(inp - inp0, 0):  # nothing new is loaded
+                    return True
             self._set_status()
             return True
         return False
@@ -144,10 +147,11 @@ class TrainingData(HasTraits):
     #@on_trait_change('normalize')
     def _normalize_data(self):
         net = self.app.network.net
-        if net and self.status == 2:
+        if net and self.normalize:  #and self.status == 2:
             net.renormalize = self.normalize
             self.input_n, self.target_n = net._setnorm(self.input, self.target)
             self.normalize = False
+            self.app.logs.logger.info('Normalization information has been calculated with current data.')
 
     #@on_trait_change('input, target')
     def _set_status(self):

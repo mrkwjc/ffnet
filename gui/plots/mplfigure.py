@@ -136,6 +136,10 @@ class MPLPlotter(HasTraits):
         self.plot(self.plot_data())
         self.figure.draw()
 
+    def replot2(self):
+        self.plot(self.plot_data())
+        self.figure.draw()
+
     def relim(self):
         ax = self.figure.axes
         ax.relim()
@@ -152,9 +156,6 @@ class MPLPlotter(HasTraits):
 
     def plot(self, data = None):
         pass
-    
-    def plot2(self):
-        self.plot(self.plot_data())
 
     traits_view = View(resizable = True)
 
@@ -245,6 +246,7 @@ class MPLPlots(HasTraits):
     selected = Instance(MPLPlotter)
     plots = List([], value=MPLPlotter)
     running = Bool(False)
+    interval = Int(250)
 
     def __init__(self, **traits):
         super(MPLPlots, self).__init__(**traits)
@@ -291,13 +293,19 @@ class MPLPlots(HasTraits):
             self.selected = plot
             self.selected.replot()
 
+    def replot(self):
+        t0 = time.time()
+        self.selected.replot()
+        t1 = time.time()
+        self.interval = int(max(250, 2*1000*(t1-t0)))
+
     def start(self):
         if self.selected:
-            t0 = time.time()
-            self.selected.plot2()
-            t1 = time.time()
+            #t0 = time.time()
+            #self.selected.replot2()
+            #t1 = time.time()
             if isinstance(self.selected, MPLAnimator):
-                self.selected.interval = int(max(250, 10*1000*(t1-t0)))
+                self.selected.interval = self.interval
                 self.selected.start()
             self.running = True
 
@@ -305,7 +313,7 @@ class MPLPlots(HasTraits):
         if self.selected:
             if isinstance(self.selected, MPLAnimator):
                 self.selected.stop()
-            self.selected.plot2()
+            self.selected.replot2()
             self.running = False
 
     traits_view = View(UItem('selected_name'),
