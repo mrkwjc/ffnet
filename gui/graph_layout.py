@@ -1,8 +1,18 @@
 import networkx as nx
 import numpy as np
 
+def topological_sort2(G):
+    ts = nx.topological_sort(G)
+    # move all sinks to the end
+    # this is rude and really not general hack for simplest imlgraphs
+    for k, v in G.out_degree().iteritems():
+        if v == 0:
+            idx = ts.index(k)
+            ts += [ts.pop(idx)]
+    return ts
+
 def layered_layout(G):
-    topological_sort = nx.topological_sort(G)
+    topological_sort = topological_sort2(G)
     n = len(topological_sort)
     pos = np.zeros((n, 2))
     posdict = {}
@@ -35,8 +45,9 @@ def layered_layout(G):
     return posdict
 
 if __name__ == "__main__":
-    #from ffnet import mlgraph, tmlgraph
-    #conec = tmlgraph((1,2,1,1,2), biases = False)
+    #from ffnet import mlgraph, tmlgraph, imlgraph
+    ##conec = tmlgraph((1,2,1,1,2), biases = False)
+    #conec = imlgraph((2, [(5,2), (5,3)], 2), biases = False)
     #G = nx.DiGraph()
     #G.add_edges_from(conec)
     def randdag():
