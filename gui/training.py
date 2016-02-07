@@ -25,7 +25,7 @@ class Trainer(HasTraits):
     iteration = Property(Int(0), transient=True)  # transient for non-pickling
     step = 1
     training_thread = Instance(Thread, transient=True)
-    best_weights = Enum('last iteration', 'minimum training error', 'minimum validation error')
+    best_weights = Enum('minimum validation error', 'minimum training error', 'last iteration')
     maxfun = Range(low=0)
 
     def __repr__(self):
@@ -92,8 +92,12 @@ class Trainer(HasTraits):
         #r.start()
         t0 = time.time()
         ## RUN 
+        # Be sure network and data are normalized
         self.app.data.normalize = self.app.network.net.renormalize
-        self.app.data._normalize_data()  # Be sure network and data are normalized
+        self.app.data._normalize_data()
+        # Always start with last weights
+        if self.iteration > 0:
+            self.app.network.net.weights[:] = self.app.shared.wlist[-1]
         self.running = True
         self.setup()
         process = self.training_process()

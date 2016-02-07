@@ -5,10 +5,8 @@ On Windows:
 
 Major issues
 * Make copyright and license notices in files and about dialog
-* Make plots for outputs in recall and derivatives
 
-
-Minor issues
+For next release
 * Better layered graph for imlgraph
 * start and stop animations outside training thread. 
 * Shared is only needed for training
