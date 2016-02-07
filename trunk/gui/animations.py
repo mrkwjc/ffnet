@@ -172,7 +172,7 @@ class RegressionAnimation(MPLAnimator):
 
 
 class TOAnimation(RegressionAnimation):
-    name = Str('Outputs')
+    name = Str('Output')
 
     def plot_init(self):
         self.figure.axes.clear()
@@ -182,7 +182,7 @@ class TOAnimation(RegressionAnimation):
         self.oline, = ax.plot([], [], 'ks-', ms=6, mfc='w', mew=1.2, lw=1.2, alpha=0.65, label='Output')
         ax.grid(True)
         ax.set_xlabel('Pattern')
-        ax.set_ylabel('Output')
+        ax.set_ylabel('Output $o_{%i}$' %self.o)
         ax.legend(loc='best')
         return self.oline, self.tline, self.vline
 
@@ -263,8 +263,8 @@ class ITOAnimation(TOAnimation):
             yr = max(trg) + (max(trg)-min(trg))*0.1
             ax.set_ylim(yl, yr)
 
-    traits_view = View(Item('i', label='Input'),
-                       Item('o', label='Output'),
+    traits_view = View(Item('o', label='Output'),
+                       Item('i', label='Input'),
                        resizable = True)
 
 
@@ -290,6 +290,33 @@ class DIOAnimation(ITOAnimation):
 
     def plot(self, data=None):
         inp, out = data
+        self.oline.set_data(inp, out)
+        self.setlim(inp, out)
+        return self.oline
+
+
+class DOAnimation(ITOAnimation):
+    name = Str('Output (derivatives)')
+
+    def plot_init(self):
+        self.figure.axes.clear()
+        ax = self.figure.axes
+        self.oline, = ax.plot([], [], 'ks-', ms=6, mfc='w', mew=1.2, lw=1.2, alpha=0.65)
+        ax.grid(True)
+        ax.set_xlabel('Pattern')
+        ax.set_ylabel('Derivative $\partial o_{%i} / \partial i_{%i}$' %(self.o, self.i))
+        return self.oline
+
+    def plot_data(self):
+        if self.app.network.net is None or self.app.data.status < 1:
+            return
+        inp = self.app.data.input[:, self.i-1]
+        out = self.app.network.net.derivative(self.app.data.input)[:, self.o-1, self.i-1]
+        return out
+
+    def plot(self, data=None):
+        out = data
+        inp = np.arange(len(out))
         self.oline.set_data(inp, out)
         self.setlim(inp, out)
         return self.oline
@@ -498,7 +525,7 @@ class RegressionPlot(MPLPlotter):
 
 
 class TOPlot(RegressionPlot):
-    name = Str('Outputs')
+    name = Str('Output')
 
     def plot_init(self):
         self.figure.axes.clear()
@@ -507,7 +534,7 @@ class TOPlot(RegressionPlot):
         self.oline, = ax.plot([], [], 'ks-', ms=6, mfc='w', mew=1.2, lw=1.2, alpha=0.65, label='Output')
         ax.grid(True)
         ax.set_xlabel('Pattern')
-        ax.set_ylabel('Output')
+        ax.set_ylabel('Output $o_{%i}$' %self.o)
         ax.legend(loc='best')
         return self.oline, self.tline
 
@@ -525,6 +552,35 @@ class TOPlot(RegressionPlot):
         self.tline.set_data(inp, trg)
         self.relim()
         return self.oline, self.tline
+
+    traits_view = View(Item('o', label = 'Network output'),
+                       resizable = True)
+
+
+class OPlot(TOPlot):
+    name = Str('Output')
+
+    def plot_init(self):
+        self.figure.axes.clear()
+        ax = self.figure.axes
+        self.oline, = ax.plot([], [], 'ks-', ms=6, mfc='w', mew=1.2, lw=1.2, alpha=0.65, label='Output')
+        ax.grid(True)
+        ax.set_xlabel('Pattern')
+        ax.set_ylabel('Output $o_{%i}$' %self.o)
+        return self.oline
+
+    def plot_data(self):
+        if self.app.network.net is None or self.app.data.status == 0:
+            return
+        out = self.app.network.net(self.app.data.input)[:, self.o-1]
+        return out,
+
+    def plot(self, data=None):
+        out, = data
+        inp = np.arange(len(out))
+        self.oline.set_data(inp, out)
+        self.relim()
+        return self.oline
 
     traits_view = View(Item('o', label = 'Network output'),
                        resizable = True)
@@ -583,8 +639,8 @@ class ITOPlot(TOPlot):
             yr = max(trg) + (max(trg)-min(trg))*0.1
             ax.set_ylim(yl, yr)
 
-    traits_view = View(Item('i', label='Input'),
-                       Item('o', label='Output'),
+    traits_view = View(Item('o', label='Output'),
+                       Item('i', label='Input'),
                        resizable = True)
 
 
@@ -645,8 +701,8 @@ class IOPlot(MPLPlotter):
             yr = max(trg) + (max(trg)-min(trg))*0.1
             ax.set_ylim(yl, yr)
 
-    traits_view = View(Item('i', label='Input'),
-                       Item('o', label='Output'),
+    traits_view = View(Item('o', label='Output'),
+                       Item('i', label='Input'),
                        resizable = True)
 
 

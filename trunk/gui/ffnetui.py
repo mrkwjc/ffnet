@@ -139,17 +139,21 @@ class FFnetApp(HasTraits):
             plots = [ErrorAnimation,
                      RegressionAnimation,
                      TOAnimation,
+                     DOAnimation,
                      ITOAnimation,
                      DIOAnimation,
                      GraphAnimation]
         elif self.mode == 'test':
             plots = [RegressionPlot,
                      TOPlot,
+                     DOAnimation,
                      ITOPlot,
                      DIOAnimation,
                      GraphAnimation]
         else:
-            plots = [IOPlot,
+            plots = [OPlot,
+                     DOAnimation,
+                     IOPlot,
                      DIOAnimation,
                      GraphAnimation]
         self.plots.classes = plots
@@ -269,7 +273,7 @@ def test():
     app.data.target_loader.filename = 'data/black-scholes-target.dat'
     app.data.load()
     app.mode = 'train'
-    app.arrange_plots()
+    app._arrange_plots()
     # Run
     app.configure_traits()
     return app
@@ -277,5 +281,5 @@ def test():
 if __name__=="__main__":
     import multiprocessing as mp
     mp.freeze_support()
-    app = main()
-    #app = test()
+    #app = main()
+    app = test()
