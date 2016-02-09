@@ -207,7 +207,7 @@ class FFnetApp(HasTraits):
                                     )
                               ),
                        handler = FFnetAppHandler(),
-                       title = 'Feed-forward neural network',
+                       title = 'ffnetui - 0.8.1 [EVALUATION ONLY!]',
                        width = 0.6,
                        height = 0.8,
                        resizable = True,

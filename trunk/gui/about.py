@@ -7,8 +7,10 @@ from pyface.api import AboutDialog
 
 about = AboutDialog(parent = None,
                     image = ImageResource('ffnetui256x256'),
-                    additions = ['<b>ffnetui-0.8.1</b>',
-                                 'Feed-forward neural network for python',
+                    additions = ['<b>ffnetui-0.8.1</b>', '[EVALUATION ONLY!]',
+                                 '',
+                                 'This is user interface for ffnet - ',
+                                 'feed-forward neural network for python',
                                  '<a href=ffnet.sourceforge.net>http://ffnet.sourceforge.net</a>',
                                  '',
                                  'Copyright &copy; 2011-2015', '<b>Marek Wojciechowski</b>',
