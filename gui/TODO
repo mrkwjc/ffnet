@@ -6,7 +6,7 @@ On Windows:
 Major issues
 * Make copyright and license notices in files and about dialog
 
-For next release
+For next release:
 * Better layered graph for imlgraph
 * start and stop animations outside training thread. 
 * Shared is only needed for training
