@@ -1,19 +1,17 @@
-This is ffnet-0.8.0 README file.
+=============================================
+ffnet: feed-forward neural network for python
+=============================================
 
-Distributed under the terms of the GNU General Public License (GPL)
-http://www.gnu.org/copyleft/gpl.html
-
-Copyright (C) 2011 by Marek Wojciechowski <mwojc@p.lodz.pl>
-
-
-**ffnet is fast and easy-to-use feed-forward neural network solution for python**
-
-For instalation instructions and documentation go to http://ffnet.sourceforge.net.
+For instalation instructions and documentation go to `http://ffnet.sourceforge.net <http://ffnet.sourceforge.net>`_.
 
 
-Release Notes
-=============
+Release notes
+-------------
+
+0.8.1
++++++
+License switched to LGPL. Only minor updates in code are performed, no API changes are made. Along with this version, new graphical user interface ffnetui-0.8.1 has been released.
 
 0.8.0
------
++++++
 This version supports python 3. Only minor changes in code (and no API changes) are made in comparison to previous release, all scripts should run without problems.
