@@ -1,14 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-########################################################################
-## Copyright (c) 2011-2015 Marek Wojciechowski 
-## <mwojc@p.lodz.pl>
-##
-## Distributed under the terms of GPL-3.0 license
-## https://opensource.org/licenses/GPL-3.0
-########################################################################
-
 from setuptools import setup
 
 metadata = {'setup_requires':   [],
@@ -29,13 +20,13 @@ except ImportError:
         import PyQt4
     else:
         metadata['install_requires'] += ['pyside>=1.2']  # Install also pyside if no backend is found
-        
+
 
 if __name__ == "__main__":
     setup(name              = 'ffnetui',
           version           = '0.8.1',
-          description       = 'User interface for ffnet - feed-forward neural network for python',
-          long_description  = 'User interface for ffnet - feed-forward neural network for python',
+          description       = 'GUI for ffnet - feed-forward neural network for python',
+          long_description  = 'GUI for ffnet - feed-forward neural network for python',
           author            = 'Marek Wojciechowski',
           author_email      = 'mwojc@p.lodz.pl',
           url               = 'ffnet.sourceforge.net',
