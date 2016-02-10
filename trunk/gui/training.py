@@ -10,13 +10,12 @@
 
 from traits.api import *
 from traitsui.api import *
+from ffnet import ffnetmodule
 import multiprocessing as mp
 from process import Process
 from redirfile import Redirector
 import time
 import numpy as np
-from ffnet import ffnet, ffnetmodule
-import logging
 from threading import Thread
 import sys
 
@@ -268,7 +267,7 @@ class CgTrainer(Trainer):
 
 
 if __name__ == "__main__":
-    from ffnet_import import *
+    from ffnet import *
     net = ffnet(mlgraph((2,2,1)))
     inp = [[0,0], [1,1], [1,0], [0,1]]
     trg = [[1], [1], [0], [0]]

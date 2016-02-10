@@ -14,20 +14,15 @@
 from traits.api import *
 from traitsui.api import *
 from traits.etsconfig.api import ETSConfig
-from matplotlib.figure import Figure
-import matplotlib.animation as animation
-from pyface.api import GUI
-import collections
-import sys
-import time
-import pyface.api as pyface
-
 if ETSConfig.toolkit == 'wx':
     from mplwx import MPLFigureEditor
 if ETSConfig.toolkit == 'qt4':
     from mplqt import MPLFigureEditor
-
 from mplconfig import BasicMPLFigureConfig
+from matplotlib.figure import Figure
+import matplotlib.animation as animation
+from pyface.api import GUI
+import time
 
 
 class MPLFigureHandler(Handler):
@@ -53,16 +48,12 @@ class MPLFigure(HasTraits):
             self.figure.canvas.draw()
         except:
             pass
-            #e = sys.exc_info()[1]
-            #pyface.error(None, "Error when drawing figure!\n\n" + e.message)
 
     def _flush_events(self):
         try:
             self.figure.canvas.flush_events()
         except:
             pass
-            #e = sys.exc_info()[1]
-            #pyface.error(None, "Error when drawing figure!\n\n" + e.message)
 
     def setup(self):
         pass
@@ -88,41 +79,6 @@ class MPLFigure(HasTraits):
                 resizable = True,
                 width = 1024,
                 height = 640)
-
-
-#class MPLPlotter(HasTraits):
-    #figure = Instance(MPLFigure)
-    #live = Bool(True)
-
-    #def __init__(self, **traits):
-        #super(MPLPlotter, self).__init__(**traits)
-        #self.figure = MPLFigureWithPlotter()
-        #self.figure.plotter = self
-
-    #@on_trait_change('+live', post_init=True)
-    #def _plot(self, name, value):
-        #if self.live and self.trait(name).live:
-            #self.clear()
-            #self.setup()
-            #self.plot()
-            #self.draw()
-
-    ##def _setup(self):
-        ##self.setup()
-
-    #def clear(self):
-        #self.figure.axes.clear()
-
-    #def draw(self):
-        #self.figure.draw()
-
-    #def setup(self):  # Implement this for initial setup
-        #pass
-
-    #def plot(self):  # Implement this for real plots
-        #pass
-
-    #view = View(resizable = True)
 
 
 class MPLPlotter(HasTraits):
@@ -311,9 +267,6 @@ class MPLPlots(HasTraits):
 
     def start(self):
         if self.selected:
-            #t0 = time.time()
-            #self.selected.replot2()
-            #t1 = time.time()
             if isinstance(self.selected, MPLAnimator):
                 self.selected.interval = self.interval
                 self.selected.start()

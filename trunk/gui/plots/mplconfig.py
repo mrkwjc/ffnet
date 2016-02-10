@@ -13,9 +13,6 @@
 
 from traits.api import *
 from traitsui.api import *
-import numpy as np
-import sys
-import pyface.api as pyface
 
 class MPLFigureConfigHandler(Handler):
     def apply(self, info):
@@ -119,6 +116,7 @@ class BasicMPLFigureConfig(MPLFigureConfig):
 
 if __name__=="__main__":
     from mplfigure import MPLFigure
+    import numpy as np
     p = MPLFigure()
     p.axes.plot(np.random.rand(200), 'bo-', ms=6.)
     p.axes.plot(np.random.rand(200), 'rs-', ms=6.)

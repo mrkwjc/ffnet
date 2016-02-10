@@ -13,15 +13,12 @@
 
 from traits.api import *
 from traitsui.api import *
-from traitsui.ui_editors.array_view_editor import ArrayViewEditor
 import pyface.api as pyface
-import matplotlib
+from ffnet import *
+from messages import display_error
 import numpy as np
-import networkx as nx
 import os
 
-from ffnet_import import *
-from messages import display_error
 
 class Dumper(HasTraits):
     training_data_only = Bool(False)

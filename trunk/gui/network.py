@@ -13,16 +13,13 @@
 
 from traits.api import *
 from traitsui.api import *
-from traitsui.ui_editors.array_view_editor import ArrayViewEditor
 import pyface.api as pyface
-import matplotlib
-import numpy as np
-import networkx as nx
 import os
 
-from ffnet_import import *
+from ffnet import *
 from messages import display_error
 from animations import GraphAnimation
+
 
 class CreateHandler(Handler):
     def close(self, info, is_ok):
@@ -58,7 +55,7 @@ class NetworkCreator(HasTraits):
     def _preview_button_fired(self):
         net = self.create()
         if net is not None:
-            from ffnetui import FFnetApp
+            from ffnetapp import FFnetApp
             app = FFnetApp()  # copy.deepcopy(self.app)  # Use copy
             app.net = net
             fig = GraphAnimation(app = app)

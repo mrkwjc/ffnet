@@ -13,17 +13,13 @@ import matplotlib
 # We want matplotlib to use a wxPython backend
 matplotlib.use('WXAgg')
 from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
-from matplotlib.figure import Figure
 from matplotlib.backends.backend_wxagg import NavigationToolbar2WxAgg
-from matplotlib.backends.backend_wx import _load_bitmap
-
-from traits.api import Any, Instance
 from traitsui.wx.editor import Editor
 from traitsui.wx.basic_editor_factory import BasicEditorFactory
-from traitsui.api import Handler
-
 import os
-basedir = os.path.dirname(__file__)
+
+basedir = os.path.dirname(os.path.realpath(__file__))
+
 
 class NavigationToolbar(NavigationToolbar2WxAgg): 
     ON_CONFIG  = wx.NewId()
@@ -78,8 +74,9 @@ class MPLFigureEditor(BasicEditorFactory):
 
 if __name__ == "__main__":
     # Create a window to demo the editor
-    from traits.api import HasTraits
-    from traitsui.api import View, Item
+    from matplotlib.figure import Figure
+    from traits.api import *
+    from traitsui.api import *
     from numpy import sin, cos, linspace, pi
     from matplotlib.widgets import  RectangleSelector
 
@@ -114,7 +111,7 @@ if __name__ == "__main__":
         def mpl_setup(self):
             def onselect(eclick, erelease):
                 print "eclick: {}, erelease: {}".format(eclick,erelease)
-               
+
             self.rs = RectangleSelector(self.axes, onselect,
                                         drawtype='box',useblit=True)
 

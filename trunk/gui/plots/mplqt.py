@@ -8,38 +8,31 @@
 ## https://opensource.org/licenses/GPL-3.0
 ########################################################################
 
-import matplotlib
-import matplotlib as mpl
-try:
-    import PySide
-    mpl.rcParams['backend.qt4']='PySide'
-except:
-    mpl.rcParams['backend.qt4']='PyQt4'
-mpl.use('Qt4Agg')
-
-from pyface.qt import QtGui, QtCore
 from traits.etsconfig.api import ETSConfig
 ETSConfig.toolkit = 'qt4'
 
-
-# We want matplotlib to use a QT backend
+import matplotlib
+try:
+    import PySide
+    matplotlib.rcParams['backend.qt4']='PySide'
+except:
+    matplotlib.rcParams['backend.qt4']='PyQt4'
+matplotlib.use('Qt4Agg')
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT
 from matplotlib.backends.qt_compat import QtWidgets
-
-from traits.api import Any, Instance
+from pyface.qt import QtGui, QtCore
 from traitsui.qt4.editor import Editor
 from traitsui.qt4.basic_editor_factory import BasicEditorFactory
-from traitsui.api import Handler
-
 import os
-basedir = os.path.dirname(__file__)
+
+basedir = os.path.dirname(os.path.realpath(__file__))
+
 
 class NavigationToolbar(NavigationToolbar2QT):
     def __init__(self, canvas, parent, tools=('Home', 'Pan', 'Zoom', 'Save'), **kwargs):
-        mpl.backends.backend_qt4.figureoptions = None
-        mpl.backends.backend_qt5.figureoptions = None
+        matplotlib.backends.backend_qt4.figureoptions = None
+        matplotlib.backends.backend_qt5.figureoptions = None
         self.toolitems = [t for t in NavigationToolbar2QT.toolitems if t[0] in tools]
         NavigationToolbar2QT.__init__(self, canvas, parent, **kwargs)
 
@@ -133,8 +126,9 @@ class MPLFigureEditor(BasicEditorFactory):
 
 if __name__ == "__main__":
     # Create a window to demo the editor
-    from traits.api import HasTraits
-    from traitsui.api import View, Item
+    from matplotlib.figure import Figure
+    from traits.api import *
+    from traitsui.api import *
     from numpy import sin, cos, linspace, pi
     from matplotlib.widgets import  RectangleSelector
 
