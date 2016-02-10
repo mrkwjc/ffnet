@@ -9,12 +9,27 @@
 ## https://opensource.org/licenses/GPL-3.0
 ########################################################################
 
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
+from setuptools import setup
 
-metadata = {}
+metadata = {'setup_requires':   [],
+            'install_requires': ['ffnet>=0.8.1',
+                                 'traitsui>=4.4',
+                                 'matplotlib>=1.4']}
+
+try:
+    import wx
+    if wx.VERSION[0] == 2 and wx.VERSION[1] == 8:
+        pass
+    else:
+        raise ImportError
+except ImportError:
+    try:
+        import PySide
+    except ImportError:
+        import PyQt4
+    else:
+        metadata['install_requires'] += ['pyside>=1.2']  # Install also pyside if no backend is found
+        
 
 if __name__ == "__main__":
     setup(name              = 'ffnetui',
@@ -31,7 +46,6 @@ if __name__ == "__main__":
           packages          = ['ffnetui', 'ffnetui.plots'],
           package_data      = {'ffnetui': ['data/*', 'images/*.*'],
                                'ffnetui.plots': ['images/*.*']},
-          entry_points      = {'console_scripts': ['ffnetui = ffnetui.ffnetui:main']},
-          install_requires  = ['ffnet>=0.8.1', 'traitsui>=4.4', 'matplotlib>=1.4'],
+          entry_points      = {'console_scripts': ['ffnetui = ffnetui:main']},
           **metadata
           )

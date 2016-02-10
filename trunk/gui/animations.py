@@ -466,6 +466,9 @@ class GraphAnimation(MPLAnimator):
         else:
             return 0
 
+    def replot2(self):
+        self.replot()
+
     traits_view = View(Item('show_biases'),
                 Item('node_labels'),
                 Item('node_size'),

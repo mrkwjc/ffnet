@@ -1,13 +1,14 @@
-On Windows:
-* all working processes should be created once at start, not at every training run, starting training is slow, training is memory hungry
-* redirecting of output do not work
-* autoscroll in logger not working on wx and qt
-
-Major issues
-* Make copyright and license notices in files and about dialog
+* remove ffnet_import.py
+* make README
 
 For next release:
 * Better layered graph for imlgraph
 * start and stop animations outside training thread. 
 * Shared is only needed for training
 * Make ffnetui icon more common in application (use custom View from main file)
+
+
+On Windows:
+* all working processes should be created once at start, not at every training run, starting training is slow, training is memory hungry
+* redirecting of output do not work
+* autoscroll in logger not working on wx and qt
