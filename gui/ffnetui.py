@@ -1,6 +1,20 @@
 #-*- coding: utf-8 -*-
-#from traits.etsconfig.api import ETSConfig
-#ETSConfig.toolkit = 'qt4'
+from traits.etsconfig.api import ETSConfig
+try:
+    import wx
+    if wx.VERSION[0] == 2 and wx.VERSION[1] == 8:
+        ETSConfig.toolkit = 'wx'
+    else:
+        raise ImportError
+except ImportError:
+    try:
+        import PySide
+        ETSConfig.toolkit = 'qt4'
+    except ImportError:
+        import PyQt4
+        ETSConfig.toolkit = 'qt4'
+    else:
+        raise ImportError('Neither "wx" nor "qt4" backends are available.')
 
 from traits.api import *
 from traitsui.api import *
@@ -250,7 +264,7 @@ class FFnetApp(HasTraits):
                          handler = SettingsHandler(),
                          title = 'Settings...',
                          resizable = True,
-                         scrollable = True,
+                         #scrollable = True,
                          width = 0.4)
 
 
