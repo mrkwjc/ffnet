@@ -1,6 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+########################################################################
+## Copyright (c) 2011-2015 Marek Wojciechowski 
+## <mwojc@p.lodz.pl>
+##
+## Distributed under the terms of GPL-3.0 license
+## https://opensource.org/licenses/GPL-3.0
+########################################################################
+
 try:
     from setuptools import setup
 except ImportError:
@@ -16,7 +24,7 @@ if __name__ == "__main__":
           author            = 'Marek Wojciechowski',
           author_email      = 'mwojc@p.lodz.pl',
           url               = 'ffnet.sourceforge.net',
-          license           = 'GPLv2',
+          license           = 'GPL-3',
           platforms         = 'Posix, Windows',
           package_dir       = {'ffnetui': '.', 
                                'ffnetui.plots': 'plots'},

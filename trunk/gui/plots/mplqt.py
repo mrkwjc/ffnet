@@ -1,12 +1,13 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Pierre Haessig — March 2014
-""" traitsui matplotlib editor with toolbar using qt backend 
-publicaly shared by Ryan Olf, April 2013
 
-Source:
-http://enthought-dev.117412.n3.nabble.com/traitsui-matplotlib-editor-with-toolbar-using-qt-backend-td4026437.html
-"""
+########################################################################
+## Copyright (c) 2011-2015 Marek Wojciechowski 
+## <mwojc@p.lodz.pl>
+##
+## Distributed under the terms of GPL-3.0 license
+## https://opensource.org/licenses/GPL-3.0
+########################################################################
+
 import matplotlib
 import matplotlib as mpl
 try:

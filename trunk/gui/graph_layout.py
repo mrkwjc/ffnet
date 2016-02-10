@@ -1,3 +1,11 @@
+########################################################################
+## Copyright (c) 2011-2015 Marek Wojciechowski 
+## <mwojc@p.lodz.pl>
+##
+## Distributed under the terms of GPL-3.0 license
+## https://opensource.org/licenses/GPL-3.0
+########################################################################
+
 import networkx as nx
 import numpy as np
 
