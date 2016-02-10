@@ -13,9 +13,8 @@
 
 from traits.api import *
 from traitsui.api import *
-import pyface.api as pyface
 from loadtxt import LoadTxt
-from messages import display_error, display_confirm
+from messages import display_error
 import numpy as np
 
 

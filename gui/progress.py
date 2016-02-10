@@ -13,7 +13,6 @@
 
 from traits.api import *
 from traitsui.api import *
-import pyface.api as pyface
 
 
 class TxtInfiniteWaiter(HasTraits):
