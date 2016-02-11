@@ -37,15 +37,18 @@ else:
     metadata['cmdclass'] = {'build_py': build_py}
     metadata['ext_modules'] = [ext1, ext2]
 
+from ffnet import version
+
 if __name__ == "__main__":
     setup(name              = 'ffnet',
-          version           = '0.8.1',
+          version           = version,
           description       = 'Feed-forward neural network solution for python',
-          long_description  = '"ffnet" is a fast and easy-to-use feed-forward neural network training solution for python. Many nice features are implemented: arbitrary network connectivity, automatic data normalization, very efficient training tools, support for multicore systems, network export to fortran code...',
+          long_description  = open('README', 'r').read(),
+          keywords          = ['neural networks'],
           author            = 'Marek Wojciechowski',
           author_email      = 'mwojc@p.lodz.pl',
           url               = 'ffnet.sourceforge.net',
-          license           = 'GPL',
+          license           = 'LGPL-3',
           platforms         = 'Posix, Windows',
           package_dir       = {'ffnet': 'ffnet', 
                                'ffnet.fortran': 'ffnet/fortran',
@@ -54,6 +57,20 @@ if __name__ == "__main__":
           package_data      = {'ffnet.fortran': ['ffnet.f', 'pikaia.f'],
                                'ffnet.examples': ['data/*']
                                },
+          requires          = ['numpy', 'scipy', 'networkx'],
           install_requires  = ['numpy>=1.4', 'scipy>=0.8', 'networkx>=1.3'],
+          classifiers       = ['Development Status :: 4 - Beta',
+                               'Environment :: Console',
+                               'Intended Audience :: Education',
+                               'Intended Audience :: End Users/Desktop',
+                               'Intended Audience :: Science/Research',
+                               'License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)',
+                               'Operating System :: OS Independent',
+                               'Programming Language :: Fortran',
+                               'Programming Language :: Python :: 2.6',
+                               'Programming Language :: Python :: 2.7',
+                               'Programming Language :: Python :: 3.4',
+                               'Programming Language :: Python :: 3.5',
+                               'Topic :: Scientific/Engineering :: Artificial Intelligence'],
           **metadata
           )
