@@ -37,11 +37,9 @@ else:
     metadata['cmdclass'] = {'build_py': build_py}
     metadata['ext_modules'] = [ext1, ext2]
 
-from ffnet import version
-
 if __name__ == "__main__":
     setup(name              = 'ffnet',
-          version           = version,
+          version           = '0.8.3',
           description       = 'Feed-forward neural network solution for python',
           long_description  = open('README', 'r').read(),
           keywords          = ['neural networks'],

@@ -23,7 +23,7 @@ For instalation instructions and documentation go to `http://ffnet.sourceforge.n
 Release notes
 -------------
 
-0.8.2
+0.8.3
 +++++
 License switched to LGPL. Only minor updates in code are performed, no API changes are made. Along with this version, new graphical user interface ffnetui-0.8.2 has been released.
 
