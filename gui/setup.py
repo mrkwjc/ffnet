@@ -23,10 +23,11 @@ except ImportError:
         metadata['install_requires'] += ['pyside>=1.2']  # Install also pyside if no backend is found
         metadata['requires'] += ['pyside']
 
+from version import version
 
 if __name__ == "__main__":
     setup(name              = 'ffnetui',
-          version           = '0.8.3',
+          version           = version,
           description       = 'GUI for ffnet - feed-forward neural network for python',
           long_description  =  open('README', 'r').read(),
           author            = 'Marek Wojciechowski',

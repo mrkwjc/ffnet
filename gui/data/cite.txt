@@ -1,4 +1,4 @@
-Marek Wojciechowski, Application of artificial neural network in soil parameter identification for deep excavation numerical model, Computer Assisted Mechanics and Engineering Science, 18(4): 303-311, 2011
+﻿Marek Wojciechowski, Application of artificial neural network in soil parameter identification for deep excavation numerical model, Computer Assisted Mechanics and Engineering Sciences, 18(4): 303-311, 2011
 
 Marek Wojciechowski, Solving differential equations by means of feed-forward artificial neural networks, Lecture Notes in Computer Science (including subseries Lecture Notes in Artificial Intelligence and Lecture Notes in Bioinformatics)
 7267(1): 187-195, 2012

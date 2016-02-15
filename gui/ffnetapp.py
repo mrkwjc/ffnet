@@ -11,6 +11,9 @@
 #from traits.etsconfig.api import ETSConfig
 #ETSConfig.toolkit = 'qt4'
 
+from version import version as  ffnetui_version
+from ffnet import version as ffnet_version
+
 from traits.api import *
 from traitsui.api import *
 from pyface.image_resource import ImageResource
@@ -91,8 +94,7 @@ class FFnetApp(HasTraits):
         self.shared = Shared()
         self.logs = Logger()
         self.plots = MPLPlots()
-        from ffnet import version
-        self.logs.logger.info('Welcome! You are using ffnet-%s.' %version)
+        self.logs.logger.info('Welcome! You are using ffnet-%s.' %ffnet_version)
         self.shell = {'app':self}
 
     def new(self):
@@ -148,7 +150,7 @@ class FFnetApp(HasTraits):
         from pyface.api import information
         citations = open('data/cite.txt', 'r').read()
         msg = u'You are encouraged to cite in your papers one (or all) of the following:\n\n\n' + \
-                unicode(citations, 'utf-8')
+                unicode(citations, 'utf-8').replace(u'\ufeff', '')
         information(None, msg, title = "Citing ffnet/ffnetui")
 
     def clear(self):
@@ -228,7 +230,7 @@ class FFnetApp(HasTraits):
                                     )
                               ),
                        handler = FFnetAppHandler(),
-                       title = 'ffnetui - 0.8.1',
+                       title = 'ffnetui-%s' %ffnetui_version,
                        width = 0.6,
                        height = 0.8,
                        resizable = True,
