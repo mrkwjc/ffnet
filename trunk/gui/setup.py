@@ -42,8 +42,8 @@ if __name__ == "__main__":
                                'ffnetui.plots': ['images/*.*']},
           entry_points      = {'console_scripts': ['ffnetui = ffnetui:main']},  # creates 'ffnetui' entry in bin
           classifiers       = ['Development Status :: 4 - Beta',
-                               'Environment :: Win32 (MS Windows)'
-                               'Environment :: X11 Applications'
+                               'Environment :: Win32 (MS Windows)',
+                               'Environment :: X11 Applications',
                                'Intended Audience :: Education',
                                'Intended Audience :: End Users/Desktop',
                                'Intended Audience :: Science/Research',
