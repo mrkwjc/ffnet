@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 ########################################################################
 ## Copyright (c) 2011-2015 Marek Wojciechowski 
@@ -23,7 +23,7 @@ from shared import Shared
 from logger import Logger
 from animations import *
 from plots.mplfigure import MPLPlots
-from actions import toolbar
+from actions import toolbar, menubar
 from messages import display_confirm
 
 
@@ -139,6 +139,18 @@ class FFnetApp(HasTraits):
         from about import about
         about.open()
 
+    def donate(self):
+        import webbrowser
+        url = 'https://sourceforge.net/p/ffnet/donate'
+        webbrowser.open(url)
+
+    def cite(self):
+        from pyface.api import information
+        citations = open('data/cite.txt', 'r').read()
+        msg = u'You are encouraged to cite in your papers one (or all) of the following:\n\n\n' + \
+                unicode(citations, 'utf-8')
+        information(None, msg, title = "Citing ffnet/ffnetui")
+
     def clear(self):
         self.shared.populate() 
         self.plots.selected.replot()
@@ -221,7 +233,7 @@ class FFnetApp(HasTraits):
                        height = 0.8,
                        resizable = True,
                        toolbar = toolbar,
-                       #menubar = menubar,
+                       menubar = menubar,
                        #statusbar = [StatusItem(name = 'net_info', width=0.5),
                                     #StatusItem(name = 'data_info', width=0.5)]
                        )
