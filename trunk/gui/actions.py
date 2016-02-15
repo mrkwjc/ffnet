@@ -84,6 +84,17 @@ about_action = Action(
     image  = ImageResource('help-browser'),
     tooltip = 'Show about dialog')
 
+donate_action = Action(
+    name   = 'Donate', 
+    action = 'donate',
+    image  = ImageResource('face-smile.png'),
+    tooltip = 'Please, donate ffnet/ffnetui development')
+
+cite_action = Action(
+    name   = 'Cite', 
+    action = 'cite',
+    image  = ImageResource('accessories-text-editor.png'),
+    tooltip = 'Please, cite ffnet/ffnetui related works')
 
 # Groups of actions
 network_actions = ActionGroup(
@@ -102,7 +113,9 @@ train_actions = ActionGroup(
     )
 
 help_actions = ActionGroup(
-    about_action
+    about_action,
+    cite_action,
+    donate_action
     )
 
 # File menu
@@ -116,5 +129,5 @@ help_menu = Menu(help_actions,
 menubar = MenuBar(file_menu, train_menu, help_menu)
 toolbar = ToolBar(network_actions,
                   train_actions,
-                  help_actions,
+                  #help_actions,
                   image_size=(22, 22))
