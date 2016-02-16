@@ -45,7 +45,7 @@ if __name__ == "__main__":
           keywords          = ['neural networks'],
           author            = 'Marek Wojciechowski',
           author_email      = 'mwojc@p.lodz.pl',
-          url               = 'ffnet.sourceforge.net',
+          url               = 'http://ffnet.sourceforge.net',
           license           = 'LGPL-3',
           platforms         = 'Posix, Windows',
           package_dir       = {'ffnet': 'ffnet', 
