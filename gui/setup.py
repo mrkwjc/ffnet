@@ -32,7 +32,7 @@ if __name__ == "__main__":
           long_description  =  open('README', 'r').read(),
           author            = 'Marek Wojciechowski',
           author_email      = 'mwojc@p.lodz.pl',
-          url               = 'ffnet.sourceforge.net',
+          url               = 'http://ffnet.sourceforge.net',
           license           = 'GPL-3',
           platforms         = 'Posix, Windows',
           package_dir       = {'ffnetui': '.', 
