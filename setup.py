@@ -41,7 +41,7 @@ if __name__ == "__main__":
     setup(name              = 'ffnet',
           version           = '0.8.3',
           description       = 'Feed-forward neural network solution for python',
-          long_description  = open('README', 'r').read(),
+          long_description  = open('README.rst', 'r').read(),
           keywords          = ['neural networks'],
           author            = 'Marek Wojciechowski',
           author_email      = 'mwojc@p.lodz.pl',
