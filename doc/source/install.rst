@@ -5,62 +5,51 @@ Installation
 Requirements
 ^^^^^^^^^^^^
 
-ffnet needs at least:
+**ffnet** needs at least:
 
 * `python-2.6 <http://python.org>`_ (or 2.4, 2.5 + multiprocessing), python-3.x is also supported
 * `numpy-1.4 <http://numpy.org>`_
 * `scipy-0.8 <http://scipy.org>`_
 * `networkx-1.3 <http://networkx.lanl.gov>`_
 
-For plots (which appear in examples) you'll need the `matplotlib <http://matplotlib.sourceforge.net>`_ package. It is also very convenient to use ffnet interactively with `ipython <http://ipython.scipy.org/moin>`_, an enhanced python shell.
+**ffnetui** depends additionally on:
+
+* `matplotlib <http://matplotlib.sourceforge.net>`_
+* `traitsui <http://code.enthought.com/projects/traits_ui/>`_
+
+For **ffnetui** python-2.7 is necessary. This is because traitsui does not work well with python-3.x currently.
 
 If you're going to compile ffnet from sources you'll need also:
 
 * Python header files (which are installed with Python by default on Windows, but not on most Linux distros, for example on Ubuntu you need additional ``python-dev`` package),
-* C and Fortran 77 compilers (on Linux you have gcc and gfortran, on Windows (32-bit) you can consider using `mingw32 <http://sourceforge.net/projects/mingw/files/Installer/mingw-get-inst/>`_).
+* C and Fortran 77 compilers (on Linux you have gcc and gfortran, on Windows you can consider using `mingw32 <http://sourceforge.net/projects/mingw/files/Installer/mingw-get-inst/>`_).
 
-On Windows you can conveniently install `Python(xy) <https://code.google.com/p/pythonxy>`_ distribution which comes now with ffnet (and its dependencies) preinstalled. Also, you might be interested in installing `Anaconda <https://store.continuum.io/cshop/anaconda/>`_ which reaches all ffnet requirements (including compilers) and is free for non-commercial use. 
+On Windows you can conveniently install `Python(xy) <https://code.google.com/p/pythonxy>`_ distribution which comes now with ffnet (and its dependencies) preinstalled. Also, you might be interested in installing `Anaconda <https://store.continuum.io/cshop/anaconda/>`_ which reaches all ffnet requirements (including compilers) and is free for non-commercial use.
 
-
-Download
-^^^^^^^^
-Go to sourceforge `download page <http://sourceforge.net/projects/ffnet/files/ffnet>`_ for release versions of ffnet.
-
-You can also checkout development version of the code from the project subversion repository:
-
-    ``svn co https://svn.code.sf.net/p/ffnet/code/trunk ffnet``
-
-or from this direct `link <http://ffnet.svn.sourceforge.net/viewvc/ffnet/trunk.tar.gz>`_.
-
-
-Installation
-^^^^^^^^^^^^
-If you have `setuptools <http://pypi.python.org/pypi/setuptools>`_ installed you can try to call from command line (as root):
-
-    ``easy_install ffnet``
-
-Alternatively, if you have `pip <http://pypi.python.org/pypi/pip>`_, you can call:
+Installation on Linux
+^^^^^^^^^^^^^^^^^^^^^
+Just call from command line:
 
     ``pip install ffnet``
 
-These commands should automatically download, compile and install ffnet.
+    ``pip install ffnetui``
 
-If this doesn't work for you, try manual installation. Unpack ffnet to the directory of your choice, enter it and run:
+or unpack downloaded `tar.gz <http://sourceforge.net/projects/ffnet/files/ffnet/0.8.3>`_ files and run:
 
-* on Linux (gcc + gfortran):
     ``python setup.py install``
 
-* on Windows (mingw32: gcc + g77):
-    ``python setup.py build --compiler=mingw32 & python setup.py install --skip-build``
+The first method will install also dependencies, the second one probably will not.
 
-On Windows you can try also binary installers available on download page. Installation is done by double click. Be aware, that these installers do not check dependencies.
+If you get compilation errors then you possibly need *gcc* and *gfortran* and/or python headers.
 
-You are also welcome to produce and share binary packages for your operating system. They will be placed at ffnet's `download page`_.
+Installation on Windows
+^^^^^^^^^^^^^^^^^^^^^^^
+If you have proper system setup the above methods should also work. However you can try binary installers available on `download page <http://sourceforge.net/projects/ffnet/files/ffnet/0.8.3>`_. Be aware, that installers for **ffnet** need working python installation and do not check dependencies. On the other hand **ffnetui** installers are all-in-one, self-contained bundles. You don't even need python to install and use ffnetui.
 
 
 Testing
 ^^^^^^^
-Installation can be tested in python console::
+ffnet installation can be tested in python console::
 
     from ffnet._tests import runtest
     runtest()

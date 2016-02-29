@@ -4,6 +4,8 @@
 Examples
 --------
 
+Here you find exemplary training scripts for ffnet:
+
 .. toctree::
     :maxdepth: 2
 

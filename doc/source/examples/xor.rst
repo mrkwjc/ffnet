@@ -8,9 +8,9 @@ XOR problem
     :language: python
 
 
-This script should produce the following Fortran source which can be compiled along with :download:`ffnet.f <../../../src/fortran/ffnet.f>`: 
+This script should produce the following Fortran source which can be compiled along with :download:`ffnet.f <../../../ffnet/fortran/ffnet.f>`: 
 
-[:download:`xor.f <../../../src/fortran/ffnet.f>`]
+[:download:`xor.f <../../../ffnet/fortran/ffnet.f>`]
 
 .. literalinclude:: ../../../examples/xor.f
     :language: fortran

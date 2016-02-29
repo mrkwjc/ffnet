@@ -5,3 +5,6 @@ dist
 *.pyd
 *.pyo
 *.spec
+examples/*.f
+examples/*.net
+*.so

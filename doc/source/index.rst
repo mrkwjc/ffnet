@@ -1,24 +1,31 @@
-==============================================
-Feed-forward neural network for python (ffnet)
-==============================================
+======================================================
+Feed-forward neural network for python (ffnet/ffnetui)
+======================================================
+
+.. image:: pictures/three_screens.png
+    :scale: 50%
+    :align: left
+    :target: screenshots.html
 
 :Author: :ref:`Marek Wojciechowski <mwojc>`
-:Version: `0.8.0 <http://sourceforge.net/projects/ffnet/files/ffnet/ffnet-0.7.1>`_
-:License: `GPL <http://www.gnu.org/copyleft/gpl.html>`_
+:Version: `0.8.3 <http://sourceforge.net/projects/ffnet/files/ffnet/0.8.3>`_
+:License: `LGPL-3 <https://opensource.org/licenses/LGPL-3.0>`_ / `GPL-3 <https://opensource.org/licenses/GPL-3.0>`_
 
-Welcome to the ffnet documentation pages!
+Welcome to ffnet documentation pages!
 
-**ffnet is a fast and easy-to-use feed-forward neural network training solution for python.**
+**ffnet** is a fast and easy-to-use feed-forward neural network training library for python. It is acommpanied with graphical user interface called **ffnetui**.
 
 .. toctree::
     :maxdepth: 1
 
     news
     overview
+    download
     install
     apidoc
     examples
-    bugs
+    screenshots
+    development
     cite
     mwojc
     acknowledgements

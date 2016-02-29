@@ -16,8 +16,10 @@ About author
 :E-mail:
     mwojc at p.lodz.pl
 :Recent publications:
-    [1] Marcin Koniorczyk, Marek Wojciechowski, "Influence of salt on desorption isotherm and hygral state of cement mortar - modeling using neural networks", Construction and Building Materials 2009, 23: 2988-2996
+    [1] Marek Wojciechowski, Solving differential equations by means of feed-forward artificial neural networks, Lecture Notes in Computer Science (including subseries Lecture Notes in Artificial Intelligence and Lecture Notes in Bioinformatics)
+    7267(1): 187-195, 2012
 
-    [2] Marek Wojciechowski "Feed-forward neural network as a tool for solving nonlinear differential equations", Proceedings of CMM-2009 - Computer Methods in Mechanics, 18-21 May 2009, Zielona Gora, Poland
+    [2] Marek Wojciechowski, Application of artificial neural network in soil parameter identification for deep excavation numerical model, Computer Assisted Mechanics and Engineering Sciences, 18(4): 303-311, 2011
 
-    [3] M. Lefik, M. Wojciechowski, "Computational tools based on artificial neural networks for analysis of composite materials", Proceedings of AI-METH 2003 - Methods Of Artificial Intelligence, T. Burczynski, W. Cholewa, W. Moczulski, AI-METH 2003, November 5-7, Gliwice, 2003
+    [3] Marcin Koniorczyk, Marek Wojciechowski, "Influence of salt on desorption isotherm and hygral state of cement mortar - modeling using neural networks", Construction and Building Materials 2009, 23: 2988-2996
+

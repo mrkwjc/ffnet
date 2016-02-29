@@ -20,7 +20,7 @@ Overview
     Excellent computational performance is achieved implementing core functions in fortran 77 and wrapping them with f2py. ffnet outstands in performance pure python training packages and is competitive to 'compiled language' software. Incorporation of multiprocessing capabilities (tnc algorithm so far) makes ffnet ideal for large scale (really!) problems. Moreover, a trained network can be exported to fortran sources, compiled and called from many programming languages.
 
 *Usage*:
-    Basic usage of the package is outlined below::
+    Basic usage of the library is outlined below::
 
         from ffnet import ffnet, mlgraph, savenet, loadnet, exportnet
         conec = mlgraph( (2,2,1) )
@@ -36,3 +36,6 @@ Overview
         partial_derivatives = net.derivative( [ 0., 0. ] )
 
     Read API :ref:`documentation <apidoc>` and :ref:`examples <examples>` for more info.
+
+*Graphical user interface*
+    As of version 0.8.3 ffnet has GUI called **ffnetui**. ffnetui is a separate project and it is not guaranteed, that the functionalities of both will be kept indentical.
