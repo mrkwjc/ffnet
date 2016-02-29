@@ -3,7 +3,7 @@
 ffnet: feed-forward neural network for python
 =============================================
 
-Basic usage of the package is outlined below:
+Basic usage of the package:
 
 >>> from ffnet import ffnet, mlgraph, savenet, loadnet, exportnet
 >>> conec = mlgraph( (2,2,1) )
@@ -19,14 +19,3 @@ Basic usage of the package is outlined below:
 >>> partial_derivatives = net.derivative( [ 0., 0. ] )
 
 For instalation instructions and documentation go to `http://ffnet.sourceforge.net <http://ffnet.sourceforge.net>`_.
-
-Release notes
--------------
-
-0.8.3
-+++++
-License switched to LGPL. Only minor updates in code are performed, no API changes are made. Along with this version, new graphical user interface ffnetui-0.8.2 has been released.
-
-0.8.0
-+++++
-This version supports python 3. Only minor changes in code (and no API changes) are made in comparison to previous release, all scripts should run without problems.
