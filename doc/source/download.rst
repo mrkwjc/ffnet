@@ -6,7 +6,7 @@ Sources
 ^^^^^^^
 Latest release:
     * `ffnet-0.8.3.tar.gz <http://sourceforge.net/projects/ffnet/files/ffnet/0.8.3/ffnet-0.8.3.tar.gz>`_
-    * `ffnetui-0.8.3.1.tar.gz <http://sourceforge.net/projects/ffnet/files/ffnet/0.8.3/ffnetui-0.8.3.1.tar.gz>`_
+    * `ffnetui-0.8.3.2.tar.gz <http://sourceforge.net/projects/ffnet/files/ffnet/0.8.3/ffnetui-0.8.3.2.tar.gz>`_
 
 Latest development:
     * ``git clone https://github.com/mrkwjc/ffnet ffnet``
