@@ -1,5 +1,8 @@
 python setup.py sdist
-python setup.py bdist_wininst
+python setup.py build --compiler=mingw32
+python setup.py bdist_wininst --skip-build
+
+REM ~ python setup.py bdist_wininst
 
 REM ~ python setup.py sdist register upload
 REM ~ python setup.py bdist_wininst register upload
