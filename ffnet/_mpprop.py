@@ -81,3 +81,22 @@ def mpgrad(x, pool, splitters, key):
     for splitter in splitters:
         res += [pool.apply_async(procgrad, (x, splitter, key))]
     return sum([r.get() for r in res])
+
+func2 = netprop.func2
+def procfunc2(x, splitter, key):
+    """
+    Per process function netprop.func2 function
+    """
+    start, end = splitter
+    net = nets[key]
+    inp = inputs[key][start:end]
+    trg = targets[key][start:end]
+    return func2(x, net.conec, net.bconecno, net.units, net.inno, net.outno, inp, trg)
+def mpfunc2(x, pool, splitters, key):
+    """
+    Execute netprop.func2 in parallel on multiprocessing *pool*
+    """
+    res = []
+    for splitter in splitters:
+        res += [pool.apply_async(procfunc2, (x, splitter, key))]
+    return map(sum, zip(*[r.get() for r in res]))  # returns function and gradient

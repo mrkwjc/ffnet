@@ -869,11 +869,10 @@ class ffnet:
 
         input, target = self._setnorm(input, target)
         if 'bounds' not in kwargs: kwargs['bounds'] = ((-100., 100.),)*len(self.conec)
-        func = netprop.func
-        fprime = netprop.grad
+        func = netprop.func2
         extra_args = (self.conec, self.bconecno, self.units, \
                            self.inno, self.outno, input, target)
-        self.weights = optimize.fmin_l_bfgs_b(func, self.weights, fprime=fprime, \
+        self.weights = optimize.fmin_l_bfgs_b(func, self.weights, \
                                               args=extra_args, **kwargs)[0]
         self.trained = 'bfgs'
 
@@ -919,11 +918,10 @@ class ffnet:
             return
 
         # single process version
-        func = netprop.func
-        fprime = netprop.grad
+        func = netprop.func2  # returns both function and gradient
         extra_args = (self.conec, self.bconecno, self.units, \
                            self.inno, self.outno, input, target)
-        res = optimize.fmin_tnc(func, self.weights, fprime=fprime, \
+        res = optimize.fmin_tnc(func, self.weights, \
                                          args=extra_args, **kwargs)
         self.weights = array( res[0] )
         self.trained = 'tnc'
@@ -966,12 +964,11 @@ class ffnet:
         splitters = mpprop.splitdata(len(input), nproc)
 
         # train
-        func = mpprop.mpfunc
-        fprime = mpprop.mpgrad
+        func = mpprop.mpfunc2
 
         #if 'messages' not in kwargs: kwargs['messages'] = 0
         #if 'bounds' not in kwargs: kwargs['bounds'] = ((-100., 100.),)*len(self.conec)
-        res = optimize.fmin_tnc(func, self.weights, fprime = fprime, \
+        res = optimize.fmin_tnc(func, self.weights, \
                                 args = (pool, splitters, key), **kwargs)
         self.weights = res[0]
 

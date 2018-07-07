@@ -305,6 +305,83 @@ cf2py intent(out) sqerr
       end
 
 c************************************************************************
+      subroutine func2(x, conec, n, bconecno, bn, units, u, inno, i,
+     &                 outno, o, Input, Targ, p, sqerr, xprime)
+c************************************************************************
+c
+c.....This function is just grad function, with the difference that sqerr
+c.....is calculated and returned at the same time. This way propagating
+c.....of signals is not repeated when gradient is calculated
+c
+      implicit none
+c.....variables
+      integer n, bn, u, i, o, p
+      integer conec(n,2), bconecno(bn), inno(i), outno(o)
+      double precision x(n), units(u), Input(p,i), Targ(p,o)
+      double precision xprime(n), diff(o), bunits(u)
+c.....helper variables
+      integer k, pat, src, trg, ctrg
+      double precision deriv, cx, sqerr
+c.....f2py statements
+cf2py intent(out) sqerr
+cf2py intent(out) xprime
+
+c.....initialize sqerr and xprime
+      sqerr = 0d0
+      do k=1,n
+          xprime(k) = 0.
+      enddo
+c.....loop over given patterns
+      DO pat = 1,p
+c.........propagate input signals
+          do k=1,i
+              units(inno(k)) = Input(pat,k)
+          enddo
+          call prop(x, conec, n, units, u)
+c.........set diffs at network output as back network inputs
+          do k=1,o
+             sqerr = sqerr + (units(outno(k)) - Targ(pat,k))**2
+             diff(k) = units(outno(k)) - Targ(pat,k)
+             deriv = units(outno(k)) * (1. - units(outno(k))) !ugly
+             bunits(outno(k)) = diff(k) * deriv
+          enddo
+c.........backpropagate errors
+          if (bn.gt.0) then
+              ctrg = conec(bconecno(1),1)
+              bunits(ctrg) = 0.
+              do k=1,bn
+                  src = conec(bconecno(k),2)
+                  trg = conec(bconecno(k),1)
+                  cx = x(bconecno(k))
+                  if (trg.ne.ctrg) then  !if next unit
+                      deriv = units(ctrg) * (1. - units(ctrg)) !ugly
+                      bunits(ctrg) = bunits(ctrg) * deriv
+                      ctrg = trg
+                      bunits(ctrg) = bunits(src) * cx
+                  else
+                      bunits(ctrg) = bunits(ctrg) + bunits(src) * cx
+                  endif
+              enddo
+              deriv = units(ctrg) * (1 - units(ctrg))
+              bunits(ctrg) = bunits(ctrg) * deriv  !for last unit
+          endif
+c.........add gradient elements to overall xprime
+          do k=1,n
+              src = conec(k,1)
+              trg = conec(k,2)
+              if (src.eq.0) then !handle bias
+                  xprime(k) = xprime(k) + bunits(trg)
+              else
+                  xprime(k) = xprime(k) + units(src) * bunits(trg)
+              endif
+          enddo
+      ENDDO
+      sqerr = 0.5d0*sqerr
+
+      return
+      end
+
+c************************************************************************
       subroutine pikaiaff(x, ffn, conec, n, units, u, inno, i, outno, o,
      &                    Input, Targ, p, bound1, bound2, isqerr)
 c************************************************************************
