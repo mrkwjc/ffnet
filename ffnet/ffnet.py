@@ -261,7 +261,7 @@ def _dependency(G, source):
     node_removal = 1
     while node_removal:
         node_removal = 0
-        for node in H.nodes():
+        for node in list(H.nodes()):
             if not H.in_degree(node) and node != source:
                 H.remove_node(node)
                 node_removal = 1
@@ -608,7 +608,7 @@ class ffnet:
         weights = zeros(nofw, 'd')
         for w in xrange(nofw):
             trg = self.conec[w,1]
-            n = len(self.graph.predecessors(trg))
+            n = len(list(self.graph.predecessors(trg)))
             bound = 2.38 / sqrt(n)
             weights[w] = random.uniform(-bound, bound)
         self.weights = weights
