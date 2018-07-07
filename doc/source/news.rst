@@ -4,8 +4,12 @@
 *28/02/2016*
     ffnet development is now moved to github. For recent changes, bugs, issues and possible contributions please go to `ffnet <https://github.com/mrkwjc/ffnet>`_ and `ffnetui <https://github.com/mrkwjc/ffnetui>`_ repositories.
 
+----
+
 *15/02/2016*
     ffnet-0.8.3 has been released. In this version we switched to LGPL. Only minor updates in code are performed, no API changes are made. Along with this version, new graphical user interface ffnetui-0.8.3.x is released under GPL-3 licence. ffnetui needs python-2.7.
+
+----
 
 *15/02/2015*
     ffnet version 0.8.0 has been released with python 3 support. Only minor changes in code (and no API changes) are made in comparison to previous release, all scripts should run without problems.

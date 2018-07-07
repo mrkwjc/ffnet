@@ -4,7 +4,6 @@ Feed-forward neural network for python (ffnet/ffnetui)
 
 .. image:: pictures/three_screens.png
     :scale: 50%
-    :align: left
     :target: screenshots.html
 
 :Author: :ref:`Marek Wojciechowski <mwojc>`
