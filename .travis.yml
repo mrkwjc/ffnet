@@ -1,18 +1,17 @@
+sudo: required
 language: python
-
 python:
     - 2.7
     - 3.6
-
 before_install:
+    - apt-get install python-dev gfortran
     - pip install --user -r requirements.txt
-
 script:
     - python -m ffnet._tests
 
 #deploy:
   #provider: pypi
-  #user: romgar
+  #user: mwojc
   #password:
     #secure: my_secure_password
   #on:
