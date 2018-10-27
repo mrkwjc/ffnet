@@ -11,10 +11,11 @@ ffnet package
 -------------
 """
 
-from _version import version
-import fortran
-import ffnet as ffnetmodule
-from ffnet import ffnet, \
+from __future__ import absolute_import
+from ._version import version
+import ffnet.fortran as fortran
+import ffnet.ffnet as ffnetmodule
+from ffnet.ffnet import ffnet, \
                   mlgraph, \
                   tmlgraph, \
                   imlgraph, \
@@ -22,5 +23,5 @@ from ffnet import ffnet, \
                   loadnet, \
                   exportnet, \
                   readdata
-from pikaia import pikaia
-import _tests
+from ffnet.pikaia import pikaia
+import ffnet._tests as _tests
