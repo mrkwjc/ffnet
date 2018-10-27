@@ -5,8 +5,8 @@ python:
     - 3.6
 before_install:
     - sudo apt-get install python-dev gfortran
-    - sudo pip install -r requirements.txt
 install:
+    - pip install -r requirements.txt
     - python setup.py install
 script:
     - cd
