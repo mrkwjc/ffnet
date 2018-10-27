@@ -5,7 +5,7 @@ python:
     - 3.6
 before_install:
     - sudo apt-get install python-dev gfortran
-    - pip install --user -r requirements.txt
+    - sudo pip install -r requirements.txt
 script:
     - python -m ffnet._tests
 
