@@ -9,6 +9,7 @@ before_install:
 install:
     - python setup.py install
 script:
+    - cd
     - python -m ffnet._tests
 
 #deploy:
