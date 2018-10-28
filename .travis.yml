@@ -17,6 +17,8 @@ install:
 script:
     - cd
     - python -m ffnet._tests
+before_deploy:
+    - cd $TRAVIS_BUILD_DIR
 deploy:
     provider: pypi
     user: mwojc
