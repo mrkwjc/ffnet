@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import sys
+try:
+    import setuptools
+except ImportError:
+    pass
 metadata = {}
 if (len(sys.argv) >= 2
         and ('--help' in sys.argv[1:] or sys.argv[1]
@@ -56,7 +60,7 @@ if __name__ == "__main__":
                                'ffnet.examples': ['data/*']
                                },
           requires          = ['numpy', 'scipy', 'networkx'],
-          install_requires  = ['numpy>=1.4', 'scipy>=0.8', 'networkx>=1.3'],
+          # install_requires  = ['numpy>=1.4', 'scipy>=0.8', 'networkx>=1.3'],
           classifiers       = ['Development Status :: 4 - Beta',
                                'Environment :: Console',
                                'Intended Audience :: Education',

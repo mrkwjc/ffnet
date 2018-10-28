@@ -19,8 +19,6 @@ script:
     - python -m ffnet._tests
 before_deploy:
     - cd $TRAVIS_BUILD_DIR
-    - pip uninstall -y wheel
-    - pip install wheel
 deploy:
     provider: pypi
     user: mwojc
