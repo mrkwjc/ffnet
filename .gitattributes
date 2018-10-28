@@ -1,1 +1,3 @@
 *.f linguist-language=Python
+.* export-ignore
+TODO.txt export-ignore
