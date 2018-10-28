@@ -1,6 +1,11 @@
 python setup.py sdist
 python setup.py build --compiler=mingw32
+python setup.py bdist --skip-build
 python setup.py bdist_wininst --skip-build
+python setup.py bdist_wheel --skip-build
+
+REM conda install setuptools mingw
+REM pip install --user --upgrade --global-option="build" --global-option="--compiler=mingw32" ffnet
 
 REM ~ python setup.py bdist_wininst
 
