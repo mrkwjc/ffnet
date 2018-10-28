@@ -24,7 +24,6 @@ deploy:
     user: mwojc
     password:
         secure: Zxc+tq+rmhd3FiAMnUn8bDsOCbfq8K+BJZ6FOyiit7uYtFyRe+M0AC5DdBDQXfgj2yIB3LlCvTmFv/ef1+RlQc+C2760EEJQwY1E/oB1EXQFAhXfM+RYvTp2HPzVXVgOJXJhO2PHkst0MnCNezSuLZ1zj2fPIn8ZmHpSDvGwZ8L1rQ5mWPjstIpV6FKvPYDYAnruWkA0DEYRRf+oXBT2uPvU8a8WPSnwa/KMPn4vka5jlS+oZ/BPXPa4vjm1Z9Yfo3zk8qEqfZM2+ybPfqJzcvOd0ugprXAd2yEaOCNdul2aewPZ2+nsDPi1r4+AmEvUZKlx+1t9hLfZypsdBY8sUu/AhWeeAMV+QBIb9SuuVGgHBnnl36XbjXZJwsyDYWQzE7S/OZA9iXfQvp5NahHYfzC0LP7gbWHLCXTeT0V50c7VVaPRsJy+mesB80CFRXEi0gYbFjm5IzNZoQ9gsfk9CO2+C3WwKvBXnGIjFAhG5qPWi38zuhAEb4NYGRowrnxkfbjM1a16o0NhCCo8mjGx/vCX0B9aG8rK7VcnWh2MS1W7mtKcDLzwifo6+qGl6X9rSrwho274b8vJy4QnslIJrOzkipEbi2gtjcV+3kZ7HQDrWH23iM7c9gdl++QQLlJbXznzC58acTiBr4jBHrThsNnuyPUL/KoGHPKRQ7PEs1M=
-    distributions: "sdist bdist_wheel"
     skip_cleanup: true
     on:
         tags: true
