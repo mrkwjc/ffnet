@@ -1,5 +1,6 @@
 ### XOR problem example for ffnet ###
 
+from __future__ import print_function
 from ffnet import ffnet, mlgraph
 
 # Generate standard layered network architecture and create network
@@ -12,29 +13,29 @@ target  = [[1.], [0.], [0.], [1.]]
 
 # Train network
 #first find good starting point with genetic algorithm (not necessary, but may be helpful)
-print "FINDING STARTING WEIGHTS WITH GENETIC ALGORITHM..."
+print("FINDING STARTING WEIGHTS WITH GENETIC ALGORITHM...")
 net.train_genetic(input, target, individuals=20, generations=500)
 #then train with scipy tnc optimizer
-print "TRAINING NETWORK..."
+print("TRAINING NETWORK...")
 net.train_tnc(input, target, maxfun = 1000, messages=1)
 
 # Test network
-print
-print "TESTING NETWORK..."
+print("")
+print("TESTING NETWORK...")
 output, regression = net.test(input, target, iprint = 2)
 
 # Save/load/export network
 from ffnet import savenet, loadnet, exportnet
-print "Network is saved..."
+print("Network is saved...")
 savenet(net, "xor.net")
-print "Network is reloaded..."
+print("Network is reloaded...")
 net = loadnet("xor.net")
-print "Network is tested again, but nothing is printed..."
+print("Network is tested again, but nothing is printed...")
 output, regression = net.test(input, target, iprint = 0)
-print
-print "Exporting trained network to the fortran source..."
+print("")
+print("Exporting trained network to the fortran source...")
 exportnet(net, "xor.f")
-print "Done..."
-print "Look at the generated xor.f file."
-print "Note: you must compile xor.f along with the ffnet.f"
-print "file which can be found in ffnet sources."
+print("Done...")
+print("Look at the generated xor.f file.")
+print("Note: you must compile xor.f along with the ffnet.f")
+print("file which can be found in ffnet sources.")

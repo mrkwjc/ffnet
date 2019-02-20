@@ -12,7 +12,7 @@ Genetic algorithm based optimizer
 """
 
 # import raw module
-from fortran import _pikaia
+from .fortran import _pikaia
 
 # Wrap main pikaia routine
 def pikaia (ff, n, ff_extra_args = (), \
@@ -144,6 +144,6 @@ def pikaia (ff, n, ff_extra_args = (), \
 
 def test():
     x = pikaia(_pikaia.twod, 2)
-    print "Solution for twod:"
-    print x
+    print("Solution for twod:")
+    print(x)
 

@@ -1,5 +1,6 @@
 ### Sine training example for ffnet ###
 
+from __future__ import print_function
 from ffnet import ffnet
 from math import pi, sin, cos
 
@@ -18,20 +19,20 @@ net = ffnet(conec)
 
 # Generation of training data (sine values for x from 0 to 2*pi)
 patterns = 16
-input = [ [ 0. ] ] + [ [ k*2*pi/patterns ] for k in xrange(1, patterns + 1) ]
+input = [ [ 0. ] ] + [ [ k*2*pi/patterns ] for k in range(1, patterns + 1) ]
 target = [ [ sin(x[0]) ] for x in input ]
 
 # Training network
 #first find good starting point with genetic algorithm (not necessary, but may be helpful)
-print "FINDING STARTING WEIGHTS WITH GENETIC ALGORITHM..."
+print("FINDING STARTING WEIGHTS WITH GENETIC ALGORITHM...")
 net.train_genetic(input, target, individuals=20, generations=500)
 #then train with scipy tnc optimizer
-print "TRAINING NETWORK..."
+print("TRAINING NETWORK...")
 net.train_tnc(input, target, maxfun = 5000, messages=1)
 
 # Testing network
-print
-print "TESTNG NETWORK..."
+print("")
+print("TESTNG NETWORK...")
 output, regression = net.test(input, target, iprint = 2)
 
 #################
@@ -39,7 +40,7 @@ output, regression = net.test(input, target, iprint = 2)
 try:
     from pylab import *
     points = 128
-    xaxis = [ 0. ] + [ k*2*pi/points for k in xrange(1, points + 1) ]
+    xaxis = [ 0. ] + [ k*2*pi/points for k in range(1, points + 1) ]
     sine = [ sin(x) for x in xaxis ]
     cosine = [ cos(x) for x in xaxis ]
     netsine = [ net([x])[0] for x in xaxis]
@@ -57,4 +58,4 @@ try:
     grid(True)
     show()
 except ImportError:
-    print "Cannot make plots. For plotting install matplotlib..."
+    print("Cannot make plots. For plotting install matplotlib...")

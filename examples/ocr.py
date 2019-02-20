@@ -6,6 +6,7 @@
 # the digit and last 10 numbers are the targets (10 targets for 10 digits).
 # Layered network architecture is used here: (64, 10, 10, 10).
 
+from __future__ import print_function
 from ffnet import ffnet, mlgraph, readdata
 
 # Generate standard layered network architecture and create network
@@ -13,18 +14,18 @@ conec = mlgraph((64,10,10,10))
 net = ffnet(conec)
 
 # Read data file
-print "READING DATA..."
+print("READING DATA...")
 data = readdata( 'data/ocr.dat', delimiter = ' ' )
 input =  data[:, :64] #first 64 columns - bitmap definition
 target = data[:, 64:] #the rest - 10 columns for 10 digits
 
 # Train network with scipy tnc optimizer - 58 lines used for training
-print "TRAINING NETWORK..."
+print("TRAINING NETWORK...")
 net.train_tnc(input[:58], target[:58], maxfun = 2000, messages=1)
 
 # Test network - remaining 10 lines used for testing
-print
-print "TESTING NETWORK..."
+print("")
+print("TESTING NETWORK...")
 output, regression = net.test(input[58:], target[58:], iprint = 2)
 
 ############################################################
@@ -50,5 +51,5 @@ try:
     xlabel("Digit")
     ylabel("Network outputs")
     show()
-except ImportError, e:
-    print "Cannot make plots. For plotting install matplotlib.\n%s" % e
+except ImportError as e:
+    print("Cannot make plots. For plotting install matplotlib.\n%s" % e)

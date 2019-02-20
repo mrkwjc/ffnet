@@ -3,8 +3,8 @@
 # FFNET TESTS
 import unittest
 import sys; import os
-from ffnet import *
-from ffnet import _linear, _norms, _normarray, _ffconec, _bconec, _dconec
+from .ffnet import *
+from .ffnet import _linear, _norms, _normarray, _ffconec, _bconec, _dconec
 import sys
 
 # Get ffnet module realpath
@@ -110,7 +110,7 @@ class Testnorms(unittest.TestCase):
     def testEmpty(self):
         inarray = [[], []]
         n = _norms(inarray)
-        for i in xrange(len(n)):
+        for i in range(len(n)):
             self.assertEqual(n[i].tolist(), [])
     def testOneColumn(self):
         inarray = [[0.], [1.], [2.]]
@@ -131,14 +131,14 @@ class Testnormarray(unittest.TestCase):
     def testEmpty(self):
         inarray = [[], []]
         n = _normarray(inarray, [])
-        for i in xrange(len(n)):
+        for i in range(len(n)):
             self.assertEqual(n[i].tolist(), [])
 
     def testOneColumn(self):
         inarray = [[0.], [1.], [1.], [0.]]
         coeff = [[0.7, 0.15]]
         n = _normarray(inarray, coeff)
-        for i in xrange(4):
+        for i in range(4):
             self.assertAlmostEqual(n[i,0], coeff[0][0]*inarray[i][0] + coeff[0][1], 8)
 
 class Testffconec(unittest.TestCase):
@@ -241,7 +241,7 @@ class TestFfnetSigmoid(unittest.TestCase):
     def testSqerror(self):
         err = self.tnet.sqerror(self.input, self.target)
         out = [ (self.tnet(self.input[i])[0] - self.target[i][0])**2 \
-                for i in xrange( len(self.input) ) ]
+                for i in range( len(self.input) ) ]
         pyerr = 0.5 * sum(out)
         self.assertNotAlmostEqual(err, pyerr, 8) #err is for normalized data, pyerr for raw data
 
@@ -253,23 +253,23 @@ class TestFfnetSigmoid(unittest.TestCase):
         self.tnet.train_momentum(self.input, self.target, eta=1., momentum=0., maxiter=1)
         w2 = self.tnet.weights
 
-        for i in xrange(len(w1)):
+        for i in range(len(w1)):
             self.assertAlmostEqual(w1[i], w2[i], 8)
 
 
     def testTrainGenetic(self):
-        print "Test of genetic algorithm optimization"
+        print("Test of genetic algorithm optimization")
         self.tnet.train_genetic(self.input, self.target, lower = -50., upper = 50., \
                                 individuals = 20, generations = 1000)
         self.tnet.test(self.input, self.target)
 
     def testTrainMomentum(self):
-        print "Test of backpropagation momentum algorithm"
+        print("Test of backpropagation momentum algorithm")
         self.tnet.train_momentum(self.input, self.target, maxiter=10000)
         self.tnet.test(self.input, self.target)
 
     def testTrainRprop(self):
-        print "Test of rprop algorithm"
+        print("Test of rprop algorithm")
         self.tnet.randomweights()
         xmi = self.tnet.train_rprop(self.input, self.target, \
                                     a=1.2, b=0.5, mimin=0.000001, mimax=50, \
@@ -277,23 +277,23 @@ class TestFfnetSigmoid(unittest.TestCase):
         self.tnet.test(self.input, self.target)
 
     def testTrainCg(self):
-        print "Test of conjugate gradient algorithm"
+        print("Test of conjugate gradient algorithm")
         self.tnet.train_cg(self.input, self.target, maxiter=1000, disp=1)
         self.tnet.test(self.input, self.target)
 
     def testTrainBfgs(self):
-        print "Test of BFGS algorithm"
-        print "Skipped because of problems on some scipy compilations."
+        print("Test of BFGS algorithm")
+        print("Skipped because of problems on some scipy compilations.")
         #self.tnet.train_bfgs(self.input, self.target, maxfun = 1000)
         #self.tnet.test(self.input, self.target)
 
     def testTrainTnc(self):
-        print "Test of TNC algorithm"
+        print("Test of TNC algorithm")
         self.tnet.train_tnc(array(self.input), array(self.target), maxfun = 1000)
         self.tnet.test(self.input, self.target)
 
     def testTrainTncMp(self):
-        print "Test of TNC parallel algorithm"
+        print("Test of TNC parallel algorithm")
         self.tnet.train_tnc(array(self.input), array(self.target), nproc = 2, maxfun = 1000)
         self.tnet.test(self.input, self.target)
 
@@ -341,11 +341,11 @@ class TestSaveLoadExport(unittest.TestCase):
         savenet( self.net, 'tmpffnet.net' )
         net = loadnet( 'tmpffnet.net' )
         res2 = net( [ 1, 2, 3, 4, 5. ] )
-        for i in xrange(5):
+        for i in range(5):
             self.assertAlmostEqual(res1[i], res2[i], 8)
 
     def testExportWithDerivative(self):
-        print os.getcwd()
+        print(os.getcwd())
         exportnet(self.net, 'tmpffnet.f')
         ## THE BELOW IS PLATFORM AND ffnet.f FILE DEPENDENT
         ## SHOULD BE COMMENTED FOR RELEASES ???
@@ -365,9 +365,9 @@ class TestSaveLoadExport(unittest.TestCase):
         del tmpffnet
         resA = self.net ( [ 1, 2, 3, 4, 5. ] )
         resB = self.net.derivative( [ 1, 2, 3, 4, 5. ] )
-        for i in xrange(5):
+        for i in range(5):
             self.assertAlmostEqual(resA[i], resA1[i], 15)
-            for j in xrange(5):
+            for j in range(5):
                 self.assertAlmostEqual(resB[i][j], resB1[i][j], 15)
 
     def testExportNoDerivative(self):
@@ -387,7 +387,7 @@ class TestSaveLoadExport(unittest.TestCase):
         import tmpffnet2
         resA1 = tmpffnet2.ffnet( [ 1, 2, 3, 4, 5. ] )
         resA = self.net ( [ 1, 2, 3, 4, 5. ] )
-        for i in xrange(5):
+        for i in range(5):
             self.assertAlmostEqual(resA[i], resA1[i], 15)
         self.assertRaises(AttributeError, lambda: tmpffnet2.dffnet([ 1, 2, 3, 4, 5. ]))
 
@@ -401,7 +401,7 @@ class TestDataReader(unittest.TestCase):
         self.assertEqual(data.shape, (68, 74))
         self.assertEqual(data.dtype.name, 'float64')
 
-from _py2f import *
+from ._py2f import *
 # _py2f module tests #########################
 class TestExport2Fortran(unittest.TestCase):  #not finished, just started
     def setUp(self):

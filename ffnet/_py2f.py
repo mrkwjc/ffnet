@@ -63,7 +63,7 @@ def farray(arr, fname):
             newindexes = []
             newfindexes = []
             for i in range(idx):
-                for j in xrange( len(indexes) ):
+                for j in range( len(indexes) ):
                     newindexes += [ indexes[j] + [i] ]
                     newfindexes += [ findexes[j] + [i + 1] ]
             indexes = newindexes[:]
@@ -76,7 +76,7 @@ def farray(arr, fname):
         findexes = [ str(tuple(idx)) for idx in findexes ]
 
     definition = ''
-    for i in xrange( len(indexes) ):
+    for i in range( len(indexes) ):
         fval = fval2string(arr[indexes[i]], ftyp)
         definition += flines ( fname + findexes[i] + ' = ' + fval )
 

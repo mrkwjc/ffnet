@@ -11,7 +11,7 @@ ffnet package
 -------------
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, print_function
 from ._version import version
 import ffnet.fortran as fortran
 import ffnet.ffnet as ffnetmodule

@@ -8,7 +8,7 @@
 """
 Parallel training functions
 """
-from fortran import _ffnet as netprop
+from .fortran import _ffnet as netprop
 
 # Global containers to store and share data between processes
 nets = {}
@@ -39,10 +39,10 @@ def splitdata(N, nproc):
     """
     n = N // nproc
     i = (nproc - N % nproc) * n
-    idx = range(n, i, n) + range(i, N, n+1)
+    idx = list(range(n, i, n)) + list(range(i, N, n+1))
     idx1 = [0] + idx
     idx2 = idx + [N]
-    return zip(idx1, idx2)
+    return list(zip(idx1, idx2))
 
 func = netprop.func
 def procfunc(x, splitter, key):
@@ -99,4 +99,5 @@ def mpfunc2(x, pool, splitters, key):
     res = []
     for splitter in splitters:
         res += [pool.apply_async(procfunc2, (x, splitter, key))]
-    return map(sum, zip(*[r.get() for r in res]))  # returns function and gradient
+    return list(map(sum, list(zip(*[r.get() for r in res]))))
+    # returns function and gradient

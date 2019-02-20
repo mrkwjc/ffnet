@@ -1,5 +1,6 @@
 ### Multiprocessing training example for ffnet ###
 
+from __future__ import print_function
 from ffnet import ffnet, mlgraph
 from scipy import rand
 
@@ -20,11 +21,11 @@ if __name__=='__main__':
     # Preserve original weights
     weights0 = net.weights.copy()
     
-    print "TRAINING, this can take a while..."
+    print("TRAINING, this can take a while...")
     for n in range(1, cpu_count()+1):
         net.weights[:] = weights0  #Start always from the same point
         t0 = time()
         net.train_tnc(input, target, nproc = n, maxfun=50, messages=0)
         t1 = time()
-        print '%s processes: %s s' %(n, t1-t0)
+        print('%s processes: %s s' %(n, t1-t0))
 

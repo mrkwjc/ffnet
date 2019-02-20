@@ -12,11 +12,11 @@ Main ffnet class and utility functions
 --------------------------------------
 """
 
-from _version import version
+from ._version import version
 from scipy import zeros, ones, random, optimize, sqrt, ndarray, array
 import networkx as NX
-from fortran import _ffnet as netprop
-from pikaia import pikaia
+from .fortran import _ffnet as netprop
+from .pikaia import pikaia
 import sys
 
 def mlgraph(arch, biases = True):
@@ -60,12 +60,12 @@ def mlgraph(arch, biases = True):
     nofl = len(arch)
     conec = []
     if nofl: trg = arch[0]
-    for l in xrange(1, nofl):
+    for l in range(1, nofl):
         layer = arch[l]
         player = arch[l-1]
-        srclist = range(trg-player+1, trg+1)
+        srclist = list(range(trg-player+1, trg+1))
         if biases: srclist += [0]
-        for i in xrange(layer):
+        for i in range(layer):
             trg += 1
             for src in srclist:
                 conec.append((src, trg))
@@ -243,11 +243,11 @@ def tmlgraph(arch, biases = True):
     conec = []; srclist = []
     if biases: srclist = [0]
     if nofl: trg = arch[0]
-    for l in xrange(1, nofl):
+    for l in range(1, nofl):
         layer = arch[l]
         player = arch[l-1]
-        srclist += range(trg-player+1, trg+1)
-        for i in xrange(layer):
+        srclist += list(range(trg-player+1, trg+1))
+        for i in range(layer):
             trg += 1
             for src in srclist:
                 conec.append((src, trg))
@@ -308,10 +308,9 @@ def _normarray(inarray, coeff):
     inarray = array(inarray).transpose()
     coeff = array(coeff)
     i = inarray.shape[0]
-    for ii in xrange(i):
+    for ii in range(i):
         inarray[ii] = inarray[ii] * coeff[ii,0] + coeff[ii,1]
     return inarray.transpose()
-    #else: print "Lack of normalization parameters. Nothing done."
 
 def _ffconec(conec):
     """
@@ -606,7 +605,7 @@ class ffnet:
         """
         nofw = len(self.conec)
         weights = zeros(nofw, 'd')
-        for w in xrange(nofw):
+        for w in range(nofw):
             trg = self.conec[w,1]
             n = len(list(self.graph.predecessors(trg)))
             bound = 2.38 / sqrt(n)
@@ -674,19 +673,23 @@ class ffnet:
             # I'm still not sure where to put this check....
             for i, col in enumerate(input.transpose()):
                 if max(col) == min(col):
-                    print "Warning: %ith input node takes always a single value of %f." %(i+1, max(col))
+                    import warnings
+                    warnings.warn("Warning: %ith input node takes always "
+                                  "a single value of %f." %(i+1, max(col)))
 
             for i, col in enumerate(target.transpose()):
                 if max(col) == min(col):
-                    print "Warning: %ith target node takes always a single value of %f." %(i+1, max(col))
+                    import warnings
+                    warnings.warn("Warning: %ith target node takes always "
+                                  "a single value of %f." %(i+1, max(col)))
 
             #limits are informative only, eni,dei/eno,deo are input/output coding-decoding
             if self.renormalize:
                 self.inlimits, self.eni, self.dei = _norms(input, lower=0.15, upper=0.85)
                 self.outlimits, self.eno, self.deo = _norms(target, lower=0.15, upper=0.85)
                 self.ded = zeros((numo,numi), 'd')
-                for o in xrange(numo):
-                    for i in xrange(numi):
+                for o in range(numo):
+                    for i in range(numi):
                         self.ded[o,i] = self.eni[i,0] * self.deo[o,0]
                 self.renormalize = False
 
@@ -715,14 +718,16 @@ class ffnet:
         if disp:
             err  = netprop.sqerror(self.weights, self.conec, self.units, \
                                    self.inno, self.outno, input, target)
-            print "Initial error --> 0.5*(sum of squared errors at output): %.15f" %err
+            print("Initial error --> 0.5*(sum of squared errors at output): "
+                  "%.15f" %err)
         self.weights = netprop.momentum(self.weights, self.conec, self.bconecno, \
                                         self.units, self.inno, self.outno, input, \
                                         target, eta, momentum, maxiter)
         if disp:
             err  = netprop.sqerror(self.weights, self.conec, self.units, \
                                    self.inno, self.outno, input, target)
-            print "Final error   --> 0.5*(sum of squared errors at output): %.15f" %err
+            print("Final error   --> 0.5*(sum of squared errors at output): "
+                  "%.15f" %err)
 
     def train_rprop(self, input, target, \
                     a = 1.2, b = 0.5, mimin = 0.000001, mimax = 50., \
@@ -763,14 +768,16 @@ class ffnet:
         if disp:
             err  = netprop.sqerror(self.weights, self.conec, self.units, \
                                    self.inno, self.outno, input, target)
-            print "Initial error --> 0.5*(sum of squared errors at output): %.15f" %err
+            print("Initial error --> 0.5*(sum of squared errors at output): "
+                  "%.15f" %err)
         self.weights, xmi = netprop.rprop(self.weights, self.conec, self.bconecno, \
                                           self.units, self.inno, self.outno, input, \
                                           target, a, b, mimin, mimax, xmi, maxiter)
         if disp:
             err  = netprop.sqerror(self.weights, self.conec, self.units, \
                                    self.inno, self.outno, input, target)
-            print "Final error   --> 0.5*(sum of squared errors at output): %.15f" %err
+            print("Final error   --> 0.5*(sum of squared errors at output): "
+                  "%.15f" %err)
         return xmi
 
     def train_genetic(self, input, target, **kwargs):
@@ -934,7 +941,7 @@ class ffnet:
         """
         #register training data at mpprop module level
         # this have to be done *BEFORE* creating pool
-        import _mpprop as mpprop
+        from . import _mpprop as mpprop
         try: key = max(mpprop.nets) + 1
         except ValueError: key = 0  # uniqe identifier for this training
         mpprop.nets[key] = self
@@ -1077,8 +1084,8 @@ class ffnet:
             sys.stdout = file
         # Print network info
         if iprint == 2:
-            print self
-            print
+            print(self)
+            print('')
         # Test data and get output
         input, target = self._testdata(input, target)
         nump = len(input)
@@ -1089,14 +1096,15 @@ class ffnet:
         target = target.transpose()
         output = output.transpose()
         regress = []
-        if iprint: print "Testing results for %i testing cases:" % nump
-        for o in xrange(numo):
+        if iprint: print("Testing results for %i testing cases:" % nump)
+        for o in range(numo):
             if iprint:
-                print "OUTPUT %i (node nr %i):" %(o+1, self.outno[o])
+                print("OUTPUT %i (node nr %i):" %(o+1, self.outno[o]))
             if iprint == 2:
-                print "Targets vs. outputs:"
-                for p in xrange(nump):
-                    print "%4i % 13.6f % 13.6f" %(p+1, target[o,p], output[o,p])
+                print("Targets vs. outputs:")
+                for p in range(nump):
+                    print("%4i % 13.6f % 13.6f" 
+                          %(p+1, target[o,p], output[o,p]))
             x = target[o]; y = output[o]
             r = linregress(x, y)
             # linregress calculates stderr of the slope instead of the estimate, even
@@ -1105,15 +1113,15 @@ class ffnet:
             estd = sstd * sqrt( ( ( x-x.mean() )**2 ).sum() )
             r += (estd,)
             if iprint:
-                print "Regression line parameters:"
-                print "slope         = % f" % r[0]
-                print "intercept     = % f" % r[1]
-                print "r-value       = % f" % r[2]
-                print "p-value       = % f" % r[3]
-                print "slope stderr  = % f" % r[4]
-                print "estim. stderr = % f" % r[5]
+                print("Regression line parameters:")
+                print("slope         = % f" % r[0])
+                print("intercept     = % f" % r[1])
+                print("r-value       = % f" % r[2])
+                print("p-value       = % f" % r[3])
+                print("slope stderr  = % f" % r[4])
+                print("estim. stderr = % f" % r[5])
             regress.append(r)
-            if iprint: print
+            if iprint: print('')
         # Close file and restore stdout
         if filename:
             file.close()
@@ -1131,17 +1139,9 @@ def savenet(net, filename):
         filename : str
             Path to the file where network is dumped
     """
-    import cPickle
-    if cPickle.format_version >= '3.0':
-        #Py3k. Cannot pickle numpy array in 3 and have it readable by 2,
-        #so don't even try for compatibility. Force binary mode.
-        import warnings
-        warnings.warn(
-            'Network files written with Python 3 not readable on Python 2')
-        file = open(filename, 'wb')
-    else:
-        file = open(filename, 'w')
-    cPickle.dump(net, file)
+    from .compat import pickle
+    file = open(filename, 'wb')
+    pickle.dump(net, file)
     file.close()
     return
 
@@ -1153,26 +1153,21 @@ def loadnet(filename):
         filename : str
             Path to the file with saved network
     """
-    import cPickle
-    if cPickle.format_version >= '3.0':
-        #Py3k, need to read in binary format to unpickle
+    from .compat import pickle
+    try:
         file = open(filename, 'rb')
-        net = cPickle.load(file, encoding='latin-1')
-    else:
-        try:
-            file = open(filename, 'rU')
-            net = cPickle.load(file)
-        except ImportError:  # when reading Windows \r\n endlines on Linux
-            import pickle  # cPickle seems to not work with universal endlines
-            file = open(filename, 'rU')
-            net = pickle.load(file)            
+        net = pickle.load(file)
+    except UnicodeDecodeError:
+        file = open(filename, 'r')
+        net = pickle.load(file)
+    file.close()
     return net
 
 def _exportfortran(net, filename, name, derivative = True):
     """
     Exports network to Fortran source
     """
-    import _py2f as py2f
+    from . import _py2f as py2f
     f = open( filename, 'w' )
     f.write( py2f.fheader( net, version = version ) )
     f.write( py2f.fcomment() )

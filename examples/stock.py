@@ -21,6 +21,7 @@
 # So let's try.
 # Attention: training might be a long process since we train a big network.
 
+from __future__ import print_function
 from ffnet import ffnet, mlgraph, readdata
 from numpy import array
 
@@ -29,27 +30,27 @@ conec = mlgraph((3,22,12,1))
 net = ffnet(conec)
 
 # Read training data omitting first column and first line
-print "READING DATA..."
+print("READING DATA...")
 data = readdata( 'data/black-scholes.dat',
                  usecols  = (1, 2, 3, 4),
                  skiprows =  1)
 input =  data[:, :3] #first 3 columns
 target = data[:, -1] #last column
 
-print "TRAINING NETWORK..."
+print("TRAINING NETWORK...")
 import sys; sys.stdout.flush() #Just to ensure dislpaing the above messages here
 net.train_tnc(input, target, maxfun = 5000, messages=1)
 
 # Test network
 print
-print "TESTING NETWORK..."
+print("TESTING NETWORK...")
 output, regression = net.test(input, target, iprint = 0)
 Rsquared = regression[0][2]
 maxerr = abs( array(output).reshape( len(output) ) - array(target) ).max()
-print "R-squared:           %s  (should be >= 0.999999)" %str(Rsquared)
-print "max. absolute error: %s  (should be <= 0.05)" %str(maxerr)
-print
-print "Is ffnet ready for a stock?"
+print("R-squared:           %s  (should be >= 0.999999)" %str(Rsquared))
+print("max. absolute error: %s  (should be <= 0.05)" %str(maxerr))
+print("")
+print("Is ffnet ready for a stock?")
 
 #####################################
 # Make plot if matplotlib is avialble
@@ -62,5 +63,5 @@ try:
     title('Outputs vs. target of trained network.')
     grid(True)
     show()
-except ImportError, e:
-    print "Cannot make plots. For plotting install matplotlib.\n%s" % e
+except ImportError as e:
+    print("Cannot make plots. For plotting install matplotlib.\n%s" % e)

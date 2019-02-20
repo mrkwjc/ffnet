@@ -9,3 +9,4 @@ examples/*.f
 examples/*.net
 *.so
 .directory
+.spyproject

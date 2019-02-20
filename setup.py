@@ -1,15 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import sys
-try:
-    import setuptools
-except ImportError:
-    pass
+#try:
+#    import setuptools
+#except ImportError:
+#    pass
 metadata = {}
 if (len(sys.argv) >= 2
         and ('--help' in sys.argv[1:] or sys.argv[1]
              in ('--help-commands', 'egg_info', '--version', 'clean'))):
-
     # For these actions, NumPy is not required.
     #
     # They are required to succeed without Numpy for example when
@@ -26,11 +25,11 @@ if (len(sys.argv) >= 2
 else:
     from numpy.distutils.core import setup
     from numpy.distutils.core import Extension
-    try:
-       from distutils.command.build_py import build_py_2to3 \
-            as build_py
-    except ImportError:
-       from distutils.command.build_py import build_py
+#    try:
+#       from distutils.command.build_py import build_py_2to3 \
+#            as build_py
+#    except ImportError:
+#       from distutils.command.build_py import build_py
 
     ext1 = Extension(name = 'ffnet.fortran._ffnet',
                      sources = ['ffnet/fortran/ffnet.f'])
@@ -38,7 +37,7 @@ else:
     ext2 = Extension(name = 'ffnet.fortran._pikaia',
                      sources = ['ffnet/fortran/pikaia.f'])
 
-    metadata['cmdclass'] = {'build_py': build_py}
+#    metadata['cmdclass'] = {'build_py': build_py}
     metadata['ext_modules'] = [ext1, ext2]
 
 if __name__ == "__main__":
