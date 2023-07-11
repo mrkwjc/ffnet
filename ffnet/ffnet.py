@@ -13,7 +13,8 @@ Main ffnet class and utility functions
 """
 
 from ._version import version
-from scipy import zeros, ones, random, optimize, sqrt, ndarray, array
+from scipy import zeros, ones, optimize, sqrt, ndarray, array
+from numpy import random
 import networkx as NX
 from .fortran import _ffnet as netprop
 from .pikaia import pikaia
