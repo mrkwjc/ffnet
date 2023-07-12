@@ -42,7 +42,7 @@ else:
 
 if __name__ == "__main__":
     setup(name              = 'ffnet',
-          version           = '0.8.4',
+          version           = '0.8.5',
           description       = 'Feed-forward neural network solution for python',
           long_description  = open('README.rst', 'r').read(),
           keywords          = ['neural networks'],
