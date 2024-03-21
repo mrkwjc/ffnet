@@ -1,2 +1,2 @@
-include LICENSE README 
+include LICENSE.txt README.rst
 # include examples/*.py examples/data/*.dat
