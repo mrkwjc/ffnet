@@ -7,41 +7,40 @@ from setuptools.command.build_py import build_py
 import distutils.log
 import subprocess
 import os
-import shutil
 
 
-class F2PyCommand(distutils.cmd.Command):
-  """A custom command to run F2Py on Fortran source files."""
+class F2PyCommand(Command):
+    """A custom command to run F2Py on Fortran source files."""
 
-  def initialize_options(self):
-    """Set default values for options."""
-    pass
+    def initialize_options(self):
+        """Set default values for options."""
+        pass
 
-  def finalize_options(self):
-    """Post-process options."""
-  pass
+    def finalize_options(self):
+        """Post-process options."""
+        pass
 
-  def run(self):
-    """Run command."""
-    os.chdir('build/lib/ffnet/fortran')
-    sources = ['ffnet.f', 'pikaia.f']
-    modules = ['_ffnet', '_pikaia']
-    for s, m in zip(sources, modules):
-        cmd = ['f2py', '-m', m, '-c', s]
-        self.announce(
-            f'Compiling Fortran extension: {str(cmd)}',
-            level=distutils.log.INFO)
-        subprocess.check_call(cmd)
-    os.chdir('../../../..')
+    def run(self):
+        """Run command."""
+        os.chdir('build/lib/ffnet/fortran')
+        sources = ['ffnet.f', 'pikaia.f']
+        modules = ['_ffnet', '_pikaia']
+        for s, m in zip(sources, modules):
+            cmd = ['f2py', '-m', m, '-c', s]
+            self.announce(
+                f'Compiling Fortran extension: {str(cmd)}',
+                level=distutils.log.INFO)
+            subprocess.check_call(cmd)
+        os.chdir('../../../..')
 
 
 class BuildPyCommand(build_py):
-  """A custom build command"""
+    """A custom build command"""
 
-  def run(self):
-    """Run command."""
-    build_py.run(self)
-    self.run_command('f2py')
+    def run(self):
+        """Run command."""
+        build_py.run(self)
+        self.run_command('f2py')
 
 
 if __name__ == "__main__":
