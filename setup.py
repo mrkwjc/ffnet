@@ -7,6 +7,10 @@ from setuptools.command.build_py import build_py
 import distutils.log
 import subprocess
 import os
+import sys
+
+major = sys.version_info.major
+minor = sys.version_info.minor
 
 
 class F2PyCommand(Command):
@@ -43,6 +47,9 @@ class BuildPyCommand(build_py):
         self.run_command('f2py')
 
 
+meson = ['meson', 'meson-python'] if (major == 3 and minor >= 12) else []
+
+
 if __name__ == "__main__":
     setup(
         cmdclass          = {'f2py': F2PyCommand,
@@ -65,7 +72,7 @@ if __name__ == "__main__":
                              'ffnet.examples': ['data/*']
                              },
         requires          = ['numpy', 'scipy', 'networkx'],
-        install_requires  = ['numpy'],
+        install_requires  = ['numpy'] + meson,
         classifiers       = ['Development Status :: 4 - Beta',
                              'Environment :: Console',
                              'Intended Audience :: Education',
