@@ -25,6 +25,7 @@ jobs:
 
       - name: Build wheels
         run: |
+          echo $CONDA/bin >> $GITHUB_PATH
           python -m pip install numpy meson scipy networkx
           python -m cibuildwheel --output-dir wheelhouse
         # to supply options, put them in 'env', like:
