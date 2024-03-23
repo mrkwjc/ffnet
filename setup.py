@@ -4,6 +4,7 @@
 from distutils.core import setup
 from distutils.cmd import Command
 from setuptools.command.build_py import build_py
+from setuptools.dist import Distribution
 import distutils.log
 import subprocess
 import os
@@ -11,6 +12,7 @@ import sys
 
 major = sys.version_info.major
 minor = sys.version_info.minor
+meson = ['meson', 'meson-python'] if (major == 3 and minor >= 12) else []
 
 
 class F2PyCommand(Command):
@@ -26,7 +28,8 @@ class F2PyCommand(Command):
 
     def run(self):
         """Run command."""
-        os.chdir('build/lib/ffnet/fortran')
+        build_lib = self.distribution._ffnet_build_lib
+        os.chdir(os.path.join(build_lib, 'ffnet/fortran'))
         sources = ['ffnet.f', 'pikaia.f']
         modules = ['_ffnet', '_pikaia']
         for s, m in zip(sources, modules):
@@ -44,16 +47,22 @@ class BuildPyCommand(build_py):
     def run(self):
         """Run command."""
         build_py.run(self)
+        self.distribution._ffnet_build_lib = self.build_lib
         self.run_command('f2py')
 
 
-meson = ['meson', 'meson-python'] if (major == 3 and minor >= 12) else []
+class BinaryDistribution(Distribution):
+    """Distribution which always forces a binary package with platform name"""
+
+    def has_ext_modules(self):
+        return True
 
 
 if __name__ == "__main__":
     setup(
         cmdclass          = {'f2py': F2PyCommand,
                              'build_py': BuildPyCommand},
+        distclass         = BinaryDistribution,
         name              = 'ffnet',
         version           = '0.8.6',
         description       = 'Feed-forward neural network solution for python',
