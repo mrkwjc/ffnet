@@ -16,8 +16,15 @@ jobs:
       # Used to host cibuildwheel
       - uses: actions/setup-python@v3
 
+      - name: Add conda to system path
+        run: |
+            echo $CONDA/bin >> $GITHUB_PATH
+
       - name: Install cibuildwheel
         run: python -m pip install cibuildwheel==2.17.0
+
+      - name: Install dependencies
+        run: conda install numpy meson scipy networkx
 
       - name: Build wheels
         run: python -m cibuildwheel --output-dir wheelhouse
