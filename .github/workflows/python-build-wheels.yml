@@ -14,7 +14,7 @@ jobs:
       - uses: actions/checkout@v4
 
       # Used to host cibuildwheel
-      - uses: actions/setup-python@v3
+      - uses: actions/setup-python@v4
 
       - name: Add conda to system path
         run: |
@@ -23,11 +23,10 @@ jobs:
       - name: Install cibuildwheel
         run: python -m pip install cibuildwheel==2.17.0
 
-      - name: Install dependencies
-        run: python -m pip install numpy meson scipy networkx
-
       - name: Build wheels
-        run: python -m cibuildwheel --output-dir wheelhouse
+        run: |
+          python -m pip install numpy meson scipy networkx
+          python -m cibuildwheel --output-dir wheelhouse
         # to supply options, put them in 'env', like:
         # env:
         #   CIBW_SOME_OPTION: value
