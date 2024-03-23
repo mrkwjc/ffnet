@@ -18,11 +18,16 @@ jobs:
       run: |
         # $CONDA is an environment variable pointing to the root of the miniconda directory
         echo $CONDA/bin >> $GITHUB_PATH
-    - name: Install ffnet build dependencies
+    - name: Install dependencies
       run: |
         conda install numpy meson scipy networkx
-    - name: Install and test ffnet
+    - name: Install ffnet
       run: |
         pip install .
         cd ffnet/fortran
         python -c "from ffnet._tests import runtest; runtest()"
+    - name: Test ffnet
+      run: |
+        cd ffnet/fortran
+        python -c "from ffnet._tests import runtest; runtest()"
+        cd ../..
