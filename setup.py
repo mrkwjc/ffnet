@@ -72,7 +72,7 @@ if __name__ == "__main__":
                              'ffnet.examples': ['data/*']
                              },
         requires          = ['numpy', 'scipy', 'networkx'],
-        install_requires  = ['numpy'] + meson,
+        setup_requires    = ['numpy'] + meson,
         classifiers       = ['Development Status :: 4 - Beta',
                              'Environment :: Console',
                              'Intended Audience :: Education',
