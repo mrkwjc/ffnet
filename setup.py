@@ -71,8 +71,8 @@ if __name__ == "__main__":
         package_data      = {'ffnet.fortran': ['ffnet.f', 'pikaia.f'],
                              'ffnet.examples': ['data/*']
                              },
-        install_requires  = ['numpy', 'scipy', 'networkx'],
-        setup_requires    = ['numpy'] + meson,
+        requires          = ['numpy', 'scipy', 'networkx'],
+        install_requires  = ['numpy'] + meson,
         classifiers       = ['Development Status :: 4 - Beta',
                              'Environment :: Console',
                              'Intended Audience :: Education',
