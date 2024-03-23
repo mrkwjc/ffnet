@@ -24,7 +24,7 @@ jobs:
         run: python -m pip install cibuildwheel==2.17.0
 
       - name: Install dependencies
-        run: conda install numpy meson scipy networkx
+        run: python -m pip numpy meson scipy networkx
 
       - name: Build wheels
         run: python -m cibuildwheel --output-dir wheelhouse
