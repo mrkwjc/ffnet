@@ -51,7 +51,7 @@ def farray(arr, fname):
     if arr.dtype == dtype('int'): ftyp = 'INTEGER '
     elif arr.dtype == dtype('float32'): ftyp = 'REAL '
     elif arr.dtype == dtype('float64'): ftyp = 'DOUBLE PRECISION '
-    else: raise TypeError("Unsupported array type: %s" (arr.dtype,))
+    else: raise TypeError("Unsupported array type: %s" %(arr.dtype,))
 
     declaration = flines ( ftyp + fname + fshp )
 

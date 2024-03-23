@@ -13,8 +13,9 @@ Main ffnet class and utility functions
 """
 
 from ._version import version
-from scipy import zeros, ones, optimize, sqrt, ndarray, array
+from numpy import zeros, ones, sqrt, ndarray, array
 from numpy import random
+from scipy import optimize
 import networkx as NX
 from .fortran import _ffnet as netprop
 from .pikaia import pikaia
@@ -169,7 +170,7 @@ def imlgraph(arch, biases = True):
 
     #Merging function
     def merge(conec, conec_tmp, nofi):
-        from scipy import array, where
+        from numpy import array, where
         try:
             trans = array(conec).max() - nofi
             tmp = array(conec_tmp)

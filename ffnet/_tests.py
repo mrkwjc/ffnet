@@ -170,7 +170,7 @@ class Testbconec(unittest.TestCase):
                  (3, 5), (4, 5), (0, 5) ]
         inno = [1,2]
         n = _bconec(conec, inno)
-        self.assertEqual(n[1], [8,7])
+        self.assertEqual(sorted(n[1]), sorted([8, 7]))
 
 class Testdconec(unittest.TestCase):
     def testNoCycles(self):
