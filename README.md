@@ -1,11 +1,10 @@
 
-=============================================
-ffnet: feed-forward neural network for python
-=============================================
+# ffnet: feed-forward neural network for python
 
 Basic usage of the package:
 
->>> from ffnet import ffnet, mlgraph, savenet, loadnet, exportnet
+```python
+from ffnet import ffnet, mlgraph, savenet, loadnet, exportnet
 >>> conec = mlgraph( (2,2,1) )
 >>> net = ffnet(conec)
 >>> input = [ [0.,0.], [0.,1.], [1.,0.], [1.,1.] ]
@@ -17,5 +16,5 @@ Basic usage of the package:
 >>> net = loadnet("xor.net")
 >>> answer = net( [ 0., 0. ] )
 >>> partial_derivatives = net.derivative( [ 0., 0. ] )
-
-For instalation instructions and documentation go to `http://ffnet.sourceforge.net <http://ffnet.sourceforge.net>`_.
+```
+For instalation instructions and documentation go to http://ffnet.sourceforge.net.
